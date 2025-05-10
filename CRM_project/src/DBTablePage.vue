@@ -1,8 +1,5 @@
 <script setup>
 import { ref } from 'vue'
-
-const props = defineProps(['table'])
-
 import DBTableManage from './components/DBTableManage.vue'
 </script>
 
@@ -15,7 +12,7 @@ import DBTableManage from './components/DBTableManage.vue'
             </svg>
         </RouterLink>
     </header>
-    <DBTableManage :table="table"/>
+    <DBTableManage :table="$route.params.table"/>
 </template>
 
 <style>

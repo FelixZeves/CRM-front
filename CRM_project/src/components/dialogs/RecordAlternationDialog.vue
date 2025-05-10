@@ -37,7 +37,7 @@ const values = ref([
 
     {name: "Подразделение",
         hint: 'Необязательное поле',
-        model: "department"},
+        model: "departments"},
 
     {name: "Классы",
         hint: 'Необязательное поле',
@@ -49,28 +49,28 @@ const values = ref([
 ])
 
 const params = ref({
-    email: '',
-    fio: '',
+    email: "",
+    fio: "",
     password: null,
     role: 3,
-    department: '',
-    classes: null,
-    lessons: null
+    departments: [],
+    classes: [],
+    lessons: []
 })
 
 async function getNeededRecord(){
     try {
 
-        let details = await axios.post('../get_detail', { 
-            ids: [props.id],
+        let details = await axios.get('/api/user', { 
+            ids: props.id,
         })
 
-        let user = details.data.users[0]
+        let user = details.data.data[0]
 
         params.value.email =  user.email
         params.value.fio =  user.profile.fio
         params.value.role = user.role
-        params.value.department =  user.profile.department
+        params.value.departments =  user.profile.departments
         params.value.classes =  user.profile.classes
         params.value.lessons =  user.profile.lessons
         

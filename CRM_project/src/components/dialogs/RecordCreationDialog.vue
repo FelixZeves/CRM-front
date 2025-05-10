@@ -89,6 +89,7 @@ async function addUser(){
                     v-if="value.options"
                     v-model="params[value.model]"
                     :options="value.options"
+                    :multiple="value.multiple"
                     :hint="value.hint"
                     emit-value
                     map-options

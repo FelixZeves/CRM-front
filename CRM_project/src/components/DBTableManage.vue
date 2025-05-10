@@ -1,7 +1,9 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import axios from 'axios';
-import { RoleEnum } from './Enums.vue'
+import { RoleEnum, TableEnum } from './Enums.vue'
+import RecordAlternationDialog from './dialogs/RecordAlternationDialog.vue';
+import RecordCreationDialog from './dialogs/RecordCreationDialog.vue';
 
 const props = defineProps(['table'])
 
@@ -11,113 +13,100 @@ axios.defaults.headers['Authorization'] = `Bearer ${token}`;
 
 let records = ref([])
 
-async function getRecords(){
-    try {
+async function fetchTableData(params){
+  const {
+    getUrl,
+    dataMapper,
+    limit = 25
+  } = params;
 
-        records.value = []
-
-        const response = await axios.get('../api/get_users');
-
-        let neededIds = response.data.ids;
-
-        let details = await axios.post('../api/get_detail', { 
-            ids: neededIds,
-        })
-
-        records.value = details.data.users
-        
-        
-    } catch (error) {
-        console.error('Ошибка авторизации:', error.response?.data || error.message);
-    }
+  try {
+    const response = await axios.get(getUrl);
+    
+    const details = response.data.data.slice(0, limit)
+    
+    return Array.isArray(details) ? details.map(dataMapper) : [];
+  } catch (error) {
+    console.error('Ошибка при загрузке данных таблицы:', error.response?.data || error.message);
+    return [];
+  }
 }
 
-getRecords()
+const table = TableEnum[props.table]
 
-async function deleteUser(id){
+const cols = table.cols
 
-    try {
-        await axios.delete(`../delete_user?id=${id}`)
-        getRecords()
-
-    } catch (error) {
-        console.error('Ошибка авторизации:', error.response?.data || error.message);
-    }
-}
+onMounted(async () => {
+    records.value = await fetchTableData({
+      getUrl: table.getUrl,
+      dataMapper: table.dataMapper,
+    });
+})
 
 </script>
 
 <template>
-    <div class="tableBody shadow-2xl">
-        <div class="w-full flex flex-row justify-between py-2 px-8 border-b-2 border-black">
-            <h3 class="text-lg font-bold">{{ $route.params.table }}</h3>
-            <!-- <ModalAddRecord :table="$route.params.table" :func="getRecords"/> -->
-        </div>
-        <div class="recordsBody self-center gap-y-6 overflow-y-auto snap-y w-full items-center flex flex-col pt-3">
-            <div class="record px-6 py-3 grid grid-cols-10 gap-x-4 justify-items-center">
-                <p class="font-bold">Email</p>
-                <p class="font-bold col-span-5">ФИО</p>
-                <p class="font-bold col-span-3">Роль</p>
-            </div>
-            <div class="record px-6 py-3 grid grid-cols-10 gap-x-4 justify-items-center hover:bg-[#F2F2F2] "
-                v-for="record in records">
-                <p class="flex w-full justify-self-start">{{ record.email }}</p>
-                <p class="col-span-5 text-center">{{ record.profile.fio }}</p>
-                <p class="col-span-3 text-center">{{ RoleEnum[record.role].translation }}</p>
+    <q-table
+        title-class="text-bold"
+        :columns="cols"
+        :rows="records || []"
+        row-key="name"
+        hide-pagination
+        virtual-scroll
+        :rows-per-page-options="[0]"
+        :pagination="{rowsPerPage : 0}"
+        no-data-label="Записей нет"
+        class="px-2 pb-2 mb-8 mt-24 h-[80vh] !max-w-screen">
 
-                <div>
-                    <!-- <ModalEditRecord 
-                    :table="$route.params.table"
-                    :name="record.profile.fio"
-                    :status="record.profile.department"
-                    /> -->
-                    <button @click="deleteUser(record.id)" class="pl-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="red" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+        <template v-slot:top="props">
+            <div class="q-table__title">
+                <q-btn flat class="!rounded-[10px]">
+                    <q-icon :name="table.icon" class="pe-3" size="sm"></q-icon>
+                    <div class="font-bold normal-case text-xl">{{ table.title }}</div>
+                </q-btn>
+            </div>
+            <q-space/>
+            <RecordCreationDialog table="Пользователи"/>
+        </template>
+
+        <template v-slot:header="props">
+            <q-tr :props="props">
+            <q-th
+                v-for="col in props.cols"
+                :key="col.name"
+                :props="props"
+            >
+                {{ col.label }}
+            </q-th>
+            <q-th auto-width />
+            </q-tr>
+        </template>
+
+        <template v-slot:body="props">
+            <q-tr :props="props" class="!py-2">
+                <q-td
+                v-for="col in props.cols"
+                :key="col.name"
+                :props="props"
+                class="max-w-[20vw] truncate">
+                <div v-if="col.field==='role'">
+                    {{ RoleEnum[col.value].translation }}
                 </div>
-            </div>
-        </div>
+                <div v-else>
+                    {{ col.value }}
+                </div>
+                </q-td>
+                <q-td auto-width>
+                    <RecordAlternationDialog :table="table.title" :id="props.row.id"/>
+                    <q-btn icon="fa-solid fa-trash" flat round color="brand-danger"></q-btn>
+                </q-td>
+            </q-tr>
+        </template>
 
-    </div>
+        </q-table>
 
 </template>
 
 <style>
-
-.record{
-    width: 97%;
-    justify-self: center;
-    border-radius: 10pt;
-}
-
-.tableBody{
-    position: fixed;
-    top: 10%;
-    left: 10%;
-    background-color: white;
-    height: 80%;
-    width: 80%;
-    justify-self: center;
-    border-radius: 20pt;
-}
-
-.recordsBody{
-    margin-left: 2%;
-    width: 95%;
-    height: 90%;
-}
-
-.leavePage{
-    height: 100%;
-    width: 30px;
-    border-radius: 5pt;
-}
-
-.leavePage:hover{
-    background-color: var(--crm-c-light-velvet);
-    color: white;
-}
 
 </style>

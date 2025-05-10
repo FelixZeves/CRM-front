@@ -10,7 +10,7 @@ const tables = ref([
 </script>
 
 <template>
-    <div class="mt-24 grid grid-cols-7 lg:grid-cols-9 2xl:grid-cols-11 gap-x-4 lg:gap-x-16 2xl:gap-x-32 3xl:gap-x-48">
+    <div class="mt-24 grid grid-cols-7 lg:grid-cols-9 2xl:grid-cols-11 gap-x-4 lg:gap-x-16 2xl:gap-x-32 3xl:gap-x-48 overflow-y-none">
         <div class="col-span-7 lg:col-span-5 xl:col-span-6 2xl:col-span-7">
             <UserTable/>
         </div>

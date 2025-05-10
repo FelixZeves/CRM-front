@@ -11,25 +11,6 @@ axios.defaults.headers['Authorization'] = `Bearer ${token}`;
 
 let records = ref([])
 
-// async function getLastRecords(){
-//     try {
-
-//         const response = await axios.get('../api/get_users');
-
-//         let neededIds = response.data.slice(0,4);
-
-//         let details = await axios.post('../api/get_detail', { 
-//             ids: neededIds,
-//         })
-
-//         return  details.data.users.map(val => ({email: val.email, 'full name': val.profile.fio, role: val.role, id: val.id}))
-        
-//     } catch (error) {
-//         console.error('Ошибка авторизации:', error.response?.data || error.message);
-//         return  []
-//     }
-// }
-
 async function fetchTableData(params){
   const {
     getUrl,
@@ -37,50 +18,56 @@ async function fetchTableData(params){
     limit = 3
   } = params;
 
-  console.log(params)
-
   try {
     const response = await axios.get(getUrl);
     
-    const details = response.data.slice(0, limit);
-
-    return Array.isArray(details.data.users) 
-      ? details.data.users.map(dataMapper)
-      : [];
+    const details = response.data.data.slice(0, limit)
+    
+    return Array.isArray(details) ? details.map(dataMapper) : [];
   } catch (error) {
     console.error('Ошибка при загрузке данных таблицы:', error.response?.data || error.message);
     return [];
   }
 }
 
+onMounted(async () => {
+  for (const [key, table] of Object.entries(TableEnum)) {
+    records.value[table.title] = await fetchTableData({
+      getUrl: table.getUrl,
+      dataMapper: table.dataMapper,
+    });
+  }
+})
+
 </script>
 
 <template>
-    <div class="shadow-2xl">
+    <div class="overflow-y-auto h-[80vh] pe-4">
         <q-table
         v-for="table in TableEnum"
         title-class="text-bold"
         :columns="table.cols"
-        :rows="fetchTableData(getUrl = table.getUrl, dataMapper = table.dataMapper)"
+        :rows="records[table.title] || []"
         row-key="name"
-        hide-bottom
-        class="px-2 pb-2">
+        hide-pagination
+        no-data-label="Записей нет"
+        class="px-2 pb-2 mb-8">
 
         <template v-slot:top="props">
             <div class="q-table__title">
-                <q-btn flat class="!rounded-[10px]">
-                    <q-icon name="fa-solid fa-user" class="pe-2" size="sm"></q-icon>
+                <q-btn flat class="!rounded-[10px]" :to="{name: 'Table', params: { table : table.name}}">
+                    <q-icon :name="table.icon" class="pe-3" size="sm"></q-icon>
                     <div class="font-bold normal-case text-xl">{{ table.title }}</div>
                 </q-btn>
             </div>
             <q-space/>
-            <RecordCreationDialog table="Пользователи"/>
+            <RecordCreationDialog :table="table.title"/>
         </template>
 
         <template v-slot:header="props">
             <q-tr :props="props">
             <q-th
-                v-for="col in props.cols"
+                v-for="col in props.cols.slice(0, 3)"
                 :key="col.name"
                 :props="props"
             >
@@ -93,7 +80,7 @@ async function fetchTableData(params){
         <template v-slot:body="props">
             <q-tr :props="props" class="!py-2">
                 <q-td
-                v-for="col in props.cols"
+                v-for="col in props.cols.slice(0, 3)"
                 :key="col.name"
                 :props="props">
                 <div v-if="col.field==='role'">
@@ -104,7 +91,7 @@ async function fetchTableData(params){
                 </div>
                 </q-td>
                 <q-td auto-width>
-                    <RecordAlternationDialog table="Пользователи" :id="props.row.id"/>
+                    <RecordAlternationDialog :table="table.title" :id="props.row.id"/>
                     <q-btn icon="fa-solid fa-trash" flat round color="brand-danger"></q-btn>
                 </q-td>
             </q-tr>
