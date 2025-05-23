@@ -40,7 +40,7 @@
   @apply !bg-[--crm-c-light-velvet] !w-1/4 !rounded-[5pt] !text-white;
 }
 
-.q-field__messages{
+.q-field__messages, .q-table__bottom{
     @apply !text-base
 }
 

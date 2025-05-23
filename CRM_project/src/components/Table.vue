@@ -61,7 +61,7 @@ onMounted(async () => {
                 </q-btn>
             </div>
             <q-space/>
-            <RecordCreationDialog :table="table.title"/>
+            <RecordCreationDialog :table="table.name"/>
         </template>
 
         <template v-slot:header="props">
@@ -91,7 +91,7 @@ onMounted(async () => {
                 </div>
                 </q-td>
                 <q-td auto-width>
-                    <RecordAlternationDialog :table="table.title" :id="props.row.id"/>
+                    <RecordAlternationDialog :table="table.name" :id="props.row.id"/>
                     <q-btn icon="fa-solid fa-trash" flat round color="brand-danger"></q-btn>
                 </q-td>
             </q-tr>

@@ -1,6 +1,7 @@
 <script setup>
 import axios from 'axios';
 import { ref } from 'vue'
+import { DialogEnum } from '../Enums.vue';
 const props = defineProps(['table', 'id'])
 
 const recordAlternation = ref(false)
@@ -10,65 +11,22 @@ const token = localStorage.getItem('jwtToken');
 
 axios.defaults.headers['Authorization'] = `Bearer ${token}`;
 
-const values = ref([
-    {name: "E-mail",
-        model: "email",
-        rules:
-            [val => !!val || 'Обязательное поле',
-            val => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || 'Введите корректный email']},
+const values = ref(DialogEnum[props.table].values)
 
-    {name: "Пароль",
-        model: "password",
-        hint: 'Может генерироваться автоматически',},
-
-    {name: "ФИО",
-        model: "fio",
-        rules:
-            [val => !!val || 'Обязательное поле']},
-
-    {name: "Роль",
-        model: "role",
-        hint: 'По умолчанию - "Учитель"',
-        options:
-            [{value: 0,  label: 'Админ'},
-            {value: 1,  label: 'Руководитель'},
-            {value: 2,  label: 'Административный работник'},
-            {value: 3,  label: 'Учитель'}]},
-
-    {name: "Подразделение",
-        hint: 'Необязательное поле',
-        model: "departments"},
-
-    {name: "Классы",
-        hint: 'Необязательное поле',
-        model: "classes"},
-
-    {name: "Уроки",
-        hint: 'Необязательное поле',
-        model: "lessons"},
-])
-
-const params = ref({
-    email: "",
-    fio: "",
-    password: null,
-    role: 3,
-    departments: [],
-    classes: [],
-    lessons: []
-})
+const params = ref(structuredClone(DialogEnum[props.table].params))
 
 async function getNeededRecord(){
     try {
-
-        let details = await axios.get('/api/user', { 
-            ids: props.id,
-        })
+        let details = await axios.get('/api/user', {
+            params: {
+                ids: props.id
+            }
+        });
 
         let user = details.data.data[0]
 
-        params.value.email =  user.email
-        params.value.fio =  user.profile.fio
+        params.value.email = String(user.email)
+        params.value.fio =  String(user.profile.fio)
         params.value.role = user.role
         params.value.departments =  user.profile.departments
         params.value.classes =  user.profile.classes
@@ -99,9 +57,9 @@ async function editUser(){
 
     <q-dialog v-model="recordAlternation" backdrop-filter="blur(4px)">
         <q-card style="max-width: 75%; min-width: 75%;" class="py-4 !rounded-[20px] !overflow-y-hidden">
-            <p align="center" class="text-bold !text-2xl">{{ table }}</p>
+            <p align="center" class="text-bold !text-2xl">{{ DialogEnum[table].title }}</p>
             <q-form @submit="editUser">
-                <div class="h-[600px] overflow-y-auto">
+                <div class="max-h-[600px] overflow-y-auto">
                     <q-card-section
                 v-for="value in values"
                 class="!w-[90%] justify-self-center !py-2">
@@ -138,7 +96,7 @@ async function editUser(){
                     <p>{{ gettedPassword }}</p>
                     <q-btn
                     type="submit"
-                    label="Создать запись"
+                    label="Изменить запись"
                     class="submit-btn"/>
                 </q-card-section>
             </q-form>

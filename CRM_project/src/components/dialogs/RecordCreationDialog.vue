@@ -1,6 +1,7 @@
 <script setup>
 import axios from 'axios';
 import { ref } from 'vue'
+import { DialogEnum } from '../Enums.vue';
 const props = defineProps(['table', 'func'])
 
 const recordCreation = ref(false)
@@ -10,60 +11,26 @@ const token = localStorage.getItem('jwtToken');
 
 axios.defaults.headers['Authorization'] = `Bearer ${token}`;
 
-const values = ref([
-    {name: "E-mail",
-        model: "email",
-        rules:
-            [val => !!val || 'Обязательное поле',
-            val => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || 'Введите корректный email']},
+const values = ref(DialogEnum[props.table].values)
 
-    {name: "Пароль",
-        model: "password",
-        hint: 'Может генерироваться автоматически',},
-
-    {name: "ФИО",
-        model: "fio",
-        rules:
-            [val => !!val || 'Обязательное поле']},
-
-    {name: "Роль",
-        model: "role",
-        hint: 'По умолчанию - "Учитель"',
-        options:
-            [{value: 0,  label: 'Админ'},
-            {value: 1,  label: 'Руководитель'},
-            {value: 2,  label: 'Административный работник'},
-            {value: 3,  label: 'Учитель'}]},
-
-    {name: "Подразделение",
-        hint: 'Необязательное поле',
-        model: "department"},
-
-    {name: "Классы",
-        hint: 'Необязательное поле',
-        model: "classes"},
-
-    {name: "Уроки",
-        hint: 'Необязательное поле',
-        model: "lessons"},
-])
-
-const params = ref({
-    email: '',
-    fio: '',
-    password: null,
-    role: 3,
-    department: '',
-    classes: null,
-    lessons: null
-})
+const datas = ref(structuredClone(DialogEnum[props.table].params))
 
 async function addUser(){
 
     try {
 
-        console.log(params.value)
-        const response = await axios.post('../api/create_user', params.value);
+        const  prepared_data = {
+            "email": datas.value.email,
+            "password": datas.value.password,
+            "profile": {
+                "fio": datas.value.fio,
+                "post": datas.value.post
+            },
+            "role": datas.value.role
+        }
+        console.log(prepared_data)
+        const response = await axios.post('/api/user', prepared_data);
+        console.log(response)
         gettedPassword.value = response.data.password;
         
     } catch (error) {
@@ -78,40 +45,43 @@ async function addUser(){
 
     <q-dialog v-model="recordCreation" backdrop-filter="blur(4px)">
         <q-card style="max-width: 75%; min-width: 75%;" class="py-4 !rounded-[20px] !overflow-y-hidden">
-            <p align="center" class="text-bold !text-2xl">{{ table }}</p>
+            <p align="center" class="text-bold !text-2xl">{{ DialogEnum[table].title }}</p>
             <q-form @submit="addUser">
-                <div class="h-[600px] overflow-y-auto">
+                <div class="max-h-[600px] overflow-y-auto">
                     <q-card-section
                 v-for="value in values"
                 class="!w-[90%] justify-self-center !py-2">
-                    <p>{{ value.name }}</p>
-                    <q-select 
-                    v-if="value.options"
-                    v-model="params[value.model]"
-                    :options="value.options"
-                    :multiple="value.multiple"
-                    :hint="value.hint"
-                    emit-value
-                    map-options
-                    hide-bottom-space
-                    dense
-                    borderless
-                    :menu-offset="[15, 30]"
-                    popup-content-class="gray-menu">
-                    </q-select>
-                    <q-input
-                    v-else
-                    hide-bottom-space
-                    dense
-                    borderless
-                    clearable
-                    color="black"
-                    label-color="black"
-                    v-model="params[value.model]"
-                    :hint="value.hint"
-                    lazy-rules
-                    :rules="value.rules">
-                    </q-input>
+                    <div
+                    v-if="!value.hidden"> 
+                        <p>{{ value.name }}</p>
+                        <q-select 
+                        v-if="value.options"
+                        v-model="datas[value.model]"
+                        :options="value.options"
+                        :multiple="value.multiple"
+                        :hint="value.hint"
+                        emit-value
+                        map-options
+                        hide-bottom-space
+                        dense
+                        borderless
+                        :menu-offset="[15, 30]"
+                        popup-content-class="gray-menu">
+                        </q-select>
+                        <q-input
+                        v-else
+                        hide-bottom-space
+                        dense
+                        borderless
+                        clearable
+                        color="black"
+                        label-color="black"
+                        v-model="datas[value.model]"
+                        :hint="value.hint"
+                        lazy-rules
+                        :rules="value.rules">
+                        </q-input>
+                    </div>
                 </q-card-section>
                 </div>
                 <q-card-section align="center">

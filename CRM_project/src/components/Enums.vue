@@ -88,7 +88,7 @@ export const TableEnum=Object.freeze({
     }
 })
 
-export const ModalEnum=Object.freeze({
+export const DialogEnum=Object.freeze({
     'users': {
         title: 'Пользователи',
         values:  [
@@ -114,28 +114,91 @@ export const ModalEnum=Object.freeze({
                 [{value: 0,  label: 'Админ'},
                 {value: 1,  label: 'Руководитель'},
                 {value: 2,  label: 'Административный работник'},
-                {value: 3,  label: 'Учитель'}]},
-
+                {value: 3,  label: 'Учитель'}]
+        },
+        {name: "Должность",
+            model: "post",
+            rules:
+                [val => !!val || 'Обязательное поле'],
+        },
         {name: "Подразделение",
             hint: 'Необязательное поле',
+            hidden: true,
             model: "department"},
 
         {name: "Классы",
             hint: 'Необязательное поле',
+            hidden: true,
             model: "classes"},
 
         {name: "Уроки",
             hint: 'Необязательное поле',
+            hidden: true,
             model: "lessons"},
         ],
         params: {
             email: '',
             fio: '',
-            password: null,
+            password: '',
             role: 3,
-            department: '',
-            classes: null,
-            lessons: null
+            post: '',
+            department: [],
+            classes: [],
+            lessons: []
+        }
+    },
+    'departments':{
+        title: 'Отделы',
+        values:  [
+        {name: "Название",
+            model: "title",
+            rules:
+                [val => !!val || 'Обязательное поле',]},
+
+        {name: "Управляющий отдел",
+            model: "head_department",},
+
+        {name: "Руководители",
+            model: "supervisors",},
+        ],
+        params: {
+            title: '',
+            head_department: null,
+            supervisors: null,
+        }
+    },
+    'classes': {
+        title: 'Классы',
+        values:  [
+        {name: "Номер",
+            model: "number",
+            rules:
+                [val => !!val || 'Обязательное поле',]},
+
+        {name: "Параллель",
+            model: "parallel",},
+
+        {name: "Специализация",
+            model: "spec",
+            rules:
+                [val => !!val || 'Обязательное поле']},
+        ],
+        params: {
+            number: null,
+            parallel: '',
+            spec: '',
+        }
+    },
+    'lessons': {
+        title: 'Уроки',
+        values:  [
+        {name: "Название",
+            model: "title",
+            rules:
+                [val => !!val || 'Обязательное поле',]},
+        ],
+        params: {
+            title: '',
         }
     },
 })
