@@ -51,7 +51,7 @@ onMounted(async () => {
         row-key="name"
         hide-pagination
         no-data-label="Записей нет"
-        class="px-2 pb-2 mb-8">
+        class="px-2 pb-2 mb-8 min-w-[45vw] max-w-[50vw]">
 
         <template v-slot:top="props">
             <div class="q-table__title">

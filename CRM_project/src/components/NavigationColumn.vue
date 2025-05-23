@@ -1,9 +1,33 @@
-<script setup lang="ts">
+<script setup>
+import axios from 'axios'
 import { ref } from 'vue'
 import ModalError from './ModalError.vue';
 import TaskCreationDialog from './dialogs/TaskCreationDialog.vue';
 
 const props = defineProps(['name', 'role', 'section'])
+
+const token = localStorage.getItem('jwtToken');
+
+axios.defaults.headers['Authorization'] = `Bearer ${token}`;
+
+const fio = ref("");
+const role = ref("");
+
+async function getUser(){
+
+    try {
+        const response = await axios.get('/api/user/me');
+
+        fio.value = response.data.profile.initials_name;
+        role.value = response.data.role;
+        
+    } catch (error) {
+        console.error('Ошибка авторизации:', error.response?.data || error.message);
+    }
+
+}
+
+getUser()
 
 </script>
 
@@ -12,8 +36,8 @@ const props = defineProps(['name', 'role', 'section'])
             <RouterLink :to="{name: 'Office'}" class="w-full flex flex-col items-center">
                 <div id="person" class="q-hoverable">
                     <img class="select-none" src="..\assets\worker-photo.jpg" alt="">
-                    <h3 v-if="section == 'Office'" class="select-none activeSection">{{ name }}</h3>
-                    <h3 v-else class="select-none">{{ name }}</h3>
+                    <h3 v-if="section == 'Office'" class="select-none activeSection">{{ fio }}</h3>
+                    <h3 v-else class="select-none">{{ fio }}</h3>
                 </div>
             </RouterLink>
             
