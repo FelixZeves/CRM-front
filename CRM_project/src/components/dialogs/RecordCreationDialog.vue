@@ -1,5 +1,4 @@
 <script setup>
-import axios from 'axios';
 import { ref } from 'vue'
 import { DialogEnum } from '../Enums.vue';
 import { useQuasar, copyToClipboard } from 'quasar';
@@ -7,10 +6,6 @@ const props = defineProps(['table', 'func'])
 
 const recordCreation = ref(false)
 let gettedPassword = ref("")
-
-const token = localStorage.getItem('jwtToken');
-
-axios.defaults.headers['Authorization'] = `Bearer ${token}`;
 
 const values = ref(DialogEnum[props.table].values)
 

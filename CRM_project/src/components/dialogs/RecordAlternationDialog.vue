@@ -1,15 +1,10 @@
 <script setup>
-import axios from 'axios';
 import { ref } from 'vue'
 import { DialogEnum } from '../Enums.vue';
 const props = defineProps(['table', 'id'])
 
 const recordAlternation = ref(false)
 let gettedPassword = ref("")
-
-const token = localStorage.getItem('jwtToken');
-
-axios.defaults.headers['Authorization'] = `Bearer ${token}`;
 
 const values = ref(DialogEnum[props.table].values)
 

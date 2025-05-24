@@ -2,10 +2,6 @@
 import { ref } from 'vue'
 import axios from 'axios'
 
-const token = localStorage.getItem('jwtToken');
-
-axios.defaults.headers['Authorization'] = `Bearer ${token}`;
-
 const user = await axios.get('/api/user/me')
 
 const id = ref(user.data.data.id)

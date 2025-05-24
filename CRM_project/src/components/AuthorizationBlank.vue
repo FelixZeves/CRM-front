@@ -16,10 +16,7 @@ async function loginUser(){
         });
 
         const token = response.data.jwt;
-
         localStorage.setItem('jwtToken', token);
-        
-        axios.defaults.headers['Authorization'] = `Bearer ${token}`;
 
         const details = await axios.get('/api/user/me');
 
@@ -28,8 +25,7 @@ async function loginUser(){
         router.push(role == 0 ? '/DBManage' : '/Office')
         
     } catch (error) {
-        authorizationError.value = 'Ошибка авторизации: ' + error.response.data.msg;
-        console.error('Ошибка авторизации:', error.response.data || error.message);
+        console.error('Ошибка авторизации:', error.message);
     }
 };
 </script>
