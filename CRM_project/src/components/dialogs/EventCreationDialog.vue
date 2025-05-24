@@ -44,14 +44,13 @@ async function CreateEvent(){
     }
     else {
         params = {
-        at: eventDateRange.value.to,
+        at: eventDateRange.value.from,
         description: eventDescription.value,
         place: eventPlace.value,
         title: eventTitle.value,
-        to: eventDateRange.from.value
+        to: eventDateRange.value.to
         }
     }
-    console.log(params)
     try{
         const response = await axios.post('/api/user/event', params)
         return response
@@ -137,7 +136,7 @@ async function CreateEvent(){
                                         <q-input
                                         style="background: var(--crm-c-light-yellow); border-radius: 5pt; padding-left: 5pt; padding-right: 5pt; width: 75%"
                                         input-style="background-color: white; height:75%; align-self: center; border-radius: 5pt; padding-left: 5px; padding-right: 5px; justify-items: center"
-                                        mask="## | ## | ####"
+                                        mask="##.##.####"
                                         dense
                                         borderless
                                         v-model="eventDateSolo" >
@@ -162,7 +161,7 @@ async function CreateEvent(){
                                         <q-input
                                             style="background: var(--crm-c-light-yellow); border-start-start-radius: 5pt; border-end-start-radius: 5pt; padding-left: 5pt; padding-right: 5pt; width: 45%"
                                             input-style="background-color: white; height:75%; align-self: center; border-radius: 5pt; padding-left: 5px; padding-right: 5px; justify-items: center"
-                                            mask="## | ## | ####"
+                                            mask="##.##.####"
                                             dense
                                             borderless
                                             v-model="eventDateRange.from" >
@@ -170,7 +169,7 @@ async function CreateEvent(){
                                         <q-input
                                             style="background: var(--crm-c-light-yellow); border-start-end-radius: 5pt; border-end-end-radius: 5pt; border-left-width: 1px; border-color: var(--vt-c-white-mute); padding-left: 5pt; padding-right: 5pt; width: 55%;"
                                             input-style="background-color: white; height:75%; align-self: center; border-radius: 5pt; padding-left: 5px; padding-right: 5px; justify-items: center"
-                                            mask="## | ## | ####"
+                                            mask="##.##.####"
                                             dense
                                             borderless
                                             v-model="eventDateRange.to" >
