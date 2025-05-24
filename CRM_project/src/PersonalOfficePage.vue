@@ -28,7 +28,9 @@ axios.defaults.headers['Authorization'] = `Bearer ${token}`;
             <div class="row-span-2 col-span-2 flex justify-center self-center">
                 <CRMCalendar class="font-jetbrains-mono!"/>
             </div>
-            <EventsTile class="row-span-2 col-span-5"/>
+            <Suspense>
+                <EventsTile class="row-span-2 col-span-5"/>
+            </Suspense>
         </main>
     </div>
 </template>

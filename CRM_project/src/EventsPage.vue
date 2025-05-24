@@ -23,7 +23,15 @@ axios.defaults.headers['Authorization'] = `Bearer ${token}`;
         <main class="col-span-3 lg:col-span-4 2xl:col-span-5">
             <div>
                 <EventsDropdown></EventsDropdown>
-                <EventsList/>
+                <Suspense>
+                    <EventsList/>
+                    <template #fallbkack>
+                        <div>
+                            Загрузка информации
+                        </div>
+                    </template>
+                </Suspense>
+                
             </div>
         </main>
     </div>

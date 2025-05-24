@@ -6,7 +6,6 @@ import { useQuasar, copyToClipboard } from 'quasar';
 const props = defineProps(['table', 'func'])
 
 const recordCreation = ref(false)
-let gettedPassword = ref("")
 
 const token = localStorage.getItem('jwtToken');
 

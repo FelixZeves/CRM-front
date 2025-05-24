@@ -6,13 +6,11 @@ const token = localStorage.getItem('jwtToken');
 
 axios.defaults.headers['Authorization'] = `Bearer ${token}`;
 
-const user = await axios.get('/api/user/me')
-
-const id = ref(user.data.data.id)
+const props = defineProps(['iconNeed'])
 
 const eventCreation = ref(false)
 
-const eventName = ref("")
+const eventTitle = ref("")
 
 const eventDescription = ref("")
 
@@ -23,7 +21,7 @@ function getTodayDate() {
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
-    return `${day}/${month}/${year}`;
+    return `${day}.${month}.${year}`;
 }
 
 const eventDateSolo = ref(getTodayDate())
@@ -38,18 +36,14 @@ function changeDateType(){
     datepickerName.value = (datepickerType .value== "one") ? "Один день" : "Диапазон"
 }
 
-const props = defineProps(['iconNeed'])
-
 async function CreateEvent(){
     let params = {}
     if (datepickerType.value == "one"){
         params = {
-        at: eventDateSolo.value,
         description: eventDescription.value,
         place: eventPlace.value,
         title: eventTitle.value,
-        to: "",
-        user: id.value
+        to: eventDateSolo.value,
         }
     }
     else {
@@ -58,11 +52,18 @@ async function CreateEvent(){
         description: eventDescription.value,
         place: eventPlace.value,
         title: eventTitle.value,
-        to: eventDateRange.from.value,
-        user: id.value
+        to: eventDateRange.from.value
         }
     }
-    await axios.push('/api/user/event', params)
+    console.log(params)
+    try{
+        const response = await axios.post('/api/user/event', params)
+        return response
+    } catch (error) {
+        console.error('Ошибка создания мероприятия:', error)
+        return []
+    }
+    
 }
 
 </script>
@@ -75,11 +76,11 @@ async function CreateEvent(){
     
     <q-dialog v-model="eventCreation" backdrop-filter="blur(4px)">
         <q-card style="max-width: 75%; min-width: 50%;" class="py-4 !rounded-[20px]">
-            <q-form>
+            <q-form @submit="CreateEvent">
                 <q-card-section>
                     <p class="text-lg text-black mb-2 ps-3 underline underline-offset-[6px]">Название мероприятия</p>
                     <q-input
-                        v-model="eventName"
+                        v-model="eventTitle"
                         :rules="[val => val && val.length > 0 || 'Введите название мероприятия']"
                         hide-bottom-space
                         dense
@@ -199,7 +200,7 @@ async function CreateEvent(){
                 </q-card-section>
         
                 <q-card-actions align="center">
-                    <q-btn label="Создать" type="submit" style="background: var(--crm-c-light-velvet); width: 25%; border-radius: 5pt;" text-color="white" v-close-popup />
+                    <q-btn label="Создать" type="submit" style="background: var(--crm-c-light-velvet); width: 25%; border-radius: 5pt;" text-color="white"/>
                 </q-card-actions>
             </q-form>
         </q-card>

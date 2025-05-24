@@ -65,10 +65,14 @@ function onDateClick(res){
         </q-list>
         </q-btn-dropdown>
       </div>
-
-      <EventCreationDialog
-        iconNeed=True>
-      </EventCreationDialog>
+      <Suspense>
+        <EventCreationDialog
+          iconNeed=True>
+        </EventCreationDialog>
+        <template #fallback>
+          <q-btn>Загрузка</q-btn>
+        </template>
+      </Suspense>
 
     </div>
   </template>

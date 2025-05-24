@@ -1,5 +1,4 @@
 <script>
-import { departmentOptions } from './Utils'
 import axios from 'axios'
 
 export const RoleEnum = Object.freeze({
@@ -252,7 +251,7 @@ export const DialogEnum=Object.freeze({
         {name: "Управляющий отдел",
             model: "head_department",
             hint: 'Необязательное поле',
-            options: departmentOptions},
+            options: []},
         ],
         params: {
             title: '',

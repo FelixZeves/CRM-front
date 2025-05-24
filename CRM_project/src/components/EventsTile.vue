@@ -2,14 +2,13 @@
 import Event from './Event.vue'
 import { ref } from 'vue';
 import EventCreationDialog from './dialogs/EventCreationDialog.vue';
+import { getEvents } from './Utils';
 
-const events = ref([
-  { name: "Название мероприятия", description: 'Краткое описание мероприятия', date: "21.11.2024", place: "Место проведения"},
-  { name: "Название мероприятия", description: 'Краткое описание мероприятия', date: "22.11.2024-26.11.2024", place: "Место проведения"},
-  { name: "Название мероприятия", description: 'Краткое описание мероприятия', date: "25.11.2024", place: "Место проведения"},
-  { name: "Название мероприятия", description: 'Краткое описание мероприятия', date: "25.11.2024", place: "Место проведения"}
-])
+const events = ref([])
 
+let response= await getEvents()
+
+events.value = response.data.data.slice(0, 3)
 </script>
 
 <template>
@@ -21,9 +20,9 @@ const events = ref([
         <div class="grid grid-rows-4 gap-y-2">
             <Event 
                 v-for="event in events"
-                :name="event.name"
+                :name="event.title"
                 :description="event.description"
-                :date="event.date"
+                :date="event.to"
                 :place="event.place"
             />
         </div>
