@@ -5,11 +5,6 @@ import ModalError from './ModalError.vue';
 import TaskCreationDialog from './dialogs/TaskCreationDialog.vue';
 
 const props = defineProps(['name', 'role', 'section'])
-
-const token = localStorage.getItem('jwtToken');
-
-axios.defaults.headers['Authorization'] = `Bearer ${token}`;
-
 const fio = ref("");
 const role = ref("");
 

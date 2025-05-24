@@ -17,4 +17,16 @@ import './assets/main.css'
 
 import 'quasar/src/css/index.sass'
 
+import axios from 'axios'
+
+// handler for jwt token
+axios.interceptors.request.use((config) => {
+    const token = localStorage.getItem('jwtToken');
+
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+})
+
 createApp(App).use(Quasar, {plugins: {Notify}, lang: langRu,}).use(router).use(VCalendar, {}).mount('#app')

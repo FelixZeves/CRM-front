@@ -3,13 +3,7 @@ import CRMCalendar from './components/CRMCalendar.vue';
 import EventsTile from './components/EventsTile.vue';
 import NavigationColumn from './components/NavigationColumn.vue';
 import TasksTile from './components/TasksTile.vue';
-import axios from 'axios'
 import { ref } from 'vue'
-
-const token = localStorage.getItem('jwtToken');
-
-axios.defaults.headers['Authorization'] = `Bearer ${token}`;
-
 
 </script>
 

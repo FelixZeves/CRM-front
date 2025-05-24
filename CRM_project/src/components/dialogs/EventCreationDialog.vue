@@ -2,10 +2,6 @@
 import { ref } from 'vue'
 import axios from 'axios'
 
-const token = localStorage.getItem('jwtToken');
-
-axios.defaults.headers['Authorization'] = `Bearer ${token}`;
-
 const props = defineProps(['iconNeed'])
 
 const eventCreation = ref(false)

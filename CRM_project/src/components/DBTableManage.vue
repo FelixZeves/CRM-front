@@ -7,10 +7,6 @@ import RecordCreationDialog from './dialogs/RecordCreationDialog.vue';
 
 const props = defineProps(['table'])
 
-const token = localStorage.getItem('jwtToken');
-
-axios.defaults.headers['Authorization'] = `Bearer ${token}`;
-
 let records = ref([])
 
 async function fetchTableData(params){

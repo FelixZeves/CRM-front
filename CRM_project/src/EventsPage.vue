@@ -1,13 +1,8 @@
 <script setup>
-import axios from 'axios'
 import NavigationColumn from './components/NavigationColumn.vue';
 import EventsList from './components/EventsList.vue';
 import { ref } from 'vue'
 import EventsDropdown from './components/dropdowns/EventsDropdown.vue';
-
-const token = localStorage.getItem('jwtToken');
-
-axios.defaults.headers['Authorization'] = `Bearer ${token}`;
 
 </script>
 

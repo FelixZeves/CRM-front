@@ -5,10 +5,6 @@ import axios from 'axios';
 import RecordCreationDialog from './dialogs/RecordCreationDialog.vue';
 import RecordAlternationDialog from './dialogs/RecordAlternationDialog.vue';
 
-const token = localStorage.getItem('jwtToken');
-
-axios.defaults.headers['Authorization'] = `Bearer ${token}`;
-
 let records = ref([])
 
 async function fetchTableData(params){
