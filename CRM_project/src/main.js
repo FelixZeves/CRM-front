@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import router from './router.js'
-import { Quasar } from 'quasar'
+import { Quasar, Notify } from 'quasar'
 import langRu from 'quasar/lang/ru'
 import App from './App.vue'
 import VCalendar from 'v-calendar'
@@ -17,4 +17,4 @@ import './assets/main.css'
 
 import 'quasar/src/css/index.sass'
 
-createApp(App).use(Quasar, {plugins: {}, lang: langRu,}).use(router).use(VCalendar, {}).mount('#app')
+createApp(App).use(Quasar, {plugins: {Notify}, lang: langRu,}).use(router).use(VCalendar, {}).mount('#app')

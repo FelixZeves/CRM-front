@@ -1,4 +1,7 @@
 <script>
+import { departmentOptions } from './Utils'
+import axios from 'axios'
+
 export const RoleEnum = Object.freeze({
     0: {name: 'Admin', translation: 'Администратор' },
     1: {name: 'Leader', translation: 'Руководитель' },
@@ -39,7 +42,14 @@ export const TableEnum=Object.freeze({
                     post: val.profile.post,
                     departments: val.departments,
 
-                })
+                }),
+                deletingFunction: async function deleteUser(id){
+                    try {
+                        await axios.delete('../api/user', {params: {ids: id}});
+                    } catch (error) {
+                        console.error('Ошибка авторизации:', error.response?.data || error.message);
+                    }
+                },
     },
     'departments':{
                 title: 'Отделы',
@@ -55,7 +65,34 @@ export const TableEnum=Object.freeze({
                     'head_department': val.head_department,
                     supervisors: val.supervisors,
                     id: val.id
-                })
+                }),
+                deletingFunction: async function deleteUser(id){
+                    try {
+                        await axios.delete('../api/user/department', {params: {ids: id}});
+                    } catch (error) {
+                        console.error('Ошибка авторизации:', error.response?.data || error.message);
+                    }
+                },
+    },
+    'specializations':{
+        title: 'Специализация',
+        name: 'specializations',
+        icon: 'fa-solid fa-pen-ruler',
+        cols: [
+            {name: 'title', label: 'Название', field: 'title', align: 'center'},
+        ],
+        getUrl: '/api/user/class/spec',
+        dataMapper: (val) => ({
+            title: val.title,
+            id: val.id
+        }),
+        deletingFunction: async function deleteClass(id){
+            try {
+                await axios.delete('/api/user/class/spec', {params: {ids: id}});
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
+        },
     },
     'classes':{
                 title: 'Классы',
@@ -72,7 +109,14 @@ export const TableEnum=Object.freeze({
                     parallel: val.parallel,
                     spec: val.spec,
                     id: val.id
-                })
+                }),
+                deletingFunction: async function deleteClass(id){
+                    try {
+                        await axios.delete('../api/user/class', {params: {ids: id}});
+                    } catch (error) {
+                        console.error('Ошибка авторизации:', error.response?.data || error.message);
+                    }
+                },
     },
     'lessons':{
                 title: 'Учебные предметы',
@@ -84,7 +128,14 @@ export const TableEnum=Object.freeze({
                 dataMapper: (val) => ({
                     title: val.title,
                     id: val.id
-                })
+                }),
+                deletingFunction: async function deleteLesson(id){
+                    try {
+                        await axios.delete('../api/user/lesson', {params: {ids: id}});
+                    } catch (error) {
+                        console.error('Ошибка авторизации:', error.response?.data || error.message);
+                    }
+                },
     }
 })
 
@@ -142,9 +193,52 @@ export const DialogEnum=Object.freeze({
             password: '',
             role: 3,
             post: '',
-            department: [],
+            departments: [],
             classes: [],
             lessons: []
+        },
+        creationFunction :  async function addUser(data){
+            try {
+                const  prepared_data = {
+                    "email": data.email,
+                    "password": data.password,
+                    "profile": {
+                        "fio": data.fio,
+                        "post": data.post
+                    },
+                    "role": data.role
+                }
+                const response = await axios.post('/api/user', prepared_data);
+                return response.data
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
+        },
+        editingFunction: async function editUser(params){
+            try {
+
+                const response = await axios.patch('../api/update_user', params);
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
+        },
+        getRecord: async function getNeededRecord(id){
+            try {
+                let details = await axios.get('/api/user', {
+                    params: {
+                        ids: id
+                    }
+                });
+                let user = details.data.data[0]
+
+                let params = {email: user.email, role: user.role, ...user.profile }
+                return params
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
         }
     },
     'departments':{
@@ -156,15 +250,93 @@ export const DialogEnum=Object.freeze({
                 [val => !!val || 'Обязательное поле',]},
 
         {name: "Управляющий отдел",
-            model: "head_department",},
-
-        {name: "Руководители",
-            model: "supervisors",},
+            model: "head_department",
+            hint: 'Необязательное поле',
+            options: departmentOptions},
         ],
         params: {
             title: '',
             head_department: null,
-            supervisors: null,
+        },
+        creationFunction: async function addDepartment(data){
+            try {
+                const response = await axios.post('/api/user/department', data);
+                console.log(response)
+                return response.data
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
+        },
+        editingFunction: async function editDepartment(params){
+            try {
+
+                const response = await axios.patch('/api/user/department', params);
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
+        },
+        getRecord: async function getNeededRecord(id){
+            try {
+                let details = await axios.get('/api/user/department', {
+                    params: {
+                        ids: id
+                    }
+                });
+                let record = details.data.data[0]
+
+                let params = {...record}
+                return params
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
+        }
+    },
+    'specializations': {
+        title: 'Специализация',
+        values:  [
+        {name: "Название",
+            model: "title",
+            rules:
+                [val => !!val || 'Обязательное поле',]},
+        ],
+        params: {
+            title: '',
+        },
+        creationFunction: async function addSpec(data){
+            try {
+                const response = await axios.put('/api/user/class/spec', data);
+                return response.data
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
+        },
+        getRecord: async function getNeededSpec(id){
+            try {
+                let details = await axios.get('/api/user/class/spec', {
+                    params: {
+                        ids: id
+                    }
+                });
+                let record = details.data.data[0]
+
+                let params = {...record}
+                return params
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
+        },
+        editingFunction: async function editSpec(params){
+            try {
+                await axios.put('/api/user/class/spec', params);
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
         }
     },
     'classes': {
@@ -176,17 +348,51 @@ export const DialogEnum=Object.freeze({
                 [val => !!val || 'Обязательное поле',]},
 
         {name: "Параллель",
-            model: "parallel",},
+            model: "parallel",
+            hint: 'По умолчанию - 0',},
 
         {name: "Специализация",
-            model: "spec",
-            rules:
-                [val => !!val || 'Обязательное поле']},
+            model: "specialization",
+            hint: 'Необязательное поле',
+        },
         ],
         params: {
             number: null,
-            parallel: '',
-            spec: '',
+            parallel: 0,
+            specialization: null,
+        },
+        creationFunction: async function addClass(data){
+            try {
+                const response = await axios.post('/api/user/class', data);
+                return response.data
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
+        },
+        getRecord: async function getNeededClass(id){
+            try {
+                let details = await axios.get('/api/user/class', {
+                    params: {
+                        ids: id
+                    }
+                });
+                let record = details.data.data[0]
+
+                let params = {...record}
+                return params
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
+        },
+        editingFunction: async function editClass(params){
+            try {
+                await axios.patch('../api/user/class', params);
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
         }
     },
     'lessons': {
@@ -199,6 +405,39 @@ export const DialogEnum=Object.freeze({
         ],
         params: {
             title: '',
+        },
+        creationFunction: async function addLesson(data){
+            try {
+                const response = await axios.post('/api/user/lesson', data);
+                return response.data
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
+        },
+        getRecord: async function getNeededLesson(id){
+            try {
+                let details = await axios.get('/api/user/lesson', {
+                    params: {
+                        ids: id
+                    }
+                });
+                let record = details.data.data[0]
+
+                let params = {...record}
+                return params
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
+        },
+        editingFunction: async function editLesson(params){
+            try {
+                await axios.put('../api/user/lesson', params);
+                
+            } catch (error) {
+                console.error('Ошибка авторизации:', error.response?.data || error.message);
+            }
         }
     },
 })

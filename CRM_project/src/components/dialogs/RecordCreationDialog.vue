@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { ref } from 'vue'
 import { DialogEnum } from '../Enums.vue';
+import { useQuasar, copyToClipboard } from 'quasar';
 const props = defineProps(['table', 'func'])
 
 const recordCreation = ref(false)
@@ -15,29 +16,10 @@ const values = ref(DialogEnum[props.table].values)
 
 const datas = ref(structuredClone(DialogEnum[props.table].params))
 
-async function addUser(){
+const creationFunction = DialogEnum[props.table].creationFunction
 
-    try {
+const q = useQuasar()
 
-        const  prepared_data = {
-            "email": datas.value.email,
-            "password": datas.value.password,
-            "profile": {
-                "fio": datas.value.fio,
-                "post": datas.value.post
-            },
-            "role": datas.value.role
-        }
-        console.log(prepared_data)
-        const response = await axios.post('/api/user', prepared_data);
-        console.log(response)
-        gettedPassword.value = response.data.password;
-        
-    } catch (error) {
-        console.error('Ошибка авторизации:', error.response?.data || error.message);
-    }
-
-}
 </script>
 
 <template>
@@ -46,7 +28,24 @@ async function addUser(){
     <q-dialog v-model="recordCreation" backdrop-filter="blur(4px)">
         <q-card style="max-width: 75%; min-width: 75%;" class="py-4 !rounded-[20px] !overflow-y-hidden">
             <p align="center" class="text-bold !text-2xl">{{ DialogEnum[table].title }}</p>
-            <q-form @submit="addUser">
+            <q-form @submit="async () => 
+                                {response = await creationFunction(datas);
+                                if(response && 'password' in response){
+                                    let notification = q.notify({
+                                            message: `Пароль созданного пользователя ${response.password}`,
+                                            position: 'top',actions: [
+                                                {label: 'Копировать',
+                                                color: 'white',
+                                                handler: async () => {
+                                                    await copyToClipboard(password)
+                                                    notification({ // Обновляем существующее уведомление
+                                                    message: `Пароль: ${response.password} (скопировано) ✅`, // Добавляем пометку
+                                                    timeout: 2500 // Теперь закрываем через 2.5 сек
+                                                    })
+                                                }
+                                                }]
+                                    })
+                                }}">
                 <div class="max-h-[600px] overflow-y-auto">
                     <q-card-section
                 v-for="value in values"

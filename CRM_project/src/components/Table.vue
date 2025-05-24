@@ -51,7 +51,7 @@ onMounted(async () => {
         row-key="name"
         hide-pagination
         no-data-label="Записей нет"
-        class="px-2 pb-2 mb-8 min-w-[45vw] max-w-[50vw]">
+        class="px-2 pb-2 mb-8 min-w-[45vw] max-w-[60vw]">
 
         <template v-slot:top="props">
             <div class="q-table__title">
@@ -92,7 +92,7 @@ onMounted(async () => {
                 </q-td>
                 <q-td auto-width>
                     <RecordAlternationDialog :table="table.name" :id="props.row.id"/>
-                    <q-btn icon="fa-solid fa-trash" flat round color="brand-danger"></q-btn>
+                    <q-btn icon="fa-solid fa-trash" flat round color="brand-danger" @click="table.deletingFunction(props.row.id)"></q-btn>
                 </q-td>
             </q-tr>
         </template>
