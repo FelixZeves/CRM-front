@@ -1,18 +1,15 @@
 <script setup>
-import { getEvents } from './Utils.js'
-import { ref } from 'vue'
 import EventOnList from './EventOnList.vue'
 
-const events = ref([])
+const props = defineProps(['events'])
+const emit = defineEmits(['update-list']);
 
-let response= await getEvents()
-
-events.value = response.data.data
 </script>
 
 <template>
     <div class="max-h-[500px] lg:max-h-[650px] overflow-y-auto">
         <EventOnList
+            @delete-event="$emit('update-list')"
             v-if="events.length > 0" 
             v-for="event in events"
             :name="event.title"

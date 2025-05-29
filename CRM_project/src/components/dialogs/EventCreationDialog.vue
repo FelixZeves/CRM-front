@@ -1,15 +1,17 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import axios from 'axios'
 
-const props = defineProps(['iconNeed'])
+const props = defineProps(['visible'])
+const emit = defineEmits(['update:visible', 'update-list'])
 
-const eventCreation = ref(false)
+const visible = computed({
+  get: () => props.visible,
+  set: val => emit('update:visible', val)
+})
 
 const eventTitle = ref("")
-
 const eventDescription = ref("")
-
 const eventPlace = ref("")
 
 function getTodayDate() {
@@ -53,6 +55,7 @@ async function CreateEvent(){
     }
     try{
         const response = await axios.post('/api/user/event', params)
+        emit('update-list')
         return response
     } catch (error) {
         console.error('Ошибка создания мероприятия:', error)
@@ -66,10 +69,9 @@ async function CreateEvent(){
 
 <template>
 
-    <q-btn v-if="iconNeed" style="background: var(--crm-c-light-yellow); text-transform:none; border-radius: 5pt;" unelevated text-color="black" icon-right="add" label="Добавить мероприятие" @click="eventCreation = true"></q-btn>
-    <q-btn v-else style="background: var(--crm-c-light-yellow); text-transform:none;  border-radius: 5pt;" size="md" unelevated rounded text-color="black" label="Добавить мероприятие" @click="eventCreation = true"></q-btn>
+    <q-btn style="background: var(--crm-c-light-yellow); text-transform:none;  border-radius: 5pt;" size="md" unelevated rounded text-color="black" label="Добавить мероприятие" @click="eventCreation = true"></q-btn>
     
-    <q-dialog v-model="eventCreation" backdrop-filter="blur(4px)">
+    <q-dialog v-model="visible" backdrop-filter="blur(4px)">
         <q-card style="max-width: 75%; min-width: 50%;" class="py-4 !rounded-[20px]">
             <q-form @submit="CreateEvent">
                 <q-card-section>
