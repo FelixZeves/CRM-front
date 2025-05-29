@@ -17,8 +17,8 @@ events.value = response.data.data
             v-for="event in events"
             :name="event.title"
             :description="event.description"
-            :deadline="event.to"
-            :creator="event.creator"
+            :deadline="event.at != event.to ? `${event.at} - ${event.to}` : event.to"
+            :creator="event.id"
             :place="event.place"
             :id="event.id">
         </EventOnList>

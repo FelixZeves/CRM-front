@@ -63,7 +63,6 @@ fillParams()
                 </q-card-section>
                 </div>
                 <q-card-section align="center">
-                    <p>{{ gettedPassword }}</p>
                     <q-btn
                     type="submit"
                     label="Изменить запись"

@@ -22,7 +22,7 @@ async function deleteEvent(){
             </div>
         </div>
         
-        <p class="lg:text-md 2xl:text-lg font-medium text-xs lg:text-sm 2xl:text-base m-0">Срок выполнения: {{ deadline }}</p>
+        <p class="lg:text-md 2xl:text-lg font-medium text-xs lg:text-sm 2xl:text-base m-0">Период порведения мероприятия: {{ deadline }}</p>
         <p class="lg:text-md 2xl:text-lg font-medium text-xs lg:text-sm 2xl:text-base m-0">Поставил(а) задачу: {{ creator }}</p>
         <div class="flex flex-row justify-between items-center mt-2">
             <p class="lg:text-md 2xl:text-lg font-medium text-xs lg:text-sm xl:text-base m-0">Место проведения: {{ place }}</p>

@@ -49,45 +49,47 @@ getUser()
                 <p v-if="section == 'Documents'" class="select-none activeSection q-hoverable">Документы</p>
                 <p v-else class="select-none q-hoverable">Документы</p>
             </RouterLink>
-            <q-btn-dropdown
-            flat
-            label="Создать"
-            dropdown-icon="sym_o_play_arrow"
-            menu-anchor="top end"
-            menu-self="top start"
-            :menu-offset="[25, 0]"
-            content-style="border-radius: 20pt;"
-            style="width: 95%;
-            height: 50px;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 5%;
-            padding-left: 45px;
-            color:white;
-            font-size: 16px;
-            text-align: center;
-            font-weight: bold;
-            text-transform: capitalize;">
-                 <q-list style="background-color: var(--crm-c-dark-velvet); border-radius: 5pt; color: white; text-align: center; font-size: 16px; font-weight: bold;" class="py-[8px] px-[12px]">
-                    <q-item v-if="role != 3" clickable style="border-radius: 10pt;">
-                        <TaskCreationDialog
-                        taskType="task">
-                        </TaskCreationDialog>
-                    </q-item>
-                    <q-separator v-if="role != 3" spaced inset size="1px" style="background-color: var(--crm-c-velvet);"></q-separator>
-                    <q-item clickable style="border-radius: 10pt;">
-                        <TaskCreationDialog
-                        taskType="application">
-                        </TaskCreationDialog>
-                    </q-item>
-                    <q-separator spaced inset size="1px" style="background-color: var(--crm-c-velvet);"></q-separator>
-                    <q-item clickable style="border-radius: 10pt;">
-                        <TaskCreationDialog
-                        taskType="memo">
-                        </TaskCreationDialog>
-                    </q-item>
-                </q-list>
-            </q-btn-dropdown>
+            <Suspense>
+                <q-btn-dropdown
+                flat
+                label="Создать"
+                dropdown-icon="sym_o_play_arrow"
+                menu-anchor="top end"
+                menu-self="top start"
+                :menu-offset="[25, 0]"
+                content-style="border-radius: 20pt;"
+                style="width: 95%;
+                height: 50px;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: 5%;
+                padding-left: 45px;
+                color:white;
+                font-size: 16px;
+                text-align: center;
+                font-weight: bold;
+                text-transform: capitalize;">
+                    <q-list style="background-color: var(--crm-c-dark-velvet); border-radius: 5pt; color: white; text-align: center; font-size: 16px; font-weight: bold;" class="py-[8px] px-[12px]">
+                        <q-item v-if="role != 3" clickable style="border-radius: 10pt;">
+                            <TaskCreationDialog
+                            taskType="task">
+                            </TaskCreationDialog>
+                        </q-item>
+                        <q-separator v-if="role != 3" spaced inset size="1px" style="background-color: var(--crm-c-velvet);"></q-separator>
+                        <q-item clickable style="border-radius: 10pt;">
+                            <TaskCreationDialog
+                            taskType="application">
+                            </TaskCreationDialog>
+                        </q-item>
+                        <q-separator spaced inset size="1px" style="background-color: var(--crm-c-velvet);"></q-separator>
+                        <q-item clickable style="border-radius: 10pt;">
+                            <TaskCreationDialog
+                            taskType="memo">
+                            </TaskCreationDialog>
+                        </q-item>
+                    </q-list>
+                </q-btn-dropdown>
+            </Suspense>
             <p class="cursor-not-allowed select-none q-hoverable">Архив</p>
             <p id="additionalButton" class="select-none q-hoverable">
                 <ModalError />

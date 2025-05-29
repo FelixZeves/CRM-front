@@ -22,7 +22,7 @@ events.value = response.data.data.slice(0, 3)
                 v-for="event in events"
                 :name="event.title"
                 :description="event.description"
-                :date="event.to"
+                :date="event.at != event.to ? `${event.at} - ${event.to}` : event.to"
                 :place="event.place"
             />
         </div>

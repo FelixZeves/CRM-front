@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { DialogEnum } from '../Enums.vue';
 import { useQuasar, copyToClipboard } from 'quasar';
+
 const props = defineProps(['table', 'func'])
 
 const recordCreation = ref(false)
@@ -31,12 +32,7 @@ const q = useQuasar()
                                                 {label: 'Копировать',
                                                 color: 'white',
                                                 handler: async () => {
-                                                    await copyToClipboard(password)
-                                                    notification({ // Обновляем существующее уведомление
-                                                    message: `Пароль: ${response.password} (скопировано) ✅`, // Добавляем пометку
-                                                    timeout: 2500 // Теперь закрываем через 2.5 сек
-                                                    })
-                                                }
+                                                    await copyToClipboard(response.password)}
                                                 }]
                                     })
                                 }}">
@@ -78,7 +74,6 @@ const q = useQuasar()
                 </q-card-section>
                 </div>
                 <q-card-section align="center">
-                    <p>{{ gettedPassword }}</p>
                     <q-btn
                     type="submit"
                     label="Создать запись"

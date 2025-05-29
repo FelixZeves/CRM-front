@@ -20,7 +20,9 @@ import { ref } from 'vue'
                 <TasksTile class="row-start-2"/>
             </div>
             <div class="row-span-2 col-span-2 flex justify-center self-center">
-                <CRMCalendar class="font-jetbrains-mono!"/>
+                <Suspense>
+                    <CRMCalendar class="font-jetbrains-mono!"/>
+                </Suspense>
             </div>
             <Suspense>
                 <EventsTile class="row-span-2 col-span-5"/>

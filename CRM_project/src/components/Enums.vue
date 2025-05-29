@@ -1,5 +1,6 @@
 <script>
 import axios from 'axios'
+import { getDepartments } from './Utils'
 
 export const RoleEnum = Object.freeze({
     0: {name: 'Admin', translation: 'Администратор' },
@@ -39,7 +40,7 @@ export const TableEnum=Object.freeze({
                     role: val.role,
                     id: val.id,
                     post: val.profile.post,
-                    departments: val.departments,
+                    departments: val.profile.departments,
 
                 }),
                 deletingFunction: async function deleteUser(id){
@@ -62,7 +63,7 @@ export const TableEnum=Object.freeze({
                 dataMapper: (val) => ({
                     title: val.title,
                     'head_department': val.head_department,
-                    supervisors: val.supervisors,
+                    supervisors: val.supervisors[0],
                     id: val.id
                 }),
                 deletingFunction: async function deleteUser(id){
@@ -174,7 +175,8 @@ export const DialogEnum=Object.freeze({
         {name: "Подразделение",
             hint: 'Необязательное поле',
             hidden: true,
-            model: "department"},
+            model: "departments",
+            options: await getDepartments()},
 
         {name: "Классы",
             hint: 'Необязательное поле',
@@ -187,11 +189,13 @@ export const DialogEnum=Object.freeze({
             model: "lessons"},
         ],
         params: {
+            default_pass: null,
             email: '',
-            fio: '',
+            pass_reset: '',
             password: '',
             role: 3,
             post: '',
+            fio: '',
             departments: [],
             classes: [],
             lessons: []
@@ -216,9 +220,24 @@ export const DialogEnum=Object.freeze({
         },
         editingFunction: async function editUser(params){
             try {
-
-                const response = await axios.patch('../api/update_user', params);
-                
+                let prepared_data = { default_pass : params.default_pass,
+                                    email: params.email,
+                                    id: params.id,
+                                    pass_reset: params.pass_reset,
+                                    password: params.password,
+                                    profile: {
+                                        classes: params.classes,
+                                        departments: [params.departments],
+                                        fio: params.fio,
+                                        lessons: params.lessons,
+                                        post: params.post
+                                    },
+                                    role: params.role
+                                }
+                console.log(prepared_data)
+                const response = await axios.patch('../api/user', prepared_data);
+                console.log(response)
+                return response
             } catch (error) {
                 console.error('Ошибка авторизации:', error.response?.data || error.message);
             }
@@ -233,6 +252,7 @@ export const DialogEnum=Object.freeze({
                 let user = details.data.data[0]
 
                 let params = {email: user.email, role: user.role, ...user.profile }
+                console.log(params)
                 return params
                 
             } catch (error) {
@@ -251,7 +271,7 @@ export const DialogEnum=Object.freeze({
         {name: "Управляющий отдел",
             model: "head_department",
             hint: 'Необязательное поле',
-            options: []},
+            options: await getDepartments()},
         ],
         params: {
             title: '',
