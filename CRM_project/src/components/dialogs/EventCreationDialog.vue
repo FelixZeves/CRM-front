@@ -68,9 +68,6 @@ async function CreateEvent(){
 
 
 <template>
-
-    <q-btn style="background: var(--crm-c-light-yellow); text-transform:none;  border-radius: 5pt;" size="md" unelevated rounded text-color="black" label="Добавить мероприятие" @click="eventCreation = true"></q-btn>
-    
     <q-dialog v-model="visible" backdrop-filter="blur(4px)">
         <q-card style="max-width: 75%; min-width: 50%;" class="py-4 !rounded-[20px]">
             <q-form @submit="CreateEvent">

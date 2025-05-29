@@ -65,7 +65,7 @@ function onDateClick(res){
         </q-btn-dropdown>
       </div>
       <Suspense>
-        <q-btn style="background: var(--crm-c-light-velvet); text-transform:none; border-radius: 5pt;" unelevated text-color="black" icon-right="add" label="Добавить мероприятие" @click="$emit('show-dialog')"></q-btn>
+        <q-btn style="background: var(--crm-c-light-yellow); text-transform:none; border-radius: 5pt;" unelevated text-color="black" icon-right="add" label="Добавить мероприятие" @click="$emit('show-dialog')"></q-btn>
         <template #fallback>
           <q-btn>Загрузка</q-btn>
         </template>
