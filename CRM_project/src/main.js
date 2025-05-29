@@ -29,4 +29,14 @@ axios.interceptors.request.use((config) => {
     return config;
 })
 
+axios.interceptors.response.use((response) => response, (error) => {
+    if (error.response.status === 401) {
+        localStorage.removeItem('jwtToken');
+        window.location.href = '/';
+
+    } else {
+        console.error('Error main.js:', error);
+    }
+})
+
 createApp(App).use(Quasar, {plugins: {Notify}, lang: langRu,}).use(router).use(VCalendar, {}).mount('#app')
