@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { DialogEnum } from '../Enums.vue';
+import { DialogEnum } from '@/components/Enums.vue';
 const props = defineProps(['table', 'id'])
 
 const recordAlternation = ref(false)

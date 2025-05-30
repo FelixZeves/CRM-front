@@ -1,8 +1,7 @@
 <script setup>
-import Event from './Event.vue'
 import { ref } from 'vue';
-import EventCreationDialog from './dialogs/EventCreationDialog.vue';
-import { getEvents } from './Utils';
+import { getEvents } from '@/components/Utils';
+import EventCreationDialog from '@/components/forms/AddEvent.vue';
 
 const events = ref([])
 const visible = ref(false)
@@ -26,18 +25,19 @@ updateList()
             </div>
         </div>
         <div class="grid grid-rows-4 gap-y-2">
-            <Event 
-                v-for="event in events"
-                :name="event.title"
-                :description="event.description"
-                :date="event.at != event.to ? `${event.at} - ${event.to}` : event.to"
-                :place="event.place"
-            />
+            <div v-for="event in events" class="w-[97%] justify-self-center px-2 event grid grid-cols-7 gap-x-2 pb-1">
+                <div class="items-start col-span-3 ps-2">
+                    <p class="text-base lg:text-lg  font-medium mb-0">{{ event.title }}</p>
+                    <p class="text-sm lg:text-base mb-0">{{ event.description }}</p>
+                </div>
+                <p class="date text-sm lg:text-base col-span-2 mb-0">{{ event.at != event.to ? `${event.at} - ${event.to}` : event.to }}</p>
+                <p class="place text-sm lg:text-base col-span-2 mb-0">{{ event.place }}</p>
+            </div>
         </div>
     </div>
 </template>
 
-<style>
+<style scoped>
 
 #eventsTile{
     height: max-content;
@@ -55,4 +55,26 @@ updateList()
     width: max-content;
 }
 
+.event{
+    border-radius: 10pt;
+}
+
+.event:hover{
+    background-color: var(--vt-c-white-mute);
+    transition: 0.5s;
+}
+
+.event .mainInfo{
+    align-self: center;
+}
+
+.event .date{
+    text-align: center;
+    align-self: center;
+}
+
+.event .place{
+    text-align: center;
+    align-self: center;
+}
 </style>

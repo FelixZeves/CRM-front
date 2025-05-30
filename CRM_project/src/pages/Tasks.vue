@@ -1,8 +1,8 @@
 <script setup>
-import NavigationColumn from './components/NavigationColumn.vue';
+import NavigationColumn from '@/components/menus/NavigationColumn.vue';
 import { ref } from 'vue'
-import TasksList from './components/TasksList.vue';
-import TasksDropdown from './components/dropdowns/TasksDropdown.vue';
+import TasksList from '@/components/layouts/TasksList.vue';
+import TasksDropdown from '@/components/menus/TasksDropdown.vue';
 
 </script>
 

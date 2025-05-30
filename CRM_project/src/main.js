@@ -30,13 +30,34 @@ axios.interceptors.request.use((config) => {
 })
 
 axios.interceptors.response.use((response) => response, (error) => {
-    if (error.response.status === 401) {
-        localStorage.removeItem('jwtToken');
-        window.location.href = '/';
+    let r = {
+        type: 'negative',
+        position: 'top',
+        message: 'Ошибка'
+    };
 
-    } else {
-        console.error('Error main.js:', error);
+    switch (error.response.status) {
+        case 401:
+            localStorage.removeItem('jwtToken');
+            r.message = 'У вас истек срок действия сессии, пожалуйста, войдите снова';
+            window.location.href = '/';
+            Notify.create(r);
+            break;
+
+        case 403:
+            r.message = 'У вас нет прав для выполнения этого действия';
+            Notify.create(r);
+            break;
+
+        default:
+            Notify.create({
+                type: 'negative',
+                position: 'top',
+                message: 'Ошибка',
+            });
+            console.error('Error:', error);
+            break;
     }
-})
+});
 
 createApp(App).use(Quasar, {plugins: {Notify}, lang: langRu,}).use(router).use(VCalendar, {}).mount('#app')

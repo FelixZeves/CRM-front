@@ -1,8 +1,8 @@
 <script setup>
 import axios from 'axios'
 import { ref } from 'vue'
-import ModalError from './ModalError.vue';
-import TaskCreationDialog from './dialogs/TaskCreationDialog.vue';
+import ModalError from '@/components/forms/BugReport.vue';
+import TaskCreationDialog from '@/components/forms/AddTask.vue';
 
 const props = defineProps(['name', 'role', 'section'])
 const fio = ref("");
@@ -30,7 +30,7 @@ getUser()
         <div id="navigationBody">
             <RouterLink :to="{name: 'Office'}" class="w-full flex flex-col items-center">
                 <div id="person" class="q-hoverable">
-                    <img class="select-none" src="..\assets\worker-photo.jpg" alt="">
+                    <img class="select-none" src="@\assets\worker-photo.jpg" alt="">
                     <h3 v-if="section == 'Office'" class="select-none activeSection">{{ fio }}</h3>
                     <h3 v-else class="select-none">{{ fio }}</h3>
                 </div>

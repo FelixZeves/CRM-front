@@ -1,9 +1,7 @@
 <script setup>
-import NavigationColumn from './components/NavigationColumn.vue';
-import { ref } from 'vue'
-import EventsDropdown from './components/dropdowns/EventsDropdown.vue';
-import DocumentsList from './components/DocumentsList.vue';
-import DocumentsDropdownNSearch from './components/dropdowns/DocumentsDropdownNSearch.vue';
+import NavigationColumn from '@/components/menus/NavigationColumn.vue';
+import DocumentsList from '@/components/layouts/DocumentsList.vue';
+import DocumentsDropdownNSearch from '@/components/menus/DocumentsDropdownNSearch.vue';
 
 </script>
 

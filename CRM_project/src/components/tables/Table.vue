@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { RoleEnum, TableEnum } from './Enums.vue'
+import { RoleEnum, TableEnum } from '@/components/Enums.vue'
 import axios from 'axios';
-import RecordCreationDialog from './dialogs/RecordCreationDialog.vue';
-import RecordAlternationDialog from './dialogs/RecordAlternationDialog.vue';
+import RecordCreationDialog from '@/components/forms/AddRecord.vue';
+import RecordAlternationDialog from '@/components/forms/EditRecord.vue';
 
 let records = ref([])
 

@@ -1,13 +1,13 @@
 import { createWebHistory, createRouter } from 'vue-router'
 
-import AuthorizationPage from './AuthorizationPage.vue'
-import PersonalOfficePage from './PersonalOfficePage.vue'
-import DBManagePage from './DBManagePage.vue'
-import PasswordChangingPage from './PasswordChangingPage.vue'
-import DBTablePage from './DBTablePage.vue'
-import TasksPage from './TasksPage.vue'
-import EventsPage from './EventsPage.vue'
-import DocumentsPage from './DocumentsPage.vue'
+import AuthorizationPage from './pages/Auth.vue'
+import PersonalOfficePage from './pages/DashboardUser.vue'
+import DBManagePage from './pages/DashboardAdmin.vue'
+import PasswordChangingPage from './pages/_PasswordChangingPage.vue'
+import DBTablePage from './pages/TableDetails.vue'
+import TasksPage from './pages/Tasks.vue'
+import EventsPage from './pages/Events.vue'
+import DocumentsPage from './pages/Docs.vue'
 
 const routes = [
   { path: '/', name: 'Authorization', component: AuthorizationPage },

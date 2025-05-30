@@ -1,7 +1,7 @@
 <script setup>
 import axios from 'axios'
 import { onMounted, ref } from 'vue'
-import { getDepartments, getSupervisors } from '../Utils'
+import { getDepartments, getSupervisors } from '@/components/Utils'
 
 const props = defineProps(['taskType'])
 

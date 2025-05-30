@@ -1,10 +1,10 @@
 <script setup>
-import NavigationColumn from './components/NavigationColumn.vue';
-import EventsList from './components/EventsList.vue';
-import EventCreationDialog from './components/dialogs/EventCreationDialog.vue';
+import NavigationColumn from '@/components/menus/NavigationColumn.vue';
+import EventsList from '@/components/layouts/EventsList.vue';
+import EventCreationDialog from '@/components/forms/AddEvent.vue';
 import { ref } from 'vue'
-import EventsDropdown from './components/dropdowns/EventsDropdown.vue';
-import { getEvents } from  './components/Utils.js';
+import EventsDropdown from '@/components/menus/EventsDropdown.vue';
+import { getEvents } from  '@/components/Utils.js';
 
 const events = ref([])
 const visible = ref(false)

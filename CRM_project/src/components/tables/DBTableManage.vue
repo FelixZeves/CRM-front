@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import axios from 'axios';
-import { RoleEnum, TableEnum } from './Enums.vue'
-import RecordAlternationDialog from './dialogs/RecordAlternationDialog.vue';
-import RecordCreationDialog from './dialogs/RecordCreationDialog.vue';
+import { RoleEnum, TableEnum } from '@/components/Enums.vue'
+import RecordAlternationDialog from '@/components/forms/EditRecord.vue';
+import RecordCreationDialog from '@/components/forms/AddRecord.vue';
 
 const props = defineProps(['table'])
 

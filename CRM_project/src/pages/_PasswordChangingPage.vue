@@ -1,6 +1,6 @@
 <script setup>
-import AuthorizationPasswordChanging from './components/AuthorizationPasswordChanging.vue';
-import AuthorizationHeader from './components/AuthorizationHeader.vue';
+import AuthorizationPasswordChanging from '@/components/forms/ChangePass.vue';
+import AuthorizationHeader from '@/components/layouts/AuthorizationHeader.vue';
 </script>
 
 <template>

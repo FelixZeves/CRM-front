@@ -1,10 +1,9 @@
 <script setup>
-import CRMCalendar from './components/CRMCalendar.vue';
-import EventsTile from './components/EventsTile.vue';
-import NavigationColumn from './components/NavigationColumn.vue';
-import TasksTile from './components/TasksTile.vue';
+import CRMCalendar from '@/components/CRMCalendar.vue';
+import EventsTile from '@/components/cards/EventsTile.vue';
+import NavigationColumn from '@/components/menus/NavigationColumn.vue';
+import TasksTile from '@/components/cards/TasksTile.vue';
 import { ref } from 'vue'
-
 </script>
 
 <template>

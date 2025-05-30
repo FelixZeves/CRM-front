@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { DialogEnum } from '../Enums.vue';
+import { DialogEnum } from '@/components/Enums.vue';
 import { useQuasar, copyToClipboard } from 'quasar';
 
 const props = defineProps(['table', 'func'])

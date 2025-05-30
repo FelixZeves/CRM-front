@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-import Table from './Table.vue';
-import DBLastUpdates from './DBLastUpdates.vue';
+import Table from '@/components/tables/Table.vue';
+import DBLastUpdates from '@/components/tables/DBLastUpdates.vue';
 
 const tables = ref([
     {name: 'Пользователи'}

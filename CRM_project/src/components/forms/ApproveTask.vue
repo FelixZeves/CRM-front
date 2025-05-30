@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { StatusEnum, TypesEnum } from '../Enums.vue'
+import { StatusEnum, TypesEnum } from '@/components/Enums.vue'
 
 const props = defineProps(['name', 'description', 'deadline', 'creator', 'documents', 'status', 'comments', 'type'])
 

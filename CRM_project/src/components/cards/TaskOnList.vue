@@ -1,7 +1,7 @@
 <script setup>
-import TaskManipulationDialog from './dialogs/TaskManipulationDialog.vue'
+import ApproveTaskForm from '@/components/forms/ApproveTask.vue'
 
-import { StatusEnum } from './Enums.vue'
+import { StatusEnum } from '@/components/Enums.vue'
 
     const props = defineProps(['name', 'description', 'deadline', 'creator', 'documents', 'status', 'comments', 'type'])
 </script>
@@ -31,7 +31,7 @@ import { StatusEnum } from './Enums.vue'
         <div class="flex flex-row justify-between items-center mt-2">
             <p class="lg:text-md 2xl:text-lg m-0">{{ documents || ""}}</p>
             <div>
-                <TaskManipulationDialog 
+                <ApproveTaskForm 
                 :name="name"
                 :description="description"
                 :deadline="deadline"
@@ -39,8 +39,7 @@ import { StatusEnum } from './Enums.vue'
                 :status="status"
                 :type="type"
                 :documents="documents">
-                
-                </TaskManipulationDialog>
+                </ApproveTaskForm>
             </div>
             
         </div>

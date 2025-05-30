@@ -1,7 +1,7 @@
 <script setup>
 import axios from 'axios'
 import { ref } from 'vue'
-import TaskOnList from './TaskOnList.vue';
+import TaskOnList from '@/components/cards/TaskOnList.vue';
 
 const tasks = ref([ {name:"Заполнить отчёт о факультативах учеников класса 2.2", description: "Согласно приказа 123.4, необходимо провести опрос учащихся и заполнить таблицу в предоставленном шаблоне. Шаблон прикреплён", deadline: "18.11.2024", creator: "Иванова Оксана Ивановна", status: "danger", type: "execute", documents: "fileName.pdf"},
                     {name:"test", description: "testing test", deadline: "18.09.2002", creator: "someone", status: "complete", type: "accept", documents: "fileName.pdf"},

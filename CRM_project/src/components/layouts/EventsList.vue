@@ -1,5 +1,5 @@
 <script setup>
-import EventOnList from './EventOnList.vue'
+import EventOnList from '@/components/cards/EventOnList.vue'
 
 const props = defineProps(['events'])
 const emit = defineEmits(['update-list']);

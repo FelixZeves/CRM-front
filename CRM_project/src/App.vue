@@ -24,6 +24,13 @@
   background: #14DC14 !important;
 }
 
+.text-brand-velvet {
+  color: #825AFF !important;
+}
+
+.bg-brand-velvet {
+  background: #825AFF !important;
+}
 .q-table__card{
   @apply !rounded-[10pt]
 }
@@ -46,6 +53,18 @@
 
 .gray-menu{
     @apply !bg-[--vt-c-white-mute] !rounded-[10pt] border-[0.5pt] border-[--crm-c-medium-gray] text-lg
+}
+
+.q-btn {
+  @apply !rounded-[5pt];
+}
+
+.q-input {
+  @apply !text-lg
+}
+
+.bg-tile {
+  @apply bg-[#f7f7f7]
 }
 
 </style>
