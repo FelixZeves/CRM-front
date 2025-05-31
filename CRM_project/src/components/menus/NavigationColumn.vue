@@ -7,6 +7,7 @@ import TaskCreationDialog from '@/components/forms/AddTask.vue';
 const props = defineProps(['name', 'role', 'section'])
 const fio = ref("");
 const role = ref("");
+const visibleBugReport = ref(false);
 
 async function getUser(){
 
@@ -91,9 +92,9 @@ getUser()
                 </q-btn-dropdown>
             </Suspense>
             <p class="cursor-not-allowed select-none q-hoverable">Архив</p>
-            <p id="additionalButton" class="select-none q-hoverable">
-                <ModalError />
-            </p>
+            <q-btn @click="visibleBugReport = true" label="Нашли ошибку?" color="brand-white">
+                <ModalError v-model:visible="visibleBugReport" />
+            </q-btn>
             <RouterLink class="v-link q-hoverable" to="/">Выйти</RouterLink>
         </div> 
 </template>
