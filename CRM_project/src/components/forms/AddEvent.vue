@@ -10,192 +10,97 @@ const visible = computed({
   set: val => emit('update:visible', val)
 })
 
-const eventTitle = ref("")
-const eventDescription = ref("")
-const eventPlace = ref("")
+const isDelegate = ref(false)
+const today = new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+const date = ref({ from: today, to: today });
 
-function getTodayDate() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${day}.${month}.${year}`;
+const formatDate = computed(() => {
+    const { from, to } = date.value;
+    return from === to ? from : `${from} - ${to}`;
+});
+
+function selectDate(val) {
+    let newDate;
+    if (typeof val === 'object')
+    newDate = {...val};
+
+if (typeof val === 'string')
+newDate = { from: val, to: val };
+
+    date.value = newDate;
+    form.value.at = newDate.from;
+    form.value.to = newDate.to;
 }
 
-const eventDateSolo = ref(getTodayDate())
+const form = ref({
+    title: '',
+    description: '',
+    place: '',
+    departments: [],
+    at: today,
+    to: today
+});
 
-const eventDateRange = ref({ from: getTodayDate(), to: getTodayDate() })
-
-const datepickerType = ref("one")
-const datepickerName = ref("Один день")
-
-function changeDateType(){
-    datepickerType.value = (datepickerType.value == "one") ? "two" : "one"
-    datepickerName.value = (datepickerType .value== "one") ? "Один день" : "Диапазон"
+async function createEvent() {
+    await axios.post('/api/user/event', form.value)
+    emit('update-list')
 }
-
-async function CreateEvent(){
-    let params = {}
-    if (datepickerType.value == "one"){
-        params = {
-        description: eventDescription.value,
-        place: eventPlace.value,
-        title: eventTitle.value,
-        to: eventDateSolo.value,
-        }
-    }
-    else {
-        params = {
-        at: eventDateRange.value.from,
-        description: eventDescription.value,
-        place: eventPlace.value,
-        title: eventTitle.value,
-        to: eventDateRange.value.to
-        }
-    }
-    try{
-        const response = await axios.post('/api/user/event', params)
-        emit('update-list')
-        return response
-    } catch (error) {
-        console.error('Ошибка создания мероприятия:', error)
-        return []
-    }
-    
-}
-
 </script>
-
 
 <template>
     <q-dialog v-model="visible" backdrop-filter="blur(4px)">
-        <q-card style="max-width: 75%; min-width: 50%;" class="py-4 !rounded-[20px]">
-            <q-form @submit="CreateEvent">
-                <q-card-section>
-                    <p class="text-lg text-black mb-2 ps-3 underline underline-offset-[6px]">Название мероприятия</p>
-                    <q-input
-                        v-model="eventTitle"
-                        :rules="[val => val && val.length > 0 || 'Введите название мероприятия']"
-                        hide-bottom-space
-                        dense
-                        borderless
-                        color="black"
-                        label-color="black"
-                        placeholder="Введите название мероприятия..."
-                        class="ps-4 bg-[--vt-c-white-mute] !rounded-[10pt] border-[0.5pt] border-[--crm-c-medium-gray]">
+        <q-card class="text-black !rounded-[15pt] !flex !w-[90vw] !min-w-[50%]">
+            <q-form @submit="createEvent" class="bg-tile p-5 !flex flex-row w-full h-full gap-2">
 
-                    </q-input>
-                </q-card-section>
-
-                <q-card-section>
-                    <p class="text-lg text-black mb-2 ps-3 underline underline-offset-[6px]">Описание мероприятия</p>
+                <q-card-section class="flex flex-col w-[60%] gap-y-4">
                     <q-input
-                        v-model="eventDescription"
-                        :rules="[val => val && val.length > 0 || 'Введите описание мероприятия']"
-                        hide-bottom-space
-                        dense
-                        borderless
-                        color="black"
-                        label-color="black"
-                        placeholder="Введите описание мероприятия..."
-                        class="ps-4 bg-[--vt-c-white-mute] !rounded-[10pt] border-[0.5pt] border-[--crm-c-medium-gray]">
-                    </q-input>
-                </q-card-section>
-        
-                <q-card-section>
-                    <p class="text-lg text-black mb-2 ps-3 underline underline-offset-[6px]">Место проведения</p>
+                        label="Название мероприятия"
+                        v-model="form.title"
+                        outlined
+                        type="text"
+                        :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
+                    />
                     <q-input
-                        v-model="eventPlace"
-                        :rules="[val => val && val.length > 0 || 'Введите место проведения мероприятия']"
-                        hide-bottom-space
-                        dense
-                        borderless
-                        color="black" 
-                        label-color="black"
-                        placeholder="Место проведения мероприятия..."
-                        class="ps-4 bg-[--vt-c-white-mute] !rounded-[10pt] border-[0.5pt] border-[--crm-c-medium-gray]">
-                    </q-input>
+                        label="Место проведения"
+                        v-model="form.place"
+                        outlined
+                        type="text"
+                        :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
+                    />
+                    <q-input
+                        label="Описание мероприятия"
+                        v-model="form.description"
+                        outlined
+                        type="textarea"
+                        :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 255 || 'Максимальная длина 255 символов']"
+                    />
                 </q-card-section>
 
-                <q-card-section style="padding-left: 0; padding-right: 0;">
-                    
-                    <div class="flex flex-row justify-between ">
-                        <div class="w-1/2 flex flex-col justify-between items-center">
-                            <p class="text-lg text-black mb-2 underline underline-offset-[6px]">Формат мероприятия</p>
-                            <q-btn @click="changeDateType()" style="margin-bottom: 16px; border-radius: 5pt; background: white; border-width: 0.5pt; border-color: var(--crm-c-medium-gray);">
-                                    <q-icon name="chevron_left" style="padding-right: 10px;"></q-icon>
-                                {{ datepickerName }}
-                                    <q-icon name="navigate_next" style="padding-left: 10px;"></q-icon>
-                            </q-btn>
-                        </div>
-                        <div class="w-1/2 flex flex-col justify-between items-center">
-                            <p class="text-lg text-black mb-2 underline underline-offset-[6px]">Время проведения</p>
-                            <q-tab-panels v-model="datepickerType" animated transition-next="slide-right" transition-prev="slide-left">
-                                <q-tab-panel name="one" style="justify-items: center;">
-                                        <q-input
-                                        style="background: var(--crm-c-light-yellow); border-radius: 5pt; padding-left: 5pt; padding-right: 5pt; width: 75%"
-                                        input-style="background-color: white; height:75%; align-self: center; border-radius: 5pt; padding-left: 5px; padding-right: 5px; justify-items: center"
-                                        mask="##.##.####"
-                                        dense
-                                        borderless
-                                        v-model="eventDateSolo" >
-                                        <template v-slot:append>
-                                            <q-icon name="event" class="cursor-pointer">
-                                            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                                <q-date minimal mask="DD/MM/YYYY" v-model="eventDateSolo">
-                                                    <div class="row items-center justify-end">
-                                                        <q-btn v-close-popup color="primary" flat>
-                                                            <q-icon name="close"></q-icon>
-                                                        </q-btn>
-                                                    </div>
-                                                </q-date>
-                                            </q-popup-proxy>
-                                            </q-icon>
-                                        </template>
-                                        </q-input>
-                                </q-tab-panel>
-            
-                                <q-tab-panel name="two" style="justify-items: center;">
-                                    <div class="flex flex-row">
-                                        <q-input
-                                            style="background: var(--crm-c-light-yellow); border-start-start-radius: 5pt; border-end-start-radius: 5pt; padding-left: 5pt; padding-right: 5pt; width: 45%"
-                                            input-style="background-color: white; height:75%; align-self: center; border-radius: 5pt; padding-left: 5px; padding-right: 5px; justify-items: center"
-                                            mask="##.##.####"
-                                            dense
-                                            borderless
-                                            v-model="eventDateRange.from" >
-                                        </q-input>
-                                        <q-input
-                                            style="background: var(--crm-c-light-yellow); border-start-end-radius: 5pt; border-end-end-radius: 5pt; border-left-width: 1px; border-color: var(--vt-c-white-mute); padding-left: 5pt; padding-right: 5pt; width: 55%;"
-                                            input-style="background-color: white; height:75%; align-self: center; border-radius: 5pt; padding-left: 5px; padding-right: 5px; justify-items: center"
-                                            mask="##.##.####"
-                                            dense
-                                            borderless
-                                            v-model="eventDateRange.to" >
-                                        <template v-slot:append>
-                                            <q-icon name="event" class="cursor-pointer">
-                                            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                                <q-date minimal mask="DD/MM/YYYY" v-model="eventDateRange" range>
-                                                    <div class="row items-center justify-end">
-                                                        <q-btn v-close-popup color="primary" flat>
-                                                            <q-icon name="close"></q-icon>
-                                                        </q-btn>
-                                                    </div>
-                                                </q-date>
-                                            </q-popup-proxy>
-                                            </q-icon>
-                                        </template>
-                                        </q-input>
-                                    </div>
-                                </q-tab-panel>
-                            </q-tab-panels>
-                        </div>
-                    </div>
+                <q-card-section class="flex flex-col gap-y-4">
+                    <q-input label="Дата мероприятия" v-model="formatDate" readonly outlined>
+                        <template v-slot:append>
+                            <q-icon name="event">
+                                <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                    <q-date
+                                        v-model="date"
+                                        minimal
+                                        range
+                                        mask="DD.MM.YYYY"
+                                        @update:model-value="selectDate"
+                                        >
+                                        <q-btn class="flex flex-row" v-close-popup label="Закрыть" flat/>
+                                    </q-date>
+                                </q-popup-proxy>
+                            </q-icon>
+                        </template>
+                    </q-input>
+                    <q-toggle class="text-base text-gray-700" label="Делегировать отделам" v-model="isDelegate"/>
+                    <div class="text-gray-500"> Включите, чтобы мероприятие было создано для отдела, а не для вас.</div>
+                    <q-select v-model="form.departments" :disable="!isDelegate" label="Отдел"/>
+                    <div class="text-gray-500"> Вы также можете выбрать несколько отделов.</div>
+                    <q-btn label="Создать" type="submit" color="brand-velvet"/>
                 </q-card-section>
-        
-                <q-card-actions align="center">
-                    <q-btn label="Создать" type="submit" style="background: var(--crm-c-light-velvet); width: 25%; border-radius: 5pt;" text-color="white"/>
-                </q-card-actions>
+
             </q-form>
         </q-card>
     </q-dialog>
