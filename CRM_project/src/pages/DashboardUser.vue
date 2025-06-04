@@ -7,24 +7,26 @@ import { ref } from 'vue'
 </script>
 
 <template>
-    <div class="h-full grid grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-x-8 lg:gap-x-16 content-center">
+    <div class="flex flex-row h-[100vh] w-[100vw] content-center px-8 gap-x-4">
         <header>
             <NavigationColumn
             section='Office'
             />
         </header>
 
-        <main class="col-span-3  lg:col-span-4 2xl:col-span-5 grid grid-rows-4 grid-cols-5 gap-x-5 gap-y-2 lg:gap-y-5 lg:mt-1 2xl:mt-2">
-            <div class="row-span-2 col-span-3 grid grid-row-subgrid">
-                <TasksTile class="row-start-2"/>
-            </div>
-            <div class="row-span-2 col-span-2 flex justify-center self-center">
-                <Suspense>
-                    <CRMCalendar class="font-jetbrains-mono!"/>
-                </Suspense>
+        <main class="flex flex-col gap-y-8 flex-grow">
+            <div class="flex flex-row gap-x-8">
+                <div class="w-1/2">
+                    <TasksTile class="row-start-2"/>
+                </div>
+                <div class="flex-grow">
+                    <Suspense>
+                        <CRMCalendar class="font-jetbrains-mono!"/>
+                    </Suspense>
+                </div>
             </div>
             <Suspense>
-                <EventsTile class="row-span-2 col-span-5"/>
+                <EventsTile class=""/>
             </Suspense>
         </main>
     </div>

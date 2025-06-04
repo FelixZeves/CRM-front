@@ -1,7 +1,38 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, toRaw } from 'vue';
+import { getEvents } from './Utils';
 
-const attrs = ref([
+const events = ref()
+
+function parseCustomDate(dateString) {
+  const [day, month, year] = dateString.split('.').map(Number);
+  return new Date(Date.UTC(year, month-1, day));
+}
+
+async function parseEvents(){
+    let response = await getEvents()
+
+    let rawEvents = response.data.data
+
+    const result = Array.from(rawEvents).map(event => ({
+    key: event.id,
+    highlight: {
+        color: 'velvet',
+    },  
+    dates: event.at != event.to  ? [[parseCustomDate(event.at), parseCustomDate(event.to)]] : [parseCustomDate(event.to)],
+    popover: {
+        label: event.title,
+    }
+    }));
+
+
+    return result
+}
+
+events.value = await parseEvents()
+
+let attrs = ref([
+    ...toRaw(events.value),
     {
         key: 'today',
         highlight: 'velvet-today',
@@ -9,8 +40,9 @@ const attrs = ref([
         popover: {
         label: 'Сегодня',
         }
-    },
-]);
+    }
+])
+
 
 </script>
 
@@ -68,15 +100,19 @@ const attrs = ref([
 
 .vc-container{
 
-    @apply !w-[100%] !h-[100%] !rounded-[20pt] py-2 px-2
-}
-
-.vc-weekdays{
-    @apply py-2
+    @apply !w-full !rounded-[20pt]
 }
 
 .vc-week{
     @apply py-2
+}
+
+.on-left{
+    @apply !me-0
+}
+
+.on-right{
+    @apply !ms-0
 }
 
 .vc-highlight{
