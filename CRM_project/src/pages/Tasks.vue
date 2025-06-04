@@ -3,6 +3,9 @@ import NavigationColumn from '@/components/menus/NavigationColumn.vue';
 import { ref } from 'vue'
 import TasksList from '@/components/layouts/TasksList.vue';
 import TasksDropdown from '@/components/menus/TasksDropdown.vue';
+import AddTask from '@/components/forms/AddTask.vue';
+
+const visible = ref(false)
 
 </script>
 
@@ -17,8 +20,9 @@ import TasksDropdown from '@/components/menus/TasksDropdown.vue';
 
         <main class="col-span-3 lg:col-span-4 2xl:col-span-5">
             <div>
-                <TasksDropdown></TasksDropdown>
+                <TasksDropdown @show-dialog="visible = true"></TasksDropdown>
                 <TasksList/>
+                <AddTask v-model:visible="visible"></AddTask>
             </div>
         </main>
     </div>

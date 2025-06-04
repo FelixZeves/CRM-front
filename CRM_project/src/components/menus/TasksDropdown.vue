@@ -2,6 +2,8 @@
 import { update } from 'immutable';
 import {ref} from 'vue'
 
+const emit = defineEmits(['show-dialog'])
+
 const statusFilter = ref("Все состояния задач")
 
 const datesFilter = ref("Старые задачи")
@@ -17,10 +19,11 @@ function onDateClick(res){
 </script>
 
 <template>
-    <div class="q-pa-md border-2 w-[90%]  mx-3">
+  <div class="q-pa-md border-2 w-[90%] flex flex-row justify-between mx-3">
+    <div class="flex flex-row items-center">
       <q-btn-dropdown
       :menu-offset="[0, 5]"
-      class="shadow-xl rounded-[20pt] me-5"
+      class="shadow-xl me-5"
       color="white"
       text-color="black"
       :label=statusFilter>
@@ -53,7 +56,7 @@ function onDateClick(res){
 
       <q-btn-dropdown
       :menu-offset="[10, 5]"
-      class="shadow-xl rounded-[20pt]"
+      class="shadow-xl"
       color="white"
       text-color="black"
       :label=datesFilter>
@@ -80,4 +83,6 @@ function onDateClick(res){
       </q-btn-dropdown>
 
     </div>
+    <q-btn class="!bg-[--crm-c-light-yellow]" unelevated text-color="black" icon-right="add" label="Создать" @click="$emit('show-dialog')"></q-btn>
+  </div>
   </template>

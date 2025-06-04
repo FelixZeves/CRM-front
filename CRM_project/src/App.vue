@@ -47,16 +47,16 @@
   @apply !bg-[--crm-c-light-velvet] !w-1/4 !rounded-[5pt] !text-white;
 }
 
-.q-field__messages, .q-table__bottom{
-    @apply !text-base
+.q-field__messages{
+    @apply !text-xs
 }
 
 .gray-menu{
     @apply !bg-[--vt-c-white-mute] !rounded-[10pt] border-[0.5pt] border-[--crm-c-medium-gray] text-lg
 }
 
-.q-btn {
-  @apply !rounded-[5pt];
+.q-btn, .q-dropdown {
+  @apply !rounded-[5pt] !normal-case !text-base
 }
 
 .q-input {

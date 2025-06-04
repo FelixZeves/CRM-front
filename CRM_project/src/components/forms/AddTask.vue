@@ -1,210 +1,251 @@
 <script setup>
 import axios from 'axios'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { getDepartments, getSupervisors } from '@/components/Utils'
 
-const props = defineProps(['taskType'])
+const props = defineProps(['visible'])
+const emit = defineEmits(['update:visible', 'update-list'])
 
-const departments = ref([])
+const role = ref()
 
-const executors = ref([])
+async function getUser(){
 
-const reviewers =  ref([])
+try {
+    const response = await axios.get('/api/user/me');
 
-const сheckers = ref([])
-
-var title = ""
-
-var hint = ""
-
-switch(props.taskType){
-    case 'application':
-        title = "Заявка"
-        hint = "заявки"
-        break
-    case 'task':
-        title = "Задача"
-        hint = "задачи"
-        break
-    case 'memo':
-        title = "Служебная записка"
-        hint = "служебной записки"
+    role.value = response.data.role;
+    
+} catch (error) {
+    console.error('Ошибка авторизации:', error.response?.data || error.message);
 }
 
-const taskCreation = ref(false)
+}
+getUser()
 
-const taskName = ref("")
+const today = new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-const taskDescription = ref("")
+const step = ref(1)
 
-const taskComment = ref("")
+const task = ref({
+    title: '',
+    description: '',
+    comment:  '',
+    deadline: today,
+    files: [],
+    executors: [],
+    reviewers: [],
+    checkers: [],
+    type: "2",    
+})
 
-const taskDeps = ref(Array())
+const activeEvent = ref(false)
+const eventForMe =  ref(false)
 
-const taskExecs = ref(Array())
+const event = ref({
+    title: '',
+    description: '',
+    place: '',
+    recivers: [],
+    at: today,
+    to: today
+});
 
-const taskRevs = ref(Array())
+const date = ref({ from: today, to: today });
 
-const taskChecks = ref(Array())
+const formatDate = computed(() => {
+    const { from, to } = date.value;
+    return from === to ? from : `${from} - ${to}`;
+});
 
-function getTodayDate() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${day}/${month}/${year}`;
+function selectDate(val) {
+    let newDate;
+    if (typeof val === 'object')
+        newDate = {...val};
+
+    if (typeof val === 'string')
+        newDate = { from: val, to: val };
+
+    date.value = newDate;
+    event.value.at = newDate.from;
+    event.value.to = newDate.to;
 }
 
-const tasktDate = ref(getTodayDate())
+function clearForm() {
+    if (step.value === 1) {
+        for (const key in task.value) {
+        const value = task.value[key]
+        if (typeof value === 'string') {
+            task.value[key] = ''
+        } else if (Array.isArray(value)) {
+            task.value[key] = []
+        }
+        }
+        task.value.deadline = today
+        task.value.type = "2"
+    } 
+    else if (step.value === 2) {
+        for (const key in event.value) {
+        const value = event.value[key]
+        if (typeof value === 'string')
+            event.value[key] = ''
+        }
+        event.value.at = today
+        event.value.to = today
+        eventForMe.value = false
+    }
+}
 
-const taskFiles = ref(Array())
+function throwData(){
+    event.value.title = task.value.title
+    event.value.description = task.value.description
+    event.value.to = task.value.deadline
+}
+
+function clearDialog(){
+    step.value = 2
+    clearForm()
+    step.value=1
+    clearForm()
+}
+
+const visible = computed({
+  get: () => props.visible,
+  set: val => emit('update:visible', val)
+})
 
 function checkDock(){
     console.log(taskFiles)
 }
 
-onMounted(async () => {
-    if (props.taskType == 'application'){
-        let depResponse =  await getDepartments()
-
-        departments.value = depResponse
-    }
-    else if(props.taskType == 'memo'){
-
-    }
-    else if(props.taskType == 'task'){
-
-    }
-})
-
 </script>
 
 <template>
 
-    <q-item-section @click="taskCreation = true">{{ title }}</q-item-section>
-    
-    <q-dialog v-model="taskCreation" backdrop-filter="blur(4px)">
-        <q-card style="max-width: 75%; min-width: 75%;" class="py-4 !rounded-[20px]">
-            <q-card-section>
-                <p class="text-lg text-black mb-2 ps-3 underline underline-offset-[6px]">Название {{ hint }}</p>
-                <q-input
-                    v-model="taskName"
-                    :rules="[val => val && val.length > 0 || 'Введите название']"
-                    hide-bottom-space
-                    dense
-                    borderless
-                    color="black"
-                    label-color="black"
-                    placeholder="Введите название задачи..."
-                    class="ps-4 bg-[--vt-c-white-mute] !rounded-[10pt] border-[0.5pt] border-[--crm-c-medium-gray]">
-
-                </q-input>
-            </q-card-section>
-
-            <q-card-section>
-                <p class="text-lg text-black mb-2 ps-3 underline underline-offset-[6px]">Основная информация</p>
-                <q-input
-                    v-model="taskDescription"
-                    :rules="[val => val && val.length > 0 || 'Введите основную информацию']"
-                    hide-bottom-space
-                    dense
-                    borderless
-                    color="black"
-                    label-color="black"
-                    placeholder="Введите описание задачи..."
-                    class="ps-4 bg-[--vt-c-white-mute] !rounded-[10pt] border-[0.5pt] border-[--crm-c-medium-gray]">
-                </q-input>
-            </q-card-section>
-    
-            <q-card-section>
-                <p class="text-lg text-black mb-2 ps-3 underline underline-offset-[6px]">Дополнительный комментарий</p>
-                <q-input
-                    v-model="taskComment"
-                    hide-bottom-space
-                    dense
-                    borderless
-                    color="black" 
-                    label-color="black"
-                    placeholder="Дополнительный комментарий..."
-                    hint="Необязательное поле"
-                    class="ps-4 bg-[--vt-c-white-mute] !rounded-[10pt] border-[0.5pt] border-[--crm-c-medium-gray]">
-                </q-input>
-            </q-card-section>
-
-            <q-card-section style="padding-left: 0; padding-right: 0;">
-                <div class="flex flex-row justify-between ">
-                    <div class="w-1/2 flex flex-col justify-between items-center">
-                        <p class="text-lg text-black mb-2 underline underline-offset-[6px]">Время выполнения</p>
-                        <q-input
-                        style="background: var(--crm-c-light-yellow); border-radius: 5pt; padding-left: 5pt; padding-right: 5pt; width: 75%"
-                        input-style="background-color: white; height:75%; align-self: center; border-radius: 5pt; padding-left: 5px; padding-right: 5px; justify-items: center"
-                        mask="## | ## | ####"
-                        dense
-                        borderless
-                        v-model="tasktDate">
-                        <template v-slot:append>
-                            <q-icon name="event" class="cursor-pointer">
-                            <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                <q-date minimal mask="DD/MM/YYYY" v-model="eventDateSolo">
-                                    <div class="row items-center justify-end">
-                                        <q-btn v-close-popup color="primary" flat>
-                                            <q-icon name="close"></q-icon>
-                                        </q-btn>
-                                    </div>
-                                </q-date>
-                            </q-popup-proxy>
-                            </q-icon>
-                        </template>
-                        </q-input>
+<q-dialog v-model="visible" backdrop-filter="blur(4px)" @hide="clearDialog">
+    <q-card class="text-black !rounded-[15pt] !flex !flex-col !w-[90vw] !min-w-[50%] !max-w-[65%] !bg-tile">
+        <q-card-section class="!flex flex-row !ps-0 items-center">
+            <q-stepper
+            v-model="step"
+            vertical
+            done-color="brand-complete"
+            active-color="brand-velvet"
+            class="flex-grow"
+            contracted
+            flat
+            animated
+            >
+            <q-step
+                :name="1"
+                title="Создание задачи"
+                icon="fa-regular fa-file-lines"
+                class="row-grow"
+                :done="step > 1"
+            >
+            <q-tabs
+            v-model="task.type"
+            class="!text-lg !font-bold"
+            active-color="primary"
+            indicator-color="primary"
+            align="justify"
+            narrow-indicator
+            >
+                <q-tab v-if="role !=3" name="0" label="Задача" />
+                <q-tab name="2" label="Служебная записка" />
+                <q-tab name="1" label="Заявка" />
+            </q-tabs>
+            <div class="!flex !flex-col">
+                <q-form class=" p-5 !flex flex-row h-full gap-x-12">
+                    <div class="flex flex-col gap-y-8 w-1/2">
+                        <div class="flex flex-row gap-x-4">
+                            <q-btn icon="refresh" color="brand-danger" @click="clearForm()"></q-btn>
+                            <q-input v-model="task.title" outlined type="text" label="Название задачи" class="!flex-grow"></q-input>
+                        </div>
+                        <q-input v-model="task.description" outlined type="textarea" label="Описание задачи"></q-input>
+                        <q-input v-model="task.comment" outlined type="textarea" label="Дополнительный комментарий"></q-input>
                     </div>
-                    <div class="w-1/2 flex flex-col justify-between items-center">
-                        <p class="text-lg text-black mb-2 underline underline-offset-[6px]">Файлы {{ hint }}</p>
-                        <q-file
-                        v-model="taskFiles"
-                        label="Добавить файл"
-                        borderless
-                        dense
-                        multiple
-                        max-files="5"
-                        
-                        accept=".pdf, .zip, .7z, .dockx, .png"
-                        counter
-                        use-chips
-                        style="background: var(--crm-c-light-yellow); border-radius: 5pt; padding-left: 5pt; padding-right: 5pt; width: 75%; height: 40px;">
-                            <template v-slot:after>
-                            <q-icon name="attach_file" />
+                    <div class="flex flex-col gap-y-8 w-1/2">
+                        <q-input label="Дата выполнения" v-model="task.deadline" readonly outlined>
+                            <template v-slot:append>
+                                <q-icon name="event">
+                                    <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                        <q-date
+                                            v-model="task.deadline"
+                                            minimal
+                                            mask="DD.MM.YYYY"
+                                            >
+                                            <q-btn class="flex flex-row" v-close-popup label="Закрыть" flat/>
+                                        </q-date>
+                                    </q-popup-proxy>
+                                </q-icon>
                             </template>
-                        </q-file>
+                        </q-input>
+                        <q-select :readonly="task.type != 0" v-model="task.executors" outlined use-chips label="Исполняющие"/>
+                        <q-select :readonly="task.type == 1" v-model="task.reviewers" outlined use-chips label="Согласующие"/>
+                        <q-select :readonly="task.type != 0" v-model="task.checkers" outlined use-chips label="Проверяющие"/>
+                        <q-select :readonly="task.type != 1" v-model="task.executors" outlined use-chips label="Отделы"/>
                     </div>
-                </div>
-            </q-card-section>
+                </q-form>
+            </div>
+            </q-step>
 
-            <q-card-section>
-                <div v-if="taskType == 'application'" class="flex flex-col justify-between">
-                    <p class="text-lg text-black mb-2 underline underline-offset-[6px]">Отделы</p>
-                    <q-select multiple use-chips v-model="taskDeps" :options="departments" label="Выбрать отдел"/>
-                </div>
-                <div v-if="taskType == 'memo'" class="flex flex-col justify-between">
-                    <p class="text-lg text-black mb-2 underline underline-offset-[6px]">Согласующие</p>
-                    <q-select multiple use-chips v-model="taskRevs" :options="reviewers" label="Выбрать согласующих"/>
-                </div>
-                <div v-if="taskType == 'task'" class="flex flex-col justify-between pb-2">
-                    <p class="text-lg text-black mb-2 underline underline-offset-[6px]">Исполнители</p>
-                    <q-select multiple use-chips v-model="taskExecs" :options="executors" label="Выбрать исполнителей"/>
-                </div>
-                <div v-if="taskType == 'task'" class="flex flex-col justify-between pb-2">
-                    <p class="text-lg text-black mb-2 underline underline-offset-[6px]">Согласующие</p>
-                    <q-select multiple use-chips v-model="taskRevs" :options="reviewers" label="Выбрать согласующих"/>
-                </div>
-                <div v-if="taskType == 'task'" class="flex flex-col justify-between pb-2">
-                    <p class="text-lg text-black mb-2 underline underline-offset-[6px]">Проверяющие</p>
-                    <q-select multiple use-chips v-model="taskChecks" :options="сheckers" label="Выбрать проверающих"/>
-                </div>
-            </q-card-section>
-    
-            <q-card-actions align="center">
-                <q-btn label="Отправить" type="submit" @click="checkDock" rounded class="submit-btn" v-close-popup />
-            </q-card-actions>
-        </q-card>
-    </q-dialog>
+            <q-step
+                v-if="task.type == 0"
+                :name="2"
+                title="Создание мероприятия"
+                class="row-grow"
+                icon="add"
+                :done="step > 2"
+            >
+                <q-form @submit="checkDock" class=" p-5 !flex flex-row h-full gap-x-12">
+                    <div class="flex flex-col gap-y-8 w-1/2">
+                        <q-toggle v-model="activeEvent" label="Создать мероприятие исполнителям"></q-toggle>
+                        <q-toggle :disable="!activeEvent" v-model="eventForMe" label="Создать для себя"></q-toggle>
+                        <div class="flex flex-row gap-x-2">
+                            <q-btn icon="refresh" color="brand-danger" @click="clearForm()"></q-btn>
+                            <q-input :disable="!activeEvent" label="Дата выполнения" v-model="formatDate" readonly outlined>
+                                <template v-slot:append>
+                                    <q-icon name="event">
+                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                            <q-date
+                                                v-model="date"
+                                                minimal
+                                                range
+                                                mask="DD.MM.YYYY"
+                                                @update:model-value="selectDate"
+                                                >
+                                                <q-btn class="flex flex-row" v-close-popup label="Закрыть" flat/>
+                                            </q-date>
+                                        </q-popup-proxy>
+                                    </q-icon>
+                                </template>
+                            </q-input>
+                        </div>
+                        <div class="text-gray-500">Чтобы создать мероприятие с одной датой проведения, дважды нажмите на необходимую дату.</div>
+                        <q-select :disable="!activeEvent" v-model="event.recivers" label="Получатели" use-chips></q-select>
+                    </div>
+                    <div class="flex flex-col gap-y-8 w-1/2">
+                       <q-input :disable="!activeEvent" v-model="event.title" label="Название мероприятия"></q-input>
+                       <q-input :disable="!activeEvent" v-model="event.place" label="Место проведения"></q-input>
+                       <q-input :disable="!activeEvent" v-model="event.description" label="Описание мероприятия" type="textarea" input-style="min-height: 165px; resize: vertical;" ></q-input>
+                    </div>
+                </q-form>
+            
+            </q-step>
+            </q-stepper>
+            
+        </q-card-section>
+        <q-card-section class="flex flex-row justify-between mx-12">
+            <q-btn :disable="step == 1 ? true : false" @click="step = 1" color="brand-velvet" label="Назад" class="navigation-btn" />
+            <q-btn v-if="step == 1 & task.type == 0" @click="step =step + 1; throwData()" color="brand-velvet" label="Далее" class="navigation-btn" />
+            <q-btn v-if="step == 2 || task.type != 0" color="brand-velvet" label="Создать" class="navigation-btn" />
+        </q-card-section>
+    </q-card>
+</q-dialog>
 </template>
+
+<style scoped>
+
+.navigation-btn{
+    @apply !w-[150px]
+}
+</style>

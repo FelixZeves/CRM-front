@@ -35,31 +35,20 @@ const taskComment = ref("")
                     </div>
                 </q-card-section>
 
-                <q-card-section >
-                    <p v-if="type == 'execute'" class="text-lg text-black mb-2 ps-3 underline underline-offset-[6px]">Текст отчёта</p>
+                <q-card-section class="flex flex-col gap-y-4">
                     <q-input
                         v-if="type == 'execute'"
                         v-model="taskReport"
+                        outlined
+                        type="textarea"
                         :rules="[val => val && val.length > 0 || 'Введите текст отчёта']"
-                        hide-bottom-space
-                        dense
-                        borderless
-                        color="black"
-                        label-color="black"
-                        placeholder="Введите текст отчёта..."
-                        class="h-[100px] ps-4 bg-[--vt-c-white-mute] !rounded-[10pt] border-[0.5pt] border-[--crm-c-medium-gray]">
+                        label="Текст отчёта">
                     </q-input>
-
-                    <p class="text-lg text-black my-2 ps-3 underline underline-offset-[6px]">Комментарий</p>
                     <q-input
                         v-model="taskComment"
-                        hide-bottom-space
-                        dense
-                        borderless
-                        color="black"
-                        label-color="black"
-                        placeholder="Введите комментарий..."
-                        class="h-[125px] ps-4 bg-[--vt-c-white-mute] !rounded-[10pt] border-[0.5pt] border-[--crm-c-medium-gray]">
+                        outlined
+                        type="textarea"
+                        label="Комментарий">
                     </q-input>
                 </q-card-section>
         

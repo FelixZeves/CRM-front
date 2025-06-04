@@ -18,7 +18,7 @@ function onDateClick(res){
 <template>
     <div class="q-pa-md border-2 w-[90%] flex flex-row justify-between mx-3">
       <div class="flex flex-row items-center">
-        <q-btn-dropdown class="shadow-xl rounded-[20pt] me-5" color="white" text-color="black" :label=statusFilter :menu-offset="[0, 5]">
+        <q-btn-dropdown class="shadow-xl rounded-[20pt] me-5 !normal-case" color="white" text-color="black" :label=statusFilter :menu-offset="[0, 5]">
           <q-list>
             <q-item clickable v-close-popup @click="onStatusClick('Все мероприятия')">
               <q-item-section>
@@ -41,7 +41,7 @@ function onDateClick(res){
           </q-list>
         </q-btn-dropdown>
   
-        <q-btn-dropdown class="shadow-xl rounded-[20pt]" color="white" text-color="black" :label=datesFilter :menu-offset="[0, 5]">
+        <q-btn-dropdown class="shadow-xl rounded-[20pt] !normal-case" color="white" text-color="black" :label=datesFilter :menu-offset="[0, 5]">
           <q-list>
           <q-item clickable v-close-popup @click="onDateClick('Старые мероприятия')">
             <q-item-section>
@@ -64,12 +64,7 @@ function onDateClick(res){
         </q-list>
         </q-btn-dropdown>
       </div>
-      <Suspense>
-        <q-btn style="background: var(--crm-c-light-yellow); text-transform:none; border-radius: 5pt;" unelevated text-color="black" icon-right="add" label="Добавить мероприятие" @click="$emit('show-dialog')"></q-btn>
-        <template #fallback>
-          <q-btn>Загрузка</q-btn>
-        </template>
-      </Suspense>
+      <q-btn class="!border-[5pt]  !bg-[--crm-c-light-yellow] !normal-case" unelevated text-color="black" icon-right="add" label="Добавить мероприятие" @click="$emit('show-dialog')"></q-btn>
 
     </div>
   </template>
