@@ -7,7 +7,7 @@ import { ref } from 'vue'
 </script>
 
 <template>
-    <div class="flex flex-row h-[100vh] w-[100vw] content-center px-8 gap-x-4">
+    <div class="flex flex-row h-[100vh] w-[100vw] content-center px-8 gap-x-8">
         <header>
             <NavigationColumn
             section='Office'
@@ -15,11 +15,11 @@ import { ref } from 'vue'
         </header>
 
         <main class="flex flex-col gap-y-8 flex-grow">
-            <div class="flex flex-row gap-x-8">
-                <div class="w-1/2">
-                    <TasksTile class="row-start-2"/>
-                </div>
+            <div class="flex flex-row gap-x-4">
                 <div class="flex-grow">
+                    <TasksTile/>
+                </div>
+                <div class="w-1/4">
                     <Suspense>
                         <CRMCalendar class="font-jetbrains-mono!"/>
                     </Suspense>

@@ -157,16 +157,33 @@ function checkDock(){
                 <q-form class=" p-5 !flex flex-row h-full gap-x-12">
                     <div class="flex flex-col gap-y-8 w-1/2">
                         <div class="flex flex-row gap-x-4">
-                            <q-btn icon="refresh" color="brand-danger" @click="clearForm()"></q-btn>
-                            <q-input v-model="task.title" outlined type="text" label="Название задачи" class="!flex-grow"></q-input>
+                            <q-btn icon="refresh" color="brand-danger opacity-[80%]" @click="clearForm()"></q-btn>
+                            <q-input
+                            v-model="task.title"
+                            outlined 
+                            type="text"
+                            label="Название задачи"
+                            :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
+                            class="!flex-grow"></q-input>
                         </div>
-                        <q-input v-model="task.description" outlined type="textarea" label="Описание задачи"></q-input>
-                        <q-input v-model="task.comment" outlined type="textarea" label="Дополнительный комментарий"></q-input>
+                        <q-input
+                        v-model="task.description"
+                        outlined type="textarea"
+                        label="Описание задачи"
+                        :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 255 || 'Максимальная длина 255 символов']"
+                        input-style="min-height: 180px; resize: vertical;"></q-input>
+                        <q-input
+                        v-model="task.comment"
+                        outlined
+                        type="textarea"
+                        label="Дополнительный комментарий"
+                        :rules="[val => val.length <= 255 || 'Максимальная длина 255 символов']"
+                        input-style="min-height: 180px; resize: vertical;"></q-input>
                     </div>
                     <div class="flex flex-col gap-y-8 w-1/2">
                         <q-input label="Дата выполнения" v-model="task.deadline" readonly outlined>
                             <template v-slot:append>
-                                <q-icon name="event">
+                                <q-icon name="event" color="brand-velvet">
                                     <q-popup-proxy cover transition-show="scale" transition-hide="scale">
                                         <q-date
                                             v-model="task.deadline"
@@ -179,6 +196,18 @@ function checkDock(){
                                 </q-icon>
                             </template>
                         </q-input>
+                        <q-file
+                            v-model="task.files"
+                            label="Прикрепить файлы"
+                            outlined
+                            bg-color="brand-wait"
+                            counter
+                            :counter-label="({filesNumber, maxFiles, totalSize}) => `${filesNumber} из ${maxFiles} (общий размер ${totalSize})`"
+                            max-files="5"
+                            use-chips
+                            multiple>
+                            <template v-slot:append><q-icon name="attach_file" /></template>
+                        </q-file>
                         <q-select :readonly="task.type != 0" v-model="task.executors" outlined use-chips label="Исполняющие"/>
                         <q-select :readonly="task.type == 1" v-model="task.reviewers" outlined use-chips label="Согласующие"/>
                         <q-select :readonly="task.type != 0" v-model="task.checkers" outlined use-chips label="Проверяющие"/>
@@ -201,10 +230,10 @@ function checkDock(){
                         <q-toggle v-model="activeEvent" label="Создать мероприятие исполнителям"></q-toggle>
                         <q-toggle :disable="!activeEvent" v-model="eventForMe" label="Создать для себя"></q-toggle>
                         <div class="flex flex-row gap-x-2">
-                            <q-btn icon="refresh" color="brand-danger" @click="clearForm()"></q-btn>
-                            <q-input :disable="!activeEvent" label="Дата выполнения" v-model="formatDate" readonly outlined>
+                            <q-btn icon="refresh" color="brand-danger opacity-[80%]" @click="clearForm()"></q-btn>
+                            <q-input :disable="!activeEvent" label="Дата выполнения" v-model="formatDate" readonly outlined  class="flex-grow">
                                 <template v-slot:append>
-                                    <q-icon name="event">
+                                    <q-icon name="event" color="brand-velvet">
                                         <q-popup-proxy cover transition-show="scale" transition-hide="scale">
                                             <q-date
                                                 v-model="date"

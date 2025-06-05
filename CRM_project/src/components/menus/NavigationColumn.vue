@@ -28,8 +28,8 @@ getUser()
 </script>
 
 <template>
-        <div class="!flex !flex-col !justify-between p-4 items-center justify-center bg-[--crm-c-dark-velvet] rounded-[15pt]">
-            <div class="flex flex-col gap-y-4">
+        <div class="!flex !flex-col p-4 items-center bg-[--crm-c-dark-velvet] rounded-[15pt]">
+            <div class="flex flex-col gap-y-4 items-center">
                 <q-btn :to="{name:  'Office'}" flat>
                     <div class="flex flex-col">
                         <q-img src="@\assets\worker-photo.jpg" class="!rounded-full"></q-img>
@@ -39,37 +39,34 @@ getUser()
                 <q-btn 
                     flat
                     disable
-                    class="cursor-not-allowed !font-bold"
+                    class="cursor-not-allowed"
                     label="Учебная деятельность"
                     :class="section == 'Education' ? 'text-brand-wait' : 'text-white'"/>
                 <q-btn
                     flat
-                    class="!font-bold"
                     :class="section == 'Tasks' ? 'text-brand-wait' : 'text-white'"
                     :to="{name : 'Tasks'}"
                     label="Задачи"/>
                 <q-btn
                     flat
-                    class="!font-bold"
                     :class="section == 'Events' ? 'text-brand-wait' : 'text-white'"
                     :to="{name : 'Events'}"
                     label="Мероприятия"/>
                 <q-btn
                     flat
-                    class="!font-bold"
                     :class="section == 'Documents' ? 'text-brand-wait' : 'text-white'"
                     :to="{name : 'Documents'}"
                     label="Документы"/>
                 <q-btn 
                     flat
                     disable
-                    class="cursor-not-allowed !font-bold"
+                    class="cursor-not-allowed"
                     label="Архив"
                     :class="section == 'Archive' ? 'text-brand-wait' : 'text-white'"/>
-                <q-btn @click="visibleBugReport = true" label="Нашли ошибку?" color="brand-white" unelevated class="mt-8 !font-bold !text-base !normal-case flex-grow">
+                <q-btn @click="visibleBugReport = true" label="Нашли ошибку?" color="brand-white" unelevated class="mt-8">
                     <ModalError v-model:visible="visibleBugReport" />
                 </q-btn>
-                <q-btn flat class="!font-bold text-white !flex-grow" to="/" label="Выйти"></q-btn>
+                <q-btn flat class="text-white" to="/" label="Выйти"></q-btn>
                 </div>
             
         </div> 
@@ -80,6 +77,10 @@ getUser()
 .q-hoverable:hover {
     background-image: linear-gradient(to right, var(--crm-c-velvet), var(--crm-c-light-velvet), var(--crm-c-light-velvet));
     opacity: 1;
+}
+
+.q-btn{
+    @apply !font-bold !w-[90%]
 }
 
 </style>

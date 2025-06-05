@@ -41,10 +41,7 @@ const tasks = ref([
 <style scoped>
 
 #tasksTile{
-    height: max-content;
-    background-color: white;
-    border-radius: 20pt;
-    padding-bottom: 4%;
+    @apply bg-white rounded-[15pt] pb-4
 }
 
 #tasksTile h3{
