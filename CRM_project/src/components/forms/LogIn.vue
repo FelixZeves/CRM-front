@@ -22,7 +22,7 @@ async function loginUser(){
 
         const role = details.data.role
 
-        router.push(role == 0 ? '/DBManage' : '/Office')
+        router.push('/Office')
         
     } catch (error) {
         console.error('Ошибка авторизации:', error.message);

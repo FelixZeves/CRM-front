@@ -21,9 +21,9 @@ const a = [
 
 const b = [
     { name: 'title', label: 'Отдел', field: row => row.title, align: 'left', sortable: true },
-    { name: 'head_department', label: 'Управляющий отдел', field: row => row.head_department, align: 'left', sortable: true },
-    { name: 'supervisors', label: 'Руководители', field: row => row.supervisors, align: 'left', sortable: true },
-    { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'center', sortable: true },
+    { name: 'head_department', label: 'Вышестоящее руководство', field: row => row.head_department, align: 'left', sortable: true },
+    { name: 'supervisors', label: 'Руководитель отдела', field: row => row.supervisors, align: 'left', sortable: true },
+    { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true },
 ]
 
 const c = [
@@ -216,7 +216,13 @@ function select(row, schema, path) {
     <div class="w-[30%] h-full overflow-y-auto">
         <div class="flex flex-col m-2">
             <div class="flex flex-col gap-4 mb-5">
-                <span class="font-bold text-gray-800 text-2xl text-start"> Административная страница </span>
+                <div class="flex flex-row justify-between">
+                    <span class="font-bold text-gray-800 text-2xl text-start"> Административная страница </span>
+                    <q-btn
+                    unelevated
+                    :to="{name : 'Office'}"
+                    icon="fa-solid fa-arrow-right-from-bracket text-brand-danger"/>
+                </div>
                 <div class="flex gap-4">
                     <q-btn
                         icon="fa-solid fa-pen"

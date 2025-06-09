@@ -63,6 +63,13 @@ getUser()
                     class="cursor-not-allowed"
                     label="Архив"
                     :class="section == 'Archive' ? 'text-brand-wait' : 'text-white'"/>
+                <q-btn
+                v-if="role == 0"
+                flat
+                label="Админ. панель"
+                class="text-white"
+                :to="{name : 'Database'}">
+                </q-btn>
                 <q-btn @click="visibleBugReport = true" label="Нашли ошибку?" color="brand-white" unelevated class="mt-8">
                     <ModalError v-model:visible="visibleBugReport" />
                 </q-btn>
