@@ -156,11 +156,21 @@ function checkDock(){
             <div class="!flex !flex-col">
                 <q-form class=" p-5 !flex flex-row h-full gap-x-12">
                     <div class="flex flex-col gap-y-8 w-1/2">
-                        <div class="flex flex-row gap-x-4">
-                            <q-btn icon="refresh" color="brand-danger opacity-[80%]" @click="clearForm()"></q-btn>
+                        <div class="flex flex-row gap-x-2">
+                            <q-btn icon="refresh" color="brand-danger opacity-[80%]" @click="clearForm()">
+                                <q-tooltip
+                                anchor="top middle"
+                                self="bottom middle"
+                                :offset="[10, 10]"
+                                max-width="200px"
+                                class="!text-sm text-center bg-brand-danger opacity-[80%]">
+                                    Сбросить поля
+                                </q-tooltip>
+                            </q-btn>
                             <q-input
                             v-model="task.title"
-                            outlined 
+                            outlined
+                            hide-bottom-space
                             type="text"
                             label="Название задачи"
                             :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
@@ -168,17 +178,16 @@ function checkDock(){
                         </div>
                         <q-input
                         v-model="task.description"
-                        outlined type="textarea"
+                        outlined
+                        type="textarea"
                         label="Описание задачи"
-                        :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 255 || 'Максимальная длина 255 символов']"
-                        input-style="min-height: 180px; resize: vertical;"></q-input>
+                        :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 1000 || 'Максимальная длина 1000 символов']"/>
                         <q-input
                         v-model="task.comment"
                         outlined
                         type="textarea"
                         label="Дополнительный комментарий"
-                        :rules="[val => val.length <= 255 || 'Максимальная длина 255 символов']"
-                        input-style="min-height: 180px; resize: vertical;"></q-input>
+                        :rules="[val => val.length <= 255 || 'Максимальная длина 255 символов']"/>
                     </div>
                     <div class="flex flex-col gap-y-8 w-1/2">
                         <q-input label="Дата выполнения" v-model="task.deadline" readonly outlined>
@@ -208,10 +217,10 @@ function checkDock(){
                             multiple>
                             <template v-slot:append><q-icon name="attach_file" /></template>
                         </q-file>
-                        <q-select :readonly="task.type != 0" v-model="task.executors" outlined use-chips label="Исполняющие"/>
-                        <q-select :readonly="task.type == 1" v-model="task.reviewers" outlined use-chips label="Согласующие"/>
-                        <q-select :readonly="task.type != 0" v-model="task.checkers" outlined use-chips label="Проверяющие"/>
-                        <q-select :readonly="task.type != 1" v-model="task.executors" outlined use-chips label="Отделы"/>
+                        <q-select v-if="task.type == 0" v-model="task.executors" outlined use-chips label="Исполнитель (-и)"/> 
+                        <q-select v-if="task.type != 1" v-model="task.reviewers" outlined use-chips label="Согласующий (-ие)"/>
+                        <q-select v-if="task.type == 0" v-model="task.checkers" outlined use-chips label="Проверяющий (-ие)"/>
+                        <q-select v-if="task.type == 1" v-model="task.executors" outlined use-chips label="Отделы"/>
                     </div>
                 </q-form>
             </div>
@@ -230,7 +239,16 @@ function checkDock(){
                         <q-toggle v-model="activeEvent" label="Создать мероприятие исполнителям"></q-toggle>
                         <q-toggle :disable="!activeEvent" v-model="eventForMe" label="Создать для себя"></q-toggle>
                         <div class="flex flex-row gap-x-2">
-                            <q-btn icon="refresh" color="brand-danger opacity-[80%]" @click="clearForm()"></q-btn>
+                            <q-btn icon="refresh" color="brand-danger opacity-[80%]" @click="clearForm()">
+                                <q-tooltip
+                                anchor="top middle"
+                                self="bottom middle"
+                                :offset="[10, 10]"
+                                max-width="200px"
+                                class="!text-sm text-center bg-brand-danger opacity-[80%]">
+                                    Сбросить поля
+                                </q-tooltip>
+                            </q-btn>
                             <q-input :disable="!activeEvent" label="Дата выполнения" v-model="formatDate" readonly outlined  class="flex-grow">
                                 <template v-slot:append>
                                     <q-icon name="event" color="brand-velvet">
@@ -253,9 +271,21 @@ function checkDock(){
                         <q-select :disable="!activeEvent" v-model="event.recivers" label="Получатели" use-chips></q-select>
                     </div>
                     <div class="flex flex-col gap-y-8 w-1/2">
-                       <q-input :disable="!activeEvent" v-model="event.title" label="Название мероприятия"></q-input>
-                       <q-input :disable="!activeEvent" v-model="event.place" label="Место проведения"></q-input>
-                       <q-input :disable="!activeEvent" v-model="event.description" label="Описание мероприятия" type="textarea" input-style="min-height: 165px; resize: vertical;" ></q-input>
+                       <q-input
+                       :disable="!activeEvent"
+                       v-model="event.title"
+                       :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
+                       label="Название мероприятия"></q-input>
+                       <q-input
+                       :disable="!activeEvent"
+                       v-model="event.place"
+                       label="Место проведения"></q-input>
+                       <q-input
+                       :disable="!activeEvent"
+                       v-model="event.description"
+                       :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 255 || 'Максимальная длина 255 символов']"
+                       label="Описание мероприятия"
+                       type="textarea" input-style="min-height: 165px; resize: vertical;" ></q-input>
                     </div>
                 </q-form>
             

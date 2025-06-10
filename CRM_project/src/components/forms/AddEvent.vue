@@ -67,16 +67,6 @@ async function createEvent() {
                         type="text"
                         :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
                     />
-                    <q-input
-                        label="Описание мероприятия"
-                        v-model="form.description"
-                        outlined
-                        type="textarea"
-                        :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 255 || 'Максимальная длина 255 символов']"
-                    />
-                </q-card-section>
-
-                <q-card-section class="flex flex-col gap-y-4">
                     <q-input label="Дата мероприятия" v-model="formatDate" readonly outlined>
                         <template v-slot:append>
                             <q-icon name="event">
@@ -94,10 +84,16 @@ async function createEvent() {
                             </q-icon>
                         </template>
                     </q-input>
-                    <q-toggle class="text-base text-gray-700" label="Делегировать отделам" v-model="isDelegate"/>
-                    <div class="text-gray-500"> Включите, чтобы мероприятие было создано для отдела, а не для вас.</div>
-                    <q-select v-model="form.departments" :disable="!isDelegate" label="Отдел"/>
-                    <div class="text-gray-500"> Вы также можете выбрать несколько отделов.</div>
+                </q-card-section>
+
+                <q-card-section class="flex flex-col gap-y-4 flex-grow">
+                    <q-input
+                        label="Описание мероприятия"
+                        v-model="form.description"
+                        outlined
+                        type="textarea"
+                        :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 255 || 'Максимальная длина 255 символов']"
+                    />
                     <q-btn label="Создать" type="submit" color="brand-velvet"/>
                 </q-card-section>
 
