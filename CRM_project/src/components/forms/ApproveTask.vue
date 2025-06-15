@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { StatusEnum, TypesEnum } from '@/components/Enums.vue'
 
-const props = defineProps(['name', 'description', 'deadline', 'creator', 'documents', 'status', 'comments', 'type'])
+const props = defineProps(['name', 'description', 'deadline', 'creator', 'documents', 'status', 'comment', 'type'])
 
 const taskManipulation = ref(false)
 
@@ -49,7 +49,7 @@ const form = ref({
                 icon="settings"
                 :done="step > 1">
                     <div class="flex flex-col px-8">
-                        <div class="flex-grow text-lg pb-10">Согласно приказа 123.4, необходимо провести опрос учащихся и заполнить таблицу в предоставленном шаблоне. Шаблон прикреплён</div>
+                        <div class="text-lg pb-10 max-h-[250px] overflow-y-auto mb-4">{{ description }}</div>
                         <div class="flex flex-row gap-x-4 pb-10">
                             <q-icon name="fa-solid fa-file-export" size="sm">
                                 <q-tooltip
@@ -84,7 +84,7 @@ const form = ref({
                         </div>
                         <div class="flex flex-col">
                             <div class="text-xl pb-2 text-semibold underline underline-offset-4">Комментарий</div>
-                            <div class="flex-grow text-lg">Дополнительный комментарий Дополнительный комментарий Дополнительный комментарий Дополнительный комментарий Дополнительный комментарий Дополнительный комментарий </div>
+                            <div class="flex-grow text-lg max-h-[250px] overflow-y-auto">{{ comment }}</div>
                         </div>
                     </div>
                 </q-step>

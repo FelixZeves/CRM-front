@@ -19,7 +19,7 @@ function onDateClick(res){
 </script>
 
 <template>
-  <div class="q-pa-md border-2 w-[90%] flex flex-row justify-between mx-3">
+  <div class="q-pa-md border-2 w-[90%] flex flex-row justify-between mx-2">
     <div class="flex flex-row items-center">
       <q-btn-dropdown
       :menu-offset="[0, 5]"
