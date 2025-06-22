@@ -1,12 +1,11 @@
 <script setup>
-import { update } from 'immutable';
 import {ref} from 'vue'
 
+const emit = defineEmits(['show-dialog']);
 const typesFilter = ref("Все типы документов")
-
 const datesFilter = ref("Все года")
-
 const focusesFilter = ref("Любая направленность")
+
 
 const searchText =ref("")
 
@@ -27,7 +26,7 @@ function onFocusClick(res){
 <template>
     <div class="q-pa-md border-2 w-[90%] flex flex-row justify-between mx-3">
         <div class="flex flex-row items-center">
-            <q-btn-dropdown menu-anchor="bottom right" class="shadow-xl rounded-[20pt] me-5" color="white" text-color="black" :label=typesFilter :menu-offset="[0, 5]">
+            <q-btn-dropdown menu-anchor="bottom right" class="shadow-xl rounded-[15pt] me-5" color="white" text-color="black" :label=typesFilter :menu-offset="[0, 5]">
               <q-list>
                 <q-item clickable v-close-popup @click="onTypeClick('Все типы документов')">
                   <q-item-section>
@@ -53,7 +52,7 @@ function onFocusClick(res){
             <q-btn-dropdown
             menu-anchor="bottom right"
             :menu-offset="[5, 5]"
-            class="shadow-xl rounded-[20pt] me-5"
+            class="shadow-xl rounded-[15pt] me-5"
             color="white"
             text-color="black"
             :label=datesFilter>
@@ -102,8 +101,8 @@ function onFocusClick(res){
               </q-list>
             </q-btn-dropdown>
         </div>
-
-        <div class="flex flex-row items-center border-2 px-2">
+        <div class="flex flex-row gap-x-2">
+          <div class="flex flex-row items-center border-2 px-2">
             <q-input v-model="searchText" borderless color="black" label-color="black" label="Поиск документа" class="md:w-[200px] 2xl:w-[400px]">
 
                 <template v-slot:append>
@@ -117,8 +116,15 @@ function onFocusClick(res){
                 </template>
                 
             </q-input>
-        
+          </div>
+          <q-btn
+          icon-right="add"
+          color="brand-wait"
+          text-color="black"
+          @click="$emit('show-dialog')">
+          </q-btn>
         </div>
+        
 
     </div>
   </template>

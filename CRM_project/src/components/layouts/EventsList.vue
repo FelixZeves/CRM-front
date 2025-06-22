@@ -7,7 +7,7 @@ const emit = defineEmits(['update-list']);
 </script>
 
 <template>
-    <div class="max-h-[500px] lg:max-h-[650px] overflow-y-auto">
+    <div class="min-h-[500px] lg:max-h-[650px] overflow-y-auto">
         <EventOnList
             @delete-event="$emit('update-list')"
             v-if="events.length > 0" 

@@ -7,7 +7,7 @@ import { ref } from 'vue'
 </script>
 
 <template>
-    <div class="flex flex-row h-[100vh] w-[100vw] content-center px-8 gap-x-8">
+    <div class="flex flex-row h-[100vh] w-[100vw] items-center px-8 gap-x-8">
         <header>
             <NavigationColumn
             section='Office'

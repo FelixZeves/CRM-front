@@ -11,7 +11,7 @@ const visible = ref(false)
 
 
 <template>
-    <div class="h-full grid grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-x-8 lg:gap-x-16 content-center">
+    <div class="h-full grid grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-x-8 lg:gap-x-16 items-center">
         <header>
             <NavigationColumn
             section='Tasks'

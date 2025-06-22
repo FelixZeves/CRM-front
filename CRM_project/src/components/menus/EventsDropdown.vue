@@ -16,7 +16,7 @@ function onDateClick(res){
 </script>
 
 <template>
-    <div class="q-pa-md border-2 w-[90%] flex flex-row justify-between mx-3">
+    <div class="q-pa-md border-2 flex flex-row justify-between mx-3">
       <div class="flex flex-row items-center">
         <q-btn-dropdown class="shadow-xl rounded-[20pt] me-5 !normal-case" color="white" text-color="black" :label=statusFilter :menu-offset="[0, 5]">
           <q-list>

@@ -67,4 +67,8 @@
   @apply bg-[#f7f7f7]
 }
 
+.q-card{
+  @apply !bg-white !rounded-[15pt]
+}
+
 </style>
