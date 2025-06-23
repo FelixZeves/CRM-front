@@ -1,7 +1,16 @@
 <script setup>
+import { ref } from 'vue'
 import NavigationColumn from '@/components/menus/NavigationColumn.vue';
 import DocumentsList from '@/components/layouts/DocumentsList.vue';
 import DocumentsDropdownNSearch from '@/components/menus/DocumentsDropdownNSearch.vue';
+import AddDoc from '@/components/forms/AddDoc.vue';
+
+const events = ref([])
+const visible = ref(false)
+
+async function updateList() {
+    
+}
 
 </script>
 
@@ -16,7 +25,8 @@ import DocumentsDropdownNSearch from '@/components/menus/DocumentsDropdownNSearc
 
         <main class="col-span-3 lg:col-span-4 2xl:col-span-5">
             <div>
-                <DocumentsDropdownNSearch></DocumentsDropdownNSearch>
+                <DocumentsDropdownNSearch @show-dialog="visible = true"></DocumentsDropdownNSearch>
+                <AddDoc v-model:visible='visible' @update-list="updateList"></AddDoc>
                 <DocumentsList/>
             </div>
         </main>

@@ -127,7 +127,7 @@ async function send() {
 
 <template>
     <q-dialog v-model="visible" backdrop-filter="blur(4px)" @hide="clearDialog">
-        <q-card class="text-black !rounded-[15pt] !flex !flex-col !w-[90vw] !min-w-[50%] !max-w-[65%] !bg-tile">
+        <q-card class="text-black !rounded-[15pt] !flex !flex-col !w-[90vw] !min-w-[50%] !max-w-[75%] !bg-tile">
             <q-card-section class="!flex flex-row !ps-0 items-center">
                 <q-stepper
                 v-model="step"
