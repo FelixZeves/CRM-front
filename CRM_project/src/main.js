@@ -30,11 +30,13 @@ axios.interceptors.request.use((config) => {
 })
 
 axios.interceptors.response.use((response) => response, (error) => {
-    let r = {
-        type: 'negative',
-        position: 'top',
-        message: 'Ошибка'
-    };
+    let r = {type: 'negative', position: 'top', message: 'Ошибка'};
+
+    if (!error.response) {
+        r.message = 'Сервер недоступен. Попробуйте позже.'
+        Notify.create(r)
+        return
+    }
 
     switch (error.response.status) {
         case 401:
@@ -53,9 +55,8 @@ axios.interceptors.response.use((response) => response, (error) => {
             Notify.create({
                 type: 'negative',
                 position: 'top',
-                message: 'Ошибка',
+                message: `Ошибка: ${error.response.data?.msg || ''}`,
             });
-            console.error('Error:', error);
             break;
     }
 });

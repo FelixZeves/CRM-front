@@ -6,7 +6,6 @@ import TasksDropdown from '@/components/menus/TasksDropdown.vue';
 import AddTask from '@/components/forms/AddTask.vue';
 
 const visible = ref(false)
-
 </script>
 
 
@@ -18,7 +17,7 @@ const visible = ref(false)
             />
         </header>
 
-        <main class="col-span-3 lg:col-span-4 2xl:col-span-5">
+        <main class="col-span-5 w-[81vw]">
             <div>
                 <TasksDropdown @show-dialog="visible = true"></TasksDropdown>
                 <TasksList/>

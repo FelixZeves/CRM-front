@@ -1,191 +1,57 @@
 <script setup>
-import TmpRecord from '@/components/forms/TmpRecord.vue'
+import { getTableSchema, getFormSchema} from '@/components/Utils.js'
+import User from '@/components/forms/admin/User.vue'
+import Department from '@/components/forms/admin/Deparment.vue'
+import Class from '@/components/forms/admin/Class.vue'
+import Lesson from '@/components/forms/admin/Lesson.vue'
 import axios from 'axios'
 import { useQuasar, copyToClipboard } from 'quasar'
 import { computed, ref } from 'vue'
 
+const q = useQuasar()
 const status = ref('read')
 const isRead = computed(() => status.value != 'read'? false: true)
-const api = ref(null)
-const details = ref({})
-const q = useQuasar()
+const url = ref(null)
+const typeForm = ref(null)
+const formSubmit = ref(null)
+const details = ref(null)
 
-const a = [
-    { name: 'fio', label: 'Ф.И.О.', field: row => row.profile.fio, align: 'left', sortable: true },
-    { name: 'post', label: 'Должность', field: row => row.profile.post, align: 'left', sortable: true },
-    { name: 'email', label: 'E-mail', field: row => row.email, align: 'left', sortable: true},
-    { name: 'role', label: 'Уровень доступа', field: row => row.role, align: 'right', sortable: true},
-    { name: 'default_pass', label: 'Стандартный пароль', field: row => row.defaul_pass ? '✔' : '✖', align: 'center', sortable: true },
-    { name: 'update_at', label: 'Обновлено', field: row => row.profile.update_at, align: 'center', sortable: true },
-]
-
-const b = [
-    { name: 'title', label: 'Отдел', field: row => row.title, align: 'left', sortable: true },
-    { name: 'head_department', label: 'Вышестоящее руководство', field: row => row.head_department, align: 'left', sortable: true },
-    { name: 'supervisors', label: 'Руководитель отдела', field: row => row.supervisors, align: 'left', sortable: true },
-    { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true },
-]
-
-const c = [
-    { name: 'class', label: 'Класс', field: row => `${row.number}.${row.parallel}`, align: 'left', sortable: true },
-    { name: 'spec', label: 'Уклон', field: row => row.spec?.title || '', align: 'left', sortable: true },
-    { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true },
-]
-
-const d = [
-    { name: 'title', label: 'Урок', field: row => row.title, align: 'left', sortable: true },
-    { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true },
-]
-
-const formSchemas = {
-    user: {
-        id: {label: 'ID', value: '', hidden: true},
-        email: {label: 'E-mail', value: ''},
-        default_pass: {label: 'Стандартный пароль', value: true, readonly: true},
-        pass_reset: {label: 'Сбросить пароль', value: false},
-        role: {label: 'Уровень доступа', value: 3},
-        password: {label: 'Пароль', value: '123456', hidden: true},
-        profile: {label: 'Профиль', value: {
-            initials_name: {label: 'Инициалы', value: '', readonly: true},
-            fio: {label: 'Ф.И.О.', value: ''},
-            post: {label: 'Должность', value: ''},
-            classes: {label: 'Классы', value: []},
-            departments: {label: 'Отделы', value: []},
-            lessons: {label: 'Уроки', value: []},
-            create_at: {label: 'Создан', value: '', readonly: true},
-            update_at: {label: 'Обновлен', value: '', readonly: true}
-        }}
-    },
-    class: {
-        id: {label: 'ID', value: '', hidden: true},
-        number: {label: 'Номер класса', value: ''},
-        parallel: {label: 'Параллель', value: ''},
-        specialization: {label: 'Уклон', value: ''}
-    },
-    lesson: {
-        id: {label: 'ID', value: '', hidden: true},
-        title: {label: 'Название', value: ''}
-    },
-    department: {
-        id: {label: 'ID', value: '', hidden: true},
-        head_department: {label: 'Управляющий отдел', value: ''},
-        title: {label: 'Название', value: ''}
-    }
+const forms = {
+    user: User,
+    department: Department,
+    class: Class,
+    lesson: Lesson
 }
 
 const tables = ref([
-    { label: "Пользователи", caption: "Управление пользователями", path: '/user', data: [], columns: a, form: formSchemas['user']},
-    { label: "Отделы", caption: "Управление отделами", path: '/user/department', data: [], columns: b, form: formSchemas['department'] },
-    { label: "Классы", caption: "Управление классами", path: '/user/class', data: [], columns: c, form: formSchemas['class']},
-    { label: "Уроки", caption: "Управление уроками", path: '/user/lesson', data: [], columns: d, form: formSchemas['lesson']}
+  {...getTableSchema('user'), path: '/api/user', data: [],
+    async get() {this.data = (await axios.get('/api/user')).data.data},
+    choose(row) {typeForm.value = 'user'; details.value = row},
+    add() {typeForm.value = 'user'; details.value = getFormSchema('user'); status.value ='create';}
+},
+  {...getTableSchema('department'), path: '/api/user/department', data: [],
+    async get() {this.data = (await axios.get('/api/user/department')).data.data},
+    choose(row) {typeForm.value = 'department'; details.value = row},
+    add() {typeForm.value = 'department'; details.value = getFormSchema('department'); status.value ='create';}
+},
+  {...getTableSchema('classes'), path: '/api/user/class', data: [],
+  async get() {this.data = (await axios.get('/api/user/class')).data.data},
+  choose(row) {typeForm.value = 'class'; details.value = row},
+  add() {typeForm.value = 'class'; details.value = getFormSchema('class'); status.value ='create';}
+},
+  {...getTableSchema('lessons'), path: '/api/user/lesson', data: [],
+  async get() {this.data = (await axios.get('/api/user/lesson')).data.data},
+  choose(row) {typeForm.value = 'lesson'; details.value = row},
+  add() {typeForm.value = 'lesson'; details.value = getFormSchema('lesson'); status.value ='create';}
+},
 ])
 
 async function save() {
-    const f = form => {
-        let obj = {}
-        for (let key in form) {
-            if (Array.isArray(form[key]['value']))
-                obj[key] = [...form[key]['value']]
-
-            else if (typeof form[key]['value'] == 'object')
-                obj[key] = {...f(form[key]['value'])}
-
-            else
-                obj[key] = form[key]['value'] == '' ? null : form[key]['value']
-        }
-        return obj
-    }
-
-    if (!isRead.value && api?.value) {
-        let path = `/api${api.value}`
-        let response = null
-        let data = f(details.value)
-        
-        if (status.value == 'create') { response = await axios.post(path, data) }
-        if (status.value == 'edit') { response = await axios.patch(path, data) }
-        
-        if (response?.status == 200) {
-            q.notify({
-                type: 'positive',
-                position: 'top',
-                color: 'brand-velvet',
-                progress: true,
-                message: 'myPass',
-                caption: 'Это ваш временный пароль',
-                actions: [
-                    {label: 'Копировать', color: 'white', handler: copyToClipboard(response.data['gen_pass'])}
-                ]})
-
-            response = await axios.get(path, { params: { ids: response.data['ids'] } })
-            select(response.data.data[0], details.value, api.value)
-
-            response = await get(api.value)
-            status.value = 'read'
-        }
-}
+    await formSubmit.value.send()
 }
 
-async function del() {
-    let response = null
-    if (details?.value?.id.value && api?.value) {
-        response = await axios.delete(`/api${api.value}`, { params: { ids: details?.value?.id.value } })
-    }
-
-    if (response?.status == 200)
-        response = await get(api.value)
-
-status.value = 'read'
-}
-
-async function get(path) {
-    let response = await axios.get(`/api${path}`);
-    let table = tables.value.find(t => t.path === path);
-
-    if (table)
-        table.data = response.data.data;
-}
-
-async function add(schema, path) {
-    const f = schema => {
-        let obj = {};
-        for (let key in schema) {
-            obj[key] = {...schema[key]}
-
-            if (Array.isArray(schema[key]['value']))
-                obj[key]['value'] = [...schema[key]['value']]
-
-            else if (typeof schema[key]['value'] === 'object'){
-                obj[key]['value'] = {...f(schema[key]['value'])}
-            }
-        }
-        return obj
-    }
-    details.value = f(schema)
-    api.value = path
-    status.value = 'create'
-}
-
-function select(row, schema, path) {
-    const f = (schema, row) => {
-        let obj = {};
-        for (let key in schema) {
-            obj[key] = {...schema[key]}
-
-            if (Array.isArray(schema[key]['value']))
-                obj[key]['value'] = Array.isArray(row?.[key]) ? [...row[key]] : [];
-
-            else if (typeof schema[key]['value'] === 'object'){
-                obj[key]['value'] = {...f(schema[key]['value'], row[key])};
-            }
-
-            else if (row[key])
-                obj[key]['value'] = row[key];
-        }
-        return obj;
-    }
-
-    details.value = f(schema, row);
-    api.value = path
+async function remove() {
+    await formSubmit.value.remove()
 }
 
 </script>
@@ -196,19 +62,18 @@ function select(row, schema, path) {
         <q-list bordered>
             <q-expansion-item
                 v-for="table in tables"
-                :switch-toggle-side="true"
+                switch-toggle-side
                 expand-separator
                 :label="table.label"
-                :caption="table.caption"
-                @show="get(table.path)"
+                @show="table.get()"
                 >
                 <q-card class="p-5">
                     <q-table
                         :rows="table.data"
                         :columns="table.columns"
-                        @row-click="(evt, row, index) => select(row, table.form, table.path)"
+                        @row-click="(evt, row, index) => {table.choose(row)}"
                     />
-                    <q-btn @click="add(table.form, table.path)" label="Добавить" flat color="brand-velvet" icon="add"/>
+                    <q-btn @click="table.add()" label="Добавить" flat color="brand-velvet" icon="add"/>
                 </q-card>
             </q-expansion-item>
         </q-list>
@@ -237,7 +102,7 @@ function select(row, schema, path) {
                         icon="fa-solid fa-trash"
                         padding="10px"
                         size="sm"
-                        @click="del"
+                        @click="remove"
                         :color="status == 'delete' ? 'brand-velvet' : 'grey-4'"
                         :text-color="status == 'delete' ? 'white' : 'blue-grey-8'"
                         :unelevated="status == 'delete' ? true : false"
@@ -257,23 +122,13 @@ function select(row, schema, path) {
                 <q-card-section class="text-h5"> {{ status === 'edit' ? 'Редактировать' : status === 'create' ? 'Создать' : 'Подробности' }} </q-card-section>
                 <q-separator inset />
                 <q-card-section class="flex flex-col justify-center">
-                    <TmpRecord :dict="details" :status="isRead"/>
-                    <q-btn v-if="!isRead" @click="save" label="Сохранить" color="brand-velvet" class="mt-2"/>
+                    <q-form @submit="save">
+                        <component ref="formSubmit" :is="forms[typeForm]" :model="details" :status="isRead" :mode="status"/>
+                        <q-btn v-if="!isRead" type="submit" label="Сохранить" color="brand-velvet" class="mt-2"/>
+                    </q-form>
                 </q-card-section>
             </q-card>
         </div>
     </div>
- </div>
+</div>
 </template>
-
-<style>
-#d-1 {
-    background-color: red;
-}
-#d-2 {
-    background-color: blue;
-}
-#d-3 {
-    background-color: green;
-}
-</style>

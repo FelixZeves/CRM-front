@@ -1,15 +1,23 @@
 <script setup>
-import { StatusEnum } from '@/components/Enums.vue'
+import axios from 'axios'
+import { StatusEnum, StatusEnum_ } from '@/components/Enums.vue'
 import { ref } from 'vue';
 
-const tasks = ref([
-  { name: "Название задачи", description: 'Краткое описание задачи', date: "18.11.2024", status: "danger"},
-  { name: "Название задачи", description: 'Краткое описание задачи', date: "20.11.2024", status: "danger"},
-  { name: "Название задачи", description: 'Краткое описание задачи', date: "24.11.2024", status: "wait"},
-  { name: "Название задачи", description: 'Краткое описание задачи', status: "complete"},
-  { name: "Название задачи", description: 'Краткое описание задачи', status: "complete"}
-])
+const tasks = ref([])
 
+async function get() {
+    tasks.value = (await axios.get('/api/user/task')).data.data
+    for (const task of tasks.value) {
+        const currentStep = task.steps.find(step => step.status !== StatusEnum_.APPROVED)
+
+        if (currentStep)
+            task.status = currentStep.status
+        else
+            task.status = StatusEnum_.APPROVED
+    }
+}
+
+get()
 </script>
 
 <template>
@@ -18,10 +26,10 @@ const tasks = ref([
         <div class="grid grid-rows-5 gap-y-0.5">
             <div v-for="task in tasks" class="task grid grid-cols-4 gap-x-1">
                 <div class="mainInfo col-span-2">
-                    <p class="text-base lg:text-lg font-medium mb-0">{{ task.name }}</p>
+                    <p class="text-base lg:text-lg font-medium mb-0">{{ task.title }}</p>
                     <p class="text-sm lg:text-base mb-0">{{ task.description }}</p>
                 </div>
-                <p class="date text-sm lg:text-base mb-0">{{ task.date || "---------" }}</p>
+                <p class="date text-sm lg:text-base mb-0">{{ task.deadline || "---------" }}</p>
                 <div class="status cursor-help" :class="StatusEnum[task.status].color">
                     <q-tooltip
                         anchor="top middle"

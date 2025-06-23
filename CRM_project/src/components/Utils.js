@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ref } from'vue'
+import { RoleEnum } from './Enums.vue';
 
 export async function getMe(){
     try{
@@ -44,4 +44,76 @@ export async function getSupervisors(){
         console.error('Ошибка загрузки информации о вас:', error);
         return []; // Возвращаем пустой массив в случае ошибки
     }
+}
+
+export function getFormSchema(name) {
+    const formSchemas = {
+        user: {
+            email: '',
+            default_pass: true,
+            role: 3,
+            profile: {
+                fio: '',
+                post: '',
+                classes: null,
+                department: null,
+                lessons: null,
+            }},
+        class: {
+            number: '',
+            parallel: '',
+            specialization: null
+        },
+        lesson: {
+            title: ''
+        },
+        department: {
+            title: '',
+            parents: [],
+            manager: null,
+            childrens: [],
+            staff: []
+        }
+    };
+
+    return formSchemas[name] ? JSON.parse(JSON.stringify(formSchemas[name])) : {};
+}
+
+export function getTableSchema(name) {
+    const TableSchema = {
+        user: {
+            label: "Пользователи",
+            columns: [
+                { name: 'fio', label: 'Ф.И.О.', field: row => row.profile.initials_name, align: 'left', sortable: true },
+                { name: 'post', label: 'Должность', field: row => row.profile.post, align: 'left', sortable: true },
+                { name: 'email', label: 'E-mail', field: row => row.email, align: 'left', sortable: true },
+                { name: 'role', label: 'Уровень доступа', field: row => RoleEnum[row.role].translation, align: 'right', sortable: true },
+                { name: 'default_pass', label: 'Стандартный пароль', field: row => row.default_pass ? '✔' : '✖', align: 'center', sortable: true },
+                { name: 'update_at', label: 'Обновлено', field: row => row.profile.update_at, align: 'center', sortable: true }]
+        },
+        department: {
+            label: "Отделы",
+            columns: [
+                { name: 'title', label: 'Отдел', field: row => row.title, align: 'left', sortable: true },
+                { name: 'manager', label: 'Руководитель отдела', field: row => row.manager?.fio, align: 'left', sortable: true },
+                { name: 'parents', label: 'Вышестоящее руководство', field: row => row.parents.map(item => `${item.title} `), align: 'left', sortable: true },
+                { name: 'childrens', label: 'Дочерние отделы', field: row => row.childrens.map(item => `${item.title} `), align: 'left', sortable: true},
+                { name: 'staff', label: 'Сотрудники', field: row => `${row.staff.length} чел.`, align: 'center', sortable: true },
+                { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true }]
+        },
+        classes: {
+            label: "Классы",
+            columns: [
+                { name: 'class', label: 'Класс', field: row => `${row.number}.${row.parallel}`, align: 'left', sortable: true },
+                { name: 'spec', label: 'Уклон', field: row => row.spec?.title || '', align: 'left', sortable: true },
+                { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true },]
+        },
+        lessons: {
+            label: "Уроки",
+            columns: [
+                { name: 'title', label: 'Урок', field: row => row.title, align: 'left', sortable: true },
+                { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true }]
+        }
+    }
+    return TableSchema[name] || null;
 }

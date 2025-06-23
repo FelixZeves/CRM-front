@@ -18,10 +18,6 @@ async function loginUser(){
         const token = response.data.jwt;
         localStorage.setItem('jwtToken', token);
 
-        const details = await axios.get('/api/user/me');
-
-        const role = details.data.role
-
         router.push('/Office')
         
     } catch (error) {

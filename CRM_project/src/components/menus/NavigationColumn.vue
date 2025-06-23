@@ -2,7 +2,6 @@
 import axios from 'axios'
 import { ref } from 'vue'
 import ModalError from '@/components/forms/BugReport.vue';
-import TaskCreationDialog from '@/components/forms/AddTask.vue';
 
 const props = defineProps(['name', 'role', 'section'])
 const fio = ref("");
