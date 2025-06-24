@@ -5,7 +5,7 @@ const emit = defineEmits(['delete-event']);
 
 async function deleteEvent(){
     try{
-        const response = await axios.delete('/api/user/event', {params: {ids: props.id}})
+        const response = await axios.delete(`/api/user/event?id=${props.id}`)
         emit('delete-event')
         return response
     } catch (error) {
@@ -39,7 +39,7 @@ async function deleteEvent(){
             </div>
             <div class="flex flex-col gap-y-2 flex-grow">
                 <div class="text-xl font-bold text-gray-700">{{ name }}</div>
-                <div class="text-base text-gray-600">{{ creator }}</div>
+                <div class="text-base text-gray-600">{{ creator}}</div>
                 <div class="text-lg text-gray-600">{{ description }}</div>
             </div>
             <q-btn label="Закрыть мероприятие" color="brand-velvet" text-color="white" @click="deleteEvent"/>
