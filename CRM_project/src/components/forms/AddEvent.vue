@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import { getFormSchema } from '@/components/Utils'
 
 const props = defineProps(['visible'])
 const emit = defineEmits(['update:visible', 'update-list'])
@@ -32,14 +33,7 @@ newDate = { from: val, to: val };
     form.value.to = newDate.to;
 }
 
-const form = ref({
-    title: '',
-    description: '',
-    place: '',
-    departments: [],
-    at: today,
-    to: today
-});
+const form = ref(getFormSchema('event'));
 
 async function createEvent() {
     await axios.post('/api/user/event', form.value)

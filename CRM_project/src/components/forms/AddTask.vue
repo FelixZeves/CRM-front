@@ -1,21 +1,28 @@
 <script setup>
 import axios from 'axios'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { DocEnum as D, RoleEnum_ as R} from '@/components/Enums.vue'
+import { getFormSchema, getToday, getMe } from '@/components/Utils.js'
+import { useQuasar } from 'quasar'
 
 const props = defineProps(['visible'])
 const emit = defineEmits(['update:visible', 'update-list'])
 
+onMounted(async () => {me.value = (await getMe()).data})
+
+const q = useQuasar()
 const role = ref()
 const step = ref(1)
 const activeEvent = ref(false)
 const eventForMe =  ref(false)
 const peopleOptions = ref([])
 const departmentOptions = ref([])
+const me = ref()
+const evtUsers = ref(new Set())
 
 const successNotify = () => q.notify({type: 'positive', position: 'top', message: 'Успех!'})
 
-const today = new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+const today = getToday();
 const date = ref({ from: today, to: today });
 
 const task = ref({
@@ -30,14 +37,7 @@ const task = ref({
     type: D.MEMO,    
 })
 
-const event = ref({
-    title: '',
-    description: '',
-    place: '',
-    recivers: [],
-    at: today,
-    to: today
-});
+const event = ref(getFormSchema('event'));
 
 const formatDate = computed(() => {
     const { from, to } = date.value;
@@ -83,15 +83,19 @@ function clearForm() {
 }
 
 function throwData(){
+    evtUsers.value.clear()
+    if (eventForMe.value) evtUsers.value.add(me.value.profile.id)
+    let tmp = [...task.value.executors, ...task.value.reviewers, ...task.value.checkers].forEach(id => evtUsers.value.add(id))
+
     event.value.title = task.value.title
     event.value.description = task.value.description
     event.value.to = task.value.deadline
 }
 
 function clearDialog(){
-    step.value = D.MEMO
+    step.value = 2
     clearForm()
-    step.value = D.APPLICATION
+    step.value = 1
     clearForm()
 }
 
@@ -105,28 +109,35 @@ function checkDock(){
 }
 
 async function lazyLoad() {
-    let user = (await axios.get('/api/user/me')).data
     let department = null
-    if (user.role == R.LEADER){
-        department = (await axios.get(`/api/user/department?id=${user.profile.manager.id}`)).data.data[0]
+    if (me.value.role == R.LEADER){
+        department = (await axios.get(`/api/user/department?id=${me.value.profile.manager.id}`)).data.data[0]
         peopleOptions.value = [...department.staff.map(staff => ({id: staff.id, fio: `${staff.fio} (Сотрудник)`})),
                                ...department.childrens.filter(child => child.manager !== null)
                                                       .map(child => ({id: child.manager.id, fio: `${child.manager.fio} (${child.title})`}))]
         departmentOptions.value = [...department.parents.map(p => ({id: p.id, title: `${p.title} (${p.manager?.fio})`}))]
     } else {
-        department = (await axios.get(`/api/user/department?id=${user.profile.department.id}`)).data.data[0]
+        department = (await axios.get(`/api/user/department?id=${me.value.profile.department.id}`)).data.data[0]
         peopleOptions.value = [{id: department.manager.id, fio: `${department.manager.fio} (${department.title})`}]
     }
 }
 
 async function send() {
     let response = await axios.post('/api/user/task', task.value)
+
+    if (activeEvent.value) {
+        event.value.user = [...evtUsers.value]
+        await axios.post('/api/user/event', event.value)
+    }
+
     if (response.status == 200) successNotify()
+    emit('update-list')
 }
 </script>
 
 <template>
     <q-dialog v-model="visible" backdrop-filter="blur(4px)" @hide="clearDialog">
+        <pre> {{  evtUsers }}</pre>
         <q-card class="text-black !rounded-[15pt] !flex !flex-col !w-[90vw] !min-w-[50%] !max-w-[75%] !bg-tile">
             <q-card-section class="!flex flex-row !ps-0 items-center">
                 <q-stepper
@@ -225,7 +236,6 @@ async function send() {
                                 multiple>
                                 <template v-slot:append><q-icon name="attach_file" /></template>
                             </q-file>
-                            <pre> {{ task }}</pre>
                             
                             <q-select
                                 v-if="task.type == D.ORDER"
@@ -234,7 +244,7 @@ async function send() {
                                 outlined
                                 emit-value
                                 map-options
-                                clearable
+                                use-chips
                                 multiple
                                 :options="peopleOptions"
                                 :option-label="'fio'"
@@ -303,7 +313,12 @@ async function send() {
                     <q-form @submit="checkDock" class=" p-5 !flex flex-row h-full gap-x-12">
                         <div class="flex flex-col gap-y-8 w-1/2">
                             <q-toggle v-model="activeEvent" label="Создать мероприятие исполнителям"></q-toggle>
-                            <q-toggle :disable="!activeEvent" v-model="eventForMe" label="Создать для себя"></q-toggle>
+                            <q-toggle 
+                                :disable="!activeEvent"
+                                v-model="eventForMe"
+                                label="Создать для себя"
+                                @update:model-value="eventForMe ? evtUsers.add(me.profile.id) : evtUsers.delete(me.profile.id)"
+                            />
                             <div class="flex flex-row gap-x-2">
                                 <q-btn icon="refresh" color="brand-danger opacity-[80%]" @click="clearForm()">
                                     <q-tooltip
@@ -334,7 +349,6 @@ async function send() {
                                 </q-input>
                             </div>
                             <div class="text-gray-500">Чтобы создать мероприятие с одной датой проведения, дважды нажмите на необходимую дату.</div>
-                            <q-select :disable="!activeEvent" v-model="event.recivers" label="Получатели" use-chips></q-select>
                         </div>
                         <div class="flex flex-col gap-y-8 w-1/2">
                         <q-input
@@ -361,7 +375,7 @@ async function send() {
             </q-card-section>
             <q-card-section class="flex flex-row justify-between mx-12">
                 <q-btn :disable="step == 1 ? true : false" @click="step = 1" color="brand-velvet" label="Назад" class="navigation-btn" />
-                <q-btn v-if="step == 1 & task.type == D.ORDER" @click="step =step + 1; throwData()" color="brand-velvet" label="Далее" class="navigation-btn" />
+                <q-btn v-if="step == 1 & task.type == D.ORDER" @click="step++; throwData()" color="brand-velvet" label="Далее" class="navigation-btn" />
                 <q-btn v-if="step == 2 || task.type != D.ORDER" @click="send" color="brand-velvet" label="Создать" class="navigation-btn" />
             </q-card-section>
         </q-card>
