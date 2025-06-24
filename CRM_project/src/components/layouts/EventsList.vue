@@ -15,7 +15,7 @@ const emit = defineEmits(['update-list']);
             :name="event.title"
             :description="event.description"
             :deadline="event.at != event.to ? `${event.at} - ${event.to}` : event.to"
-            :creator="event.id"
+            :creator="event.creator.fio"
             :place="event.place"
             :id="event.id">
         </EventOnList>

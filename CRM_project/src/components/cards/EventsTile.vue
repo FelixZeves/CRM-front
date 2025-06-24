@@ -2,14 +2,13 @@
 import { ref } from 'vue';
 import { getEvents } from '@/components/Utils';
 import EventCreationDialog from '@/components/forms/AddEvent.vue';
+import axios from 'axios';
 
 const events = ref([])
 const visible = ref(false)
 
 async function updateList() {
-    await getEvents().then(response => {
-        events.value = response.data.data.slice(0, 3)
-    })
+    events.value = (await axios.get('/api/user/event?limit=3')).data.data
 }
 
 updateList()
