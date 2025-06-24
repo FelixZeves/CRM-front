@@ -10,15 +10,15 @@ const visible = ref(false)
 
 
 <template>
-    <div class="h-full grid grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-x-8 lg:gap-x-16 items-center">
+    <div class="h-full flex flex-row h-[100vh] w-[100vw] items-center px-8 gap-x-8">
         <header>
             <NavigationColumn
             section='Tasks'
             />
         </header>
 
-        <main class="col-span-5 w-[81vw]">
-            <div>
+        <main class="flex flex-grow">
+            <div class="flex-grow">
                 <TasksDropdown @show-dialog="visible = true"></TasksDropdown>
                 <TasksList/>
                 <AddTask v-model:visible="visible"></AddTask>

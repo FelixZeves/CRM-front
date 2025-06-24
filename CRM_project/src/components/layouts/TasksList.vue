@@ -25,7 +25,7 @@ defineExpose({get})
 </script>
 
 <template>
-    <q-list class="max-h-[600px] lg:max-h-[650px] overflow-y-auto">
+    <q-list class="flex-grow !max-w-[90%] !min-w-[90%] min-h-[500px] lg:max-h-[650px] overflow-y-auto !justify-self-center">
         <q-item v-for="task in tasks">
             <TaskOnList
                 :key="task.id" 

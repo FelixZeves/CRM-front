@@ -17,7 +17,7 @@ const btn = ref({
 </script>
 
 <template>
-    <q-card class="!max-w-[90%] !min-w-[90%] flex flex-col bg-white !rounded-[15pt] mx-2 my-2 p-5 !min-h-[250px] !max-h-[500px]">
+    <q-card class="flex flex-col flex-grow bg-white !rounded-[15pt] mx-2 my-2 p-5 !min-h-[250px] !max-h-[500px]">
         <div class="flex flex-row justify-between items-center gap-y-5">
             <span class="lg:text-lg 2xl:text-xl font-bold text-sm lg:text-base 2xl:text-lg mb-2">{{ body.title }}</span>
             <div class="absolute top-0 end-0 h-[40px] w-[30%] rounded-tr-[10pt] border-b-[8pt] border-s-[8pt]  border-[--vt-c-white-mute] rounded-bl-[25pt] cursor-help" :class="S[body.status].color">
@@ -84,7 +84,7 @@ const btn = ref({
         </div>
     </q-card>
     <ApproveTaskForm 
-      v-model:visible='visible'
+      v-model:visible="visible"
       :user="user"
       :body="body">
     </ApproveTaskForm>

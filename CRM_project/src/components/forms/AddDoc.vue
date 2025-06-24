@@ -14,7 +14,6 @@ const form = ref({
     title: '',
     file: null,
     infinitely: false,
-    departments: [],
     spec: [],
 });
 

@@ -42,7 +42,6 @@ const form = ref({
                 <div class="text-xl font-bold text-center">{{ body.title }}</div>
                 <q-stepper
                     v-model="step"
-                    done-color="brand-complete"
                     active-color="brand-velvet"
                     class="flex-grow"
                     header-nav
@@ -56,7 +55,10 @@ const form = ref({
                     :title="s.user.fio"
                     :caption="s.id !== curStep.id ? s.update_at : body.deadline"
                     icon="settings"
-                    :done="s.status == St.APPROVED"
+                    :active-icon="s.status == St.PROGRESS ? 'fa-solid fa-edit' : 'fa-regular fa-eye'"
+                    :done-icon="s.status == St.APPROVED ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"
+                    :done-color="s.status == St.APPROVED ? 'brand-complete' : 'brand-danger'"
+                    :done="s.status == St.APPROVED || s.status == St.REJECTED"
                     :disable="s.status == St.PROGRESS && s.user.id != user.profile.id"
                 >
                     <div class="flex flex-col px-8 gap-y-4">

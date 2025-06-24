@@ -24,7 +24,7 @@ function onFocusClick(res){
 </script>
 
 <template>
-    <div class="q-pa-md border-2 w-[90%] flex flex-row justify-between mx-3">
+    <div class="q-pa-md border-2 w-[90%] flex flex-row justify-between justify-self-center">
         <div class="flex flex-row items-center">
             <q-btn-dropdown menu-anchor="bottom right" class="shadow-xl rounded-[15pt] me-5" color="white" text-color="black" :label=typesFilter :menu-offset="[0, 5]">
               <q-list>

@@ -11,7 +11,7 @@ const docs = ref([ {name:"Приказ 3432.15 “О привлечении уч
 </script>
 
 <template>
-    <q-list class="max-h-[500px] lg:max-h-[650px] overflow-y-auto">
+    <q-list class="flex-grow !max-w-[90%] !min-w-[90%] max-h-[600px] lg:max-h-[650px] overflow-y-auto !justify-self-center">
         <DocumentOnList 
         v-for="doc in docs"
         :name="doc.name"
