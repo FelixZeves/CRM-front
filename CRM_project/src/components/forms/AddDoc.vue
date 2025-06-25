@@ -25,7 +25,7 @@ async function createDoc() {
 
 <template>
     <q-dialog v-model="visible" backdrop-filter="blur(4px)">
-        <q-card class="text-black !rounded-[15pt] !flex !w-[90vw] !min-w-[50%]">
+        <q-card class="text-black !rounded-[15pt] !flex !w-[90vw] !min-w-[55%]">
             <q-form @submit="createDoc" class="bg-tile p-5 !flex flex-row w-full h-full gap-2">
 
                 <q-card-section class="flex flex-col w-[55%] gap-y-4">
@@ -49,7 +49,7 @@ async function createDoc() {
                                 <template v-slot:append><q-icon name="attach_file" /></template>
                         </q-file>
                         <q-checkbox
-                            class="text-gray-700 text-base"
+                            class="text-gray-700 text-base !w-[35%]"
                             label="Бессрочный"
                             indeterminate-value
                             keep-color

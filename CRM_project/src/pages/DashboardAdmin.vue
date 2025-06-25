@@ -58,7 +58,7 @@ async function remove() {
 
 <template>
  <div class="w-full h-full flex flex-row p-5 pb-1 gap-10">
-    <div class="flex-grow max-w-[67%] pr-1 h-full overflow-y-auto">
+    <div class="flex-grow max-w-[65%] pe-1 h-full overflow-y-auto">
         <q-list bordered>
             <q-expansion-item
                 v-for="table in tables"
@@ -67,7 +67,7 @@ async function remove() {
                 :label="table.label"
                 @show="table.get()"
                 >
-                <q-card class="p-5">
+                <q-card class="p-5 !rounded-none">
                     <q-table
                         :rows="table.data"
                         :columns="table.columns"
@@ -82,7 +82,7 @@ async function remove() {
         <div class="flex flex-col m-2">
             <div class="flex flex-col gap-4 mb-5">
                 <div class="flex flex-row justify-between">
-                    <span class="font-bold text-gray-800 text-2xl text-start"> Административная страница </span>
+                    <span class="font-bold text-gray-800 text-xl 2xl:text-2xl content-center"> Административная страница </span>
                     <q-btn
                     unelevated
                     :to="{name : 'Office'}"
@@ -109,7 +109,7 @@ async function remove() {
                     />
                 </div>
                 <span class="font-bold text-gray-800 text-xl text-start">Описание</span>
-                <span class="font-normal text-base text-gray-700 text-start">
+                <span class="font-normal 2xl:text-base text-gray-700 text-start">
                     На этой странице вы можете управлять пользователями,
                     отделами и уроками вашего образовательного центра,
                     а также добавлять новые записи. Также здесь можно
@@ -118,7 +118,7 @@ async function remove() {
                 </span>
             </div>
 
-            <q-card class="!shadow-xl !rounded-[15pt] p-2">
+            <q-card class="!min-h-[40vh] p-2">
                 <q-card-section class="text-h5"> {{ status === 'edit' ? 'Редактировать' : status === 'create' ? 'Создать' : 'Подробности' }} </q-card-section>
                 <q-separator inset />
                 <q-card-section class="flex flex-col justify-center">

@@ -16,7 +16,7 @@ async function updateList() {
 
 
 <template>
-    <div class="h-full flex flex-row h-[100vh] w-[100vw] items-center">
+    <div class="h-full flex flex-row h-[100vh] w-[100vw] items-center px-8 gap-x-2">
         <header>
             <NavigationColumn
             section='Documents'
@@ -24,7 +24,7 @@ async function updateList() {
         </header>
 
         <main class="flex flex-grow max-w-[80%]">
-            <div class="">
+            <div class="flex-grow">
                 <DocumentsDropdownNSearch @show-dialog="visible = true"></DocumentsDropdownNSearch>
                 <AddDoc v-model:visible='visible' @update-list="updateList"></AddDoc>
                 <DocumentsList/>

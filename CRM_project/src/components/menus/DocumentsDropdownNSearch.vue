@@ -2,7 +2,7 @@
 import {ref} from 'vue'
 
 const emit = defineEmits(['show-dialog']);
-const typesFilter = ref("Все типы документов")
+const typesFilter = ref("Все документы")
 const datesFilter = ref("Все года")
 const focusesFilter = ref("Любая направленность")
 
@@ -24,13 +24,13 @@ function onFocusClick(res){
 </script>
 
 <template>
-    <div class="q-pa-md border-2 w-[90%] flex flex-row justify-between justify-self-center">
-        <div class="flex flex-row items-center">
-            <q-btn-dropdown menu-anchor="bottom right" class="shadow-xl rounded-[15pt] me-5" color="white" text-color="black" :label=typesFilter :menu-offset="[0, 5]">
+    <div class="q-pa-md border-2 flex-grow !w-[80%] flex flex-row justify-between justify-self-center mx-3">
+        <div class="flex flex-row items-center gap-x-2">
+            <q-btn-dropdown menu-anchor="bottom right" class="shadow-xl rounded-[15pt]" color="white" text-color="black" :label=typesFilter :menu-offset="[0, 5]">
               <q-list>
-                <q-item clickable v-close-popup @click="onTypeClick('Все типы документов')">
+                <q-item clickable v-close-popup @click="onTypeClick('Все документы')">
                   <q-item-section>
-                    <q-item-label>Все типы документов</q-item-label>
+                    <q-item-label>Все документы</q-item-label>
                   </q-item-section>
                 </q-item>
       
@@ -52,7 +52,7 @@ function onFocusClick(res){
             <q-btn-dropdown
             menu-anchor="bottom right"
             :menu-offset="[5, 5]"
-            class="shadow-xl rounded-[15pt] me-5"
+            class="shadow-xl rounded-[15pt]"
             color="white"
             text-color="black"
             :label=datesFilter>
@@ -78,7 +78,7 @@ function onFocusClick(res){
               </q-list>
             </q-btn-dropdown>
       
-            <q-btn-dropdown menu-anchor="bottom right" class="shadow-xl rounded-[20pt] me-5" color="white" text-color="black" :label=focusesFilter :menu-offset="[0, 5]">
+            <q-btn-dropdown menu-anchor="bottom right" class="shadow-xl rounded-[15pt]" color="white" text-color="black" :label=focusesFilter :menu-offset="[0, 5]">
               <q-list>
                 <q-item clickable v-close-popup @click="onFocusClick('Любая направленность')">
                   <q-item-section>
@@ -102,16 +102,16 @@ function onFocusClick(res){
             </q-btn-dropdown>
         </div>
         <div class="flex flex-row gap-x-2">
-          <div class="flex flex-row items-center border-2 px-2">
-            <q-input v-model="searchText" borderless color="black" label-color="black" label="Поиск документа" class="md:w-[200px] 2xl:w-[400px]">
+          <div class="flex flex-row items-center border-2">
+            <q-input v-model="searchText" borderless label-color="black" label="Поиск документа">
 
                 <template v-slot:append>
-                    <q-icon v-if="searchText !== ''" name="close" color="black" size="md" @click="searchText = ''" class="cursor-pointer" />
+                    <q-icon v-if="searchText !== ''" name="close" color="black" size="sm" @click="searchText = ''" class="cursor-pointer" />
                 </template>
 
                 <template v-slot:after>
-                    <button class="ms-1">
-                        <q-icon color="black" name="search" size="md"></q-icon>
+                    <button>
+                        <q-icon color="black" name="search" size="sm"></q-icon>
                     </button>
                 </template>
                 

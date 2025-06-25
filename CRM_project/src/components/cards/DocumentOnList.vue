@@ -10,7 +10,7 @@ function downloadFile(){
 </script>
 
 <template>
-    <q-item class="!flex !flex-grow">
+    <q-item class="!flex-grow !w-[90%] !ms-3 justify-self-center">
         <q-card class="flex-grow !min-w-[90%]">
             <q-card-section class="flex flex-row items-center">
                 <q-icon name="fa-regular fa-file-word" size="xl" class="!max-w-[5%]"/>
