@@ -5,7 +5,7 @@ import { DocEnum as D, RoleEnum_ as R} from '@/components/Enums.vue'
 import { getFormSchema, getToday, getMe } from '@/components/Utils.js'
 import { useQuasar } from 'quasar'
 
-const props = defineProps(['visible'])
+const props = defineProps(['visible', 'body'])
 const emit = defineEmits(['update:visible', 'update-list'])
 
 onMounted(async () => {me.value = (await getMe()).data})
@@ -36,6 +36,13 @@ const task = ref({
     checkers: [],
     type: D.MEMO,    
 })
+
+if (props.body){
+    task.value.title = props.body.title
+    task.value.description = props.body.description
+    task.value.deadline = props.body.deadline
+    task.value.type = D.ORDER
+}
 
 const event = ref(getFormSchema('event'));
 
@@ -137,7 +144,6 @@ async function send() {
 
 <template>
     <q-dialog v-model="visible" backdrop-filter="blur(4px)" @hide="clearDialog">
-        <pre> {{  evtUsers }}</pre>
         <q-card class="text-black !rounded-[15pt] !flex !flex-col !w-[90vw] !min-w-[50%] !max-w-[75%] !bg-tile">
             <q-card-section class="!flex flex-row !ps-0 items-center">
                 <q-stepper
@@ -259,7 +265,7 @@ async function send() {
                                 outlined
                                 emit-value
                                 map-options
-                                clearable
+                                use-chips
                                 multiple
                                 :options="peopleOptions"
                                 :option-label="'fio'"
@@ -274,7 +280,7 @@ async function send() {
                                 outlined
                                 emit-value
                                 map-options
-                                clearable
+                                use-chips
                                 multiple
                                 :options="peopleOptions"
                                 :option-label="'fio'"
@@ -353,15 +359,18 @@ async function send() {
                         <div class="flex flex-col gap-y-8 w-1/2">
                         <q-input
                         :disable="!activeEvent"
+                        outlined
                         v-model="event.title"
                         :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
                         label="Название мероприятия"></q-input>
                         <q-input
                         :disable="!activeEvent"
+                        outlined
                         v-model="event.place"
                         label="Место проведения"></q-input>
                         <q-input
                         :disable="!activeEvent"
+                        outlined
                         v-model="event.description"
                         :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 255 || 'Максимальная длина 255 символов']"
                         label="Описание мероприятия"

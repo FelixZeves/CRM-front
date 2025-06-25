@@ -39,10 +39,7 @@ updateList()
 <style scoped>
 
 #eventsTile{
-    height: max-content;
-    background-color: white;
-    border-radius: 20pt;
-    padding-bottom: 2%;
+    @apply bg-white rounded-[15pt] pb-4
 }
 
 #eventsHead{

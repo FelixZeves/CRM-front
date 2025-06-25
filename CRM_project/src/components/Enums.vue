@@ -22,8 +22,8 @@ export const TypesEnum=Object.freeze({
 })
 
 export const StatusEnum=Object.freeze({
-    0: {description: "Задача на согласовании и проверке", color: "!bg-[--crm-c-light-yellow]", textColor: "text-black"},
-    1: {description: "Задача ожидает выполнения", color: "!bg-[--crm-c-danger]", textColor: "text-white"},
+    0: {description: "Задача ожидает выполнения", color: "!bg-[--crm-c-light-yellow]", textColor: "text-black"},
+    1: {description: "Задача отклонена", color: "!bg-[--crm-c-danger]", textColor: "text-white"},
     2: {description: "Задача выполенена", color: "!bg-[--crm-c-complete]", textColor: "text-white"}
 })
 

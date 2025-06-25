@@ -21,7 +21,7 @@ async function parseEvents(){
     },  
     dates: event.at != event.to  ? [[parseCustomDate(event.at), parseCustomDate(event.to)]] : [parseCustomDate(event.to)],
     popover: {
-        label: event.title,
+        label: `${event.title} - ${event.creator.fio}`,
     }
     }));
 
@@ -51,7 +51,7 @@ let attrs = ref([
         borderless
         trim-weeks
         title-position="left"
-        class="shadow-2xl"
+        class="shadow-2xl !min-h-[40vh]"
         color="velvet"
         :attributes="attrs"
     />
@@ -99,8 +99,7 @@ let attrs = ref([
 }
 
 .vc-container{
-
-    @apply !w-full !rounded-[20pt]
+    @apply !w-full !rounded-[15pt] !px-3 pt-3
 }
 
 .vc-week{
