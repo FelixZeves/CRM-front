@@ -21,7 +21,7 @@ async function parseEvents(){
     },  
     dates: event.at != event.to  ? [[parseCustomDate(event.at), parseCustomDate(event.to)]] : [parseCustomDate(event.to)],
     popover: {
-        label: `${event.title} - ${event.creator.fio}`,
+        label: `${event.title} - ${event.creator.init_name}`,
     }
     }));
 

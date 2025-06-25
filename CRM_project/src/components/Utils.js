@@ -102,7 +102,7 @@ export function getTableSchema(name) {
             label: "Отделы",
             columns: [
                 { name: 'title', label: 'Отдел', field: row => row.title, align: 'left', sortable: true },
-                { name: 'manager', label: 'Руководитель отдела', field: row => row.manager?.fio, align: 'left', sortable: true },
+                { name: 'manager', label: 'Руководитель отдела', field: row => row.manager?.init_name, align: 'left', sortable: true },
                 { name: 'parents', label: 'Вышестоящее руководство', field: row => row.parents.map(item => `${item.title} `), align: 'left', sortable: true },
                 { name: 'childrens', label: 'Дочерние отделы', field: row => row.childrens.length, align: 'left', sortable: true},
                 { name: 'staff', label: 'Сотрудники', field: row => `${row.staff.length} чел.`, align: 'center', sortable: true },

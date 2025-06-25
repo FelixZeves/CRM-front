@@ -85,6 +85,7 @@ defineExpose({send, remove})
                 map-options
                 multiple
                 use-chips
+                :readonly="status"
                 :options="buffOptions"
                 :option-label="'title'"
                 :option-value="'id'"
