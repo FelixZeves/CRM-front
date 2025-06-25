@@ -2,13 +2,8 @@ import axios from 'axios';
 import { RoleEnum } from './Enums.vue';
 
 export async function getMe(){
-    try{
-        const response = await axios.get('/api/user/me')
-        return response
-    } catch (error) {
-        console.error('Ошибка загрузки информации о вас:', error);
-        return []; // Возвращаем пустой массив в случае ошибки
-    }
+    const response = await axios.get('/api/user/me')
+    return response
 }
 
 export async function getDepartments(){
@@ -46,6 +41,10 @@ export async function getSupervisors(){
     }
 }
 
+export function getToday() {
+    return new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
 export function getFormSchema(name) {
     const formSchemas = {
         user: {
@@ -73,6 +72,14 @@ export function getFormSchema(name) {
             manager: null,
             childrens: [],
             staff: []
+        },
+        event: {
+            title: '',
+            description: '',
+            place: '',
+            user: [],
+            at: getToday(),
+            to: getToday()
         }
     };
 
@@ -97,7 +104,7 @@ export function getTableSchema(name) {
                 { name: 'title', label: 'Отдел', field: row => row.title, align: 'left', sortable: true },
                 { name: 'manager', label: 'Руководитель отдела', field: row => row.manager?.fio, align: 'left', sortable: true },
                 { name: 'parents', label: 'Вышестоящее руководство', field: row => row.parents.map(item => `${item.title} `), align: 'left', sortable: true },
-                { name: 'childrens', label: 'Дочерние отделы', field: row => row.childrens.map(item => `${item.title} `), align: 'left', sortable: true},
+                { name: 'childrens', label: 'Дочерние отделы', field: row => row.childrens.length, align: 'left', sortable: true},
                 { name: 'staff', label: 'Сотрудники', field: row => `${row.staff.length} чел.`, align: 'center', sortable: true },
                 { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true }]
         },
