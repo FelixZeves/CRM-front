@@ -115,6 +115,18 @@ function checkDock(){
     console.log(taskFiles)
 }
 
+function labelChanges(){
+    if (task.value.type == D.ORDER){
+        return 'задачи'
+    }
+    else if (task.value.type == D.MEMO){
+        return 'служебной записки'
+    }
+    else{
+        return 'заявки'
+    }
+}
+
 async function lazyLoad() {
     let department = null
     if (me.value.role == R.LEADER){
@@ -158,7 +170,7 @@ async function send() {
                 >
                 <q-step
                     :name="D.APPLICATION"
-                    title="Создание задачи"
+                    :title="`Создание ${labelChanges()}`"
                     icon="fa-regular fa-file-lines"
                     class="row-grow"
                     :done="step > D.APPLICATION"

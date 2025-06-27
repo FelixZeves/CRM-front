@@ -1,33 +1,29 @@
 <script setup>
 import axios from 'axios'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import ModalError from '@/components/forms/BugReport.vue';
 
 const props = defineProps(['name', 'role', 'section'])
 const fio = ref("");
 const role = ref("");
+const defaultPass =  ref(false)
 const visibleBugReport = ref(false);
 
 async function getUser(){
 
-    try {
-        const response = await axios.get('/api/user/me');
+    const response = (await axios.get('/api/user/me')).data;
 
-        fio.value = response.data.profile.initials_name;
-        role.value = response.data.role;
-        
-    } catch (error) {
-        console.error('Ошибка авторизации:', error.response?.data || error.message);
-    }
+    fio.value = response.profile.initials_name;
+    role.value = response.role;
+    defaultPass.value = response.default_pass
 
 }
 
-getUser()
-
+onMounted(async () => {await getUser()})
 </script>
 
 <template>
-        <div class="!flex !flex-col p-4 items-center bg-[--crm-c-dark-velvet] rounded-[15pt]">
+        <div class="!flex !flex-col p-4 items-center bg-[--crm-c-dark-velvet] rounded-[15pt] h-[80%]">
             <div class="flex flex-col gap-y-4 items-center">
                 <q-btn :to="{name:  'Office'}" flat>
                     <div class="flex flex-col">
@@ -69,12 +65,11 @@ getUser()
                 class="text-white"
                 :to="{name : 'Database'}">
                 </q-btn>
-                <q-btn @click="visibleBugReport = true" label="Нашли ошибку?" color="brand-white" unelevated class="mt-8">
+                <q-btn @click="visibleBugReport = true" label="Нашли ошибку?" color="brand-white" unelevated class="mt-[2vh]">
                     <ModalError v-model:visible="visibleBugReport" />
                 </q-btn>
                 <q-btn flat class="text-white" to="/" label="Выйти"></q-btn>
                 </div>
-            
         </div> 
 </template>
 

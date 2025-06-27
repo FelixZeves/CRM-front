@@ -21,7 +21,7 @@ get()
 </script>
 
 <template>
-    <div id="tasksTile" class="shadow-2xl">
+    <!-- <div id="tasksTile" class="shadow-2xl">
         <h3 class="text-lg lg:text-2xl 2xl:text-3xl font-bold">Задачи</h3>
         <div class="grid grid-rows-5 gap-y-0.5">
             <div v-for="task in tasks" class="task grid grid-cols-4 gap-x-1">
@@ -43,61 +43,45 @@ get()
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
+
+    
+    <q-list class="!max-h-[40vh] overflow-y-auto flex-grow">
+        <q-item
+            v-for="task in tasks"
+            class="items-center !max-h-[250px] !min-h-[100px] flex items-stretch gap-x-4 !px-0">
+            <q-item-section>
+                <q-card class="flex flex-grow">
+                    <q-card-section class="flex flex-row flex-grow justify-between content-center">
+                        <div class="flex-grow">
+                            <div class="text-xl text-stone-700">{{ task.title }}</div>
+                            <div class="text-lg text-stone-600">{{ task.description }}</div>
+                        </div>
+                        <div class="w-[20%] text-end">
+                            <div class="text-base text-stone-600">{{ task.steps[0].user.init_name }}</div>
+                            <div class="text-base text-stone-600">{{ task.deadline }}</div>
+                        </div>
+                    </q-card-section>
+                </q-card>
+            </q-item-section>
+
+            <div class="w-[3%] !min-h-[100px] rounded-[5pt] shadow-lg cursor-help" :class="StatusEnum[task.status].color">
+                <q-tooltip
+                    anchor="top middle"
+                    self="bottom middle"
+                    max-width="200px"
+                    :offset="[10, 10]"
+                    class="!text-sm text-center"
+                    :class="StatusEnum[task.status].color, StatusEnum[task.status].textColor">
+                    {{ StatusEnum[task.status].description }}
+                </q-tooltip>
+            </div>
+            
+        </q-item>
+    </q-list>
+            
 </template>
 
 <style scoped>
-
-#tasksTile{
-    @apply bg-white rounded-[15pt] pb-4
-}
-
-#tasksTile h3{
-    padding-left: 5%;
-    padding-top: 2%;
-    padding-bottom: 0%;
-}
-
-.task{
-    justify-self: center;
-    border-radius: 10pt;
-    width: 95%;
-    height: 55px;
-}
-
-.task:hover{
-    background-color: var(--vt-c-white-mute);
-    transition: 0.5s;
-}
-
-.task .mainInfo{
-    padding-left: 5%;
-    align-self: center;
-}
-
-.task .date{
-    text-align: center;
-    align-self: center;
-}
-
-.task .status{
-    justify-self: center;
-    align-self: center;
-    height: 20px;
-    width: 20px;
-    border-radius: 20pt;
-}
-
-.task .status-danger{
-    background-color: var(--crm-c-danger);
-}
-
-.task .status-wait{
-    background-color: var(--crm-c-light-yellow);
-}
-
-.task .status-complete{
-    background-color: var(--crm-c-complete);
-}
 
 </style>

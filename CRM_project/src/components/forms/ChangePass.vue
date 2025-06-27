@@ -1,4 +1,6 @@
 <script setup>
+import axios from 'axios'
+import router from '@/router';
 import { ref } from 'vue'
 
 const passwordVerification = ref("")
@@ -6,8 +8,10 @@ const password = ref("")
 
 const authorizationError = ref("")
 
-function passwordCheck(){
-    return password.value == passwordVerification.value && password.value
+async function passwordCheck(){
+    await axios.put('/api/user/change-pass', {password: password.value})
+
+    router.push('/')
 }
 </script>
 
