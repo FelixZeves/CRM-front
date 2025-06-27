@@ -1,10 +1,22 @@
 <script setup>
-    const props = defineProps(['name', 'type', 'spec', 'date', 'file'])
+import axios from 'axios'
 
-function downloadFile(){
+    const props = defineProps(['body'])
 
-    console.log('Типа Скачал')
+async function downloadFile(){
+    const response = await axios.get(`/api/user/file/download?id=${props.body.id}`, { responseType: 'stream' })
+    const fileName = decodeURIComponent(response.headers['content-disposition'].split('filename=')[1]?.replace(/["']/g, ''))
+    const blob = new Blob([response.data], { type: 'application/octet-stream' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
 
+    link.href = url
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
 }
 
 </script>
@@ -15,14 +27,13 @@ function downloadFile(){
             <q-card-section class="flex flex-row items-center">
                 <q-icon name="fa-regular fa-file-word" size="xl" class="!max-w-[5%]"/>
                 <div class="flex flex-col px-4 !max-w-[90%] !min-w-[90%]">
-                    <div class="font-bold text-sm lg:text-base 2xl:text-lg !max-w-full truncate pb-4">{{ name }}</div>
+                    <div class="font-bold text-sm lg:text-base 2xl:text-lg !max-w-full truncate pb-4">{{ body.title }}</div>
                     <div class="flex flex-row justify-end">
-                        <q-chip clickable outline square color="grey-8" :label="type"></q-chip>
-                        <q-chip clickable outline square color="grey-8" :label="spec"></q-chip>
-                        <q-chip outline square color="grey-8" :label="date"></q-chip>
+                        <q-chip v-for="tag in body.tags" clickable outline square color="grey-8" :label="tag.title"/>
+                        <q-chip outline square color="grey-8" :label="body.create_at"></q-chip>
                     </div>
                 </div>
-                <q-btn flat class="!max-w-[5%]">
+                <q-btn flat class="!max-w-[5%]" @click="downloadFile">
                     <q-icon name="download" size="lg"></q-icon>
                 </q-btn>
             </q-card-section>

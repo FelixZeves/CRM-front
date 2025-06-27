@@ -6,17 +6,12 @@ export async function getMe(){
     return response
 }
 
-export async function getDepartments(){
-    try {
-        const response = await axios.get('/api/user/department');
-        return response.data.data.map(item => ({
-            value: item.id,  // или item.id, в зависимости от структуры ответа
-            label: item.title  // или item.name
-        }));
-    } catch (error) {
-        console.error('Ошибка загрузки отделов:', error);
-        return []; // Возвращаем пустой массив в случае ошибки
-    }
+export async function getDepartments(id = null){
+    let url = '/api/user/department'
+    if (id)
+        url = `${url}?id=${id}`
+
+    return (await axios.get(url)).data
 }
 
 export async function getEvents(){
@@ -80,6 +75,13 @@ export function getFormSchema(name) {
             user: [],
             at: getToday(),
             to: getToday()
+        },
+        file: {
+            title: '',
+            body: [],
+            infinitely: false,
+            tags: [],
+            departments: []
         }
     };
 
