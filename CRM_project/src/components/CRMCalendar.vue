@@ -47,14 +47,16 @@ let attrs = ref([
 </script>
 
 <template>
-    <VCalendar
+    <div class="flex justify-center">
+        <VCalendar
         borderless
         trim-weeks
         title-position="left"
-        class="shadow-2xl !min-h-[40vh]"
+        class="shadow-2xl !min-h-[40vh] max-w-[30vw]"
         color="velvet"
         :attributes="attrs"
     />
+    </div>
 </template>
 
 <style>

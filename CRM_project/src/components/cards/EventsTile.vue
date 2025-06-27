@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { getEvents } from '@/components/Utils';
 import EventCreationDialog from '@/components/forms/AddEvent.vue';
 import axios from 'axios';
@@ -11,11 +11,11 @@ async function updateList() {
     events.value = (await axios.get('/api/user/event?limit=3')).data.data
 }
 
-updateList()
+onMounted(() => {updateList()})
 </script>
 
 <template>
-    <div id="eventsTile" class="shadow-2xl">
+    <!-- <div id="eventsTile" class="shadow-2xl">
         <div id="eventsHead" class="flex flex-row justify-between px-6 py-2">
             <h3 class="text-lg lg:text-2xl 2xl:text-3xl font-bold ps-2">Ближайшие мероприятия</h3>
             <div class="w-1/4 flex justify-center me-4">
@@ -33,6 +33,29 @@ updateList()
                 <p class="place text-sm lg:text-base col-span-2 mb-0">{{ event.place }}</p>
             </div>
         </div>
+    </div> -->
+    <div class="q-px-lg q-py-md">
+        <q-timeline
+            color="brand-velvet"
+        >
+            <q-timeline-entry heading>
+                Мероприятия
+            </q-timeline-entry>
+
+            <q-timeline-entry
+                v-for="event in events"
+                :title="event.title"
+                :subtitle="`${event.at != event.to ? `${event.at} - ${event.to}` : event.to} : ${event.creator.init_name}`"
+            >
+                <div class="text-xl text-stone-700">
+                    {{ event.description }}
+                </div>
+                <div class="text-lg text-stone-600">
+                    {{ event.place }}
+                </div>
+            </q-timeline-entry>
+
+        </q-timeline>
     </div>
 </template>
 

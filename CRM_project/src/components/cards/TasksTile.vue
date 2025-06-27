@@ -45,7 +45,6 @@ get()
         </div>
     </div> -->
 
-    
     <q-list class="!max-h-[40vh] overflow-y-auto flex-grow">
         <q-item
             v-for="task in tasks"
