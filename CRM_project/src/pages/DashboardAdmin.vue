@@ -24,25 +24,29 @@ const forms = {
 }
 
 const tables = ref([
-  {...getTableSchema('user'), path: '/api/user', data: [],
+  {...getTableSchema('user'), name: 'user', data: [],
     async get() {this.data = (await axios.get('/api/user')).data.data},
     choose(row) {typeForm.value = 'user'; details.value = row},
-    add() {typeForm.value = 'user'; details.value = getFormSchema('user'); status.value ='create';}
+    add() {typeForm.value = 'user'; details.value = getFormSchema('user'); status.value ='create';},
+    info: "1. Человек может быть либо руководителем, либо сотрудником отдела;\n2. Чтобы открепить человека от отдела, необходимо откреплять его в форме редактировния отдела."
 },
-  {...getTableSchema('department'), path: '/api/user/department', data: [],
+  {...getTableSchema('department'), name: 'department', data: [],
     async get() {this.data = (await axios.get('/api/user/department')).data.data},
     choose(row) {typeForm.value = 'department'; details.value = row},
-    add() {typeForm.value = 'department'; details.value = getFormSchema('department'); status.value ='create';}
+    add() {typeForm.value = 'department'; details.value = getFormSchema('department'); status.value ='create';},
+    info: "1. Чтобы добавить руководителя или сотрудника, необходимо выбрать нужный отдел в форме редактирования/добавления пользователя;\n2. Вышестоящее руководство добавляется путём добавления дочернего отдела у вышестоящего."
 },
-  {...getTableSchema('classes'), path: '/api/user/class', data: [],
+  {...getTableSchema('classes'), name: 'class', data: [],
   async get() {this.data = (await axios.get('/api/user/class')).data.data},
   choose(row) {typeForm.value = 'class'; details.value = row},
-  add() {typeForm.value = 'class'; details.value = getFormSchema('class'); status.value ='create';}
+  add() {typeForm.value = 'class'; details.value = getFormSchema('class'); status.value ='create';},
+  info: "Вводите класс и параллель отдельно"
 },
-  {...getTableSchema('lessons'), path: '/api/user/lesson', data: [],
+  {...getTableSchema('lessons'), name: 'lesson', data: [],
   async get() {this.data = (await axios.get('/api/user/lesson')).data.data},
   choose(row) {typeForm.value = 'lesson'; details.value = row},
-  add() {typeForm.value = 'lesson'; details.value = getFormSchema('lesson'); status.value ='create';}
+  add() {typeForm.value = 'lesson'; details.value = getFormSchema('lesson'); status.value ='create';},
+  info: "Вводите уроки в виде: *Название урока* *класс* *кабинет*"
 },
 ])
 
@@ -109,12 +113,15 @@ async function remove() {
                     />
                 </div>
                 <span class="font-bold text-gray-800 text-xl text-start">Описание</span>
-                <span class="font-normal 2xl:text-base text-gray-700 text-start">
-                    На этой странице вы можете управлять пользователями,
-                    отделами и уроками вашего образовательного центра,
-                    а также добавлять новые записи. Также здесь можно
-                    просматривать детали каждого элемента, что позволяет
-                    легко отслеживать и управлять всеми аспектами вашего центра.
+                <span v-if="typeForm && tables.find(t => t.name.includes(typeForm))" class="font-normal 2xl:text-base text-gray-700 text-start whitespace-pre-line">
+                {{ tables.find(t => t.name.includes(typeForm)).info }}
+                </span>
+                <span v-else class="font-normal 2xl:text-base text-gray-700 text-start">
+                На этой странице вы можете управлять пользователями,
+                отделами и уроками вашего образовательного центра,
+                а также добавлять новые записи. Также здесь можно
+                просматривать детали каждого элемента, что позволяет
+                легко отслеживать и управлять всеми аспектами вашего центра.
                 </span>
             </div>
 
@@ -123,7 +130,7 @@ async function remove() {
                 <q-separator inset />
                 <q-card-section class="flex flex-col justify-center">
                     <q-form @submit="save">
-                        <component ref="formSubmit" :is="forms[typeForm]" :model="details" :status="isRead" :mode="status"/>
+                        <component ref="formSubmit" :is="forms[typeForm]" :model="details" :status="isRead" :mode="status" @update-list="tables.find(t => t.name.includes(typeForm)).get()"/>
                         <q-btn v-if="!isRead" type="submit" label="Сохранить" color="brand-velvet" class="mt-2"/>
                     </q-form>
                 </q-card-section>

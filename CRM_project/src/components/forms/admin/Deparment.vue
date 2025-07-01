@@ -9,10 +9,13 @@ const props = defineProps({
     mode: {type: String, default: 'read'}
 })
 
+const emit = defineEmits(['update-list'])
+
 const q = useQuasar()
 const localModel = ref(JSON.parse(JSON.stringify(props.model)))
 const buffOptions = ref([{title: 'Пусто', id: null}])
 const staffOptions = ref([...props.model.staff])
+const managerOption = ref([props.model.manager])
 const successNotify = () => q.notify({type: 'positive', position: 'top', message: 'Успех!'})
 const confirmNotify = () => q.notify({
     type: 'ongoing',
@@ -20,7 +23,7 @@ const confirmNotify = () => q.notify({
     color: 'red-5',
     message: 'Вы уверены?',
     actions: [
-        {label: 'Подтвердить', color: 'white', handler: async () => {await axios.delete(`/api/user/department?id=${localModel.value.id}`)}},
+        {label: 'Подтвердить', color: 'white', handler: async () => {await axios.delete(`/api/user/department?id=${localModel.value.id}`); emit('update-list')}},
         {label: 'Отменить', color: 'white'}
 ]})
 
@@ -35,6 +38,7 @@ async function send() {
         if (props.mode == 'create') {await axios.post('/api/user/department', localModel.value)}
         if (props.mode == 'edit') {await axios.patch('/api/user/department', localModel.value)}
         successNotify()
+        emit('update-list')
     }
 }
 
@@ -69,10 +73,10 @@ defineExpose({send, remove})
                 emit-value
                 map-options
                 :readonly="status"
-                :options="buffOptions"
+                :options="managerOption"
                 :option-label="'fio'"
                 :option-value="'id'"
-                @focus="lazyLoad('/api/user/department/short')"
+                @focus="lazyLoad('/api/user/department')"
                 v-model="localModel.manager"
             />
         </q-item>
@@ -86,7 +90,7 @@ defineExpose({send, remove})
                 multiple
                 use-chips
                 :readonly="status"
-                :options="buffOptions"
+                :options="buffOptions.manager"
                 :option-label="'title'"
                 :option-value="'id'"
                 @focus="getDepartments"
@@ -120,7 +124,7 @@ defineExpose({send, remove})
                 multiple
                 :readonly="status"
                 :options="staffOptions"
-                :option-label="'fio'"
+                :option-label="'init_name'"
                 :option-value="'id'"
                 v-model="localModel.staff"
             />

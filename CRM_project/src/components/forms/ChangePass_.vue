@@ -26,3 +26,7 @@ const confirmNotify = () => q.notify({
 
 onMounted(async () => {await checkPass()})
 </script>
+
+<template>
+    
+</template>

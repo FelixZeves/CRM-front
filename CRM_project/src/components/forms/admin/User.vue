@@ -10,6 +10,8 @@ const props = defineProps({
     mode: {type: String, default: 'read'}
 })
 
+const emit = defineEmits(['update-list'])
+
 const q = useQuasar()
 const isPassReset = ref(false)
 const roleOptions = Object.entries(RoleEnum).map(([key, value]) => ({label: value.translation, value: Number(key)}))
@@ -32,7 +34,7 @@ const confirmNotify = () => q.notify({
     color: 'red-5',
     message: 'Вы уверены?',
     actions: [
-        {label: 'Подтвердить', color: 'white', handler: async () => {await axios.delete('/api/user', { params: { id: props.model.id } })}},
+        {label: 'Подтвердить', color: 'white', handler: async () => {await axios.delete('/api/user', { params: { id: props.model.id } }); emit('update-list')}},
         {label: 'Отменить', color: 'white'}
 ]})
 
@@ -57,6 +59,8 @@ async function send() {
         }
 
         if (props.mode == 'edit') {await axios.patch('/api/user', props.model); successNotify()}
+
+        emit('update-list')
     }
 }
 

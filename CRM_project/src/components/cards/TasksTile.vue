@@ -64,7 +64,7 @@ get()
                 </q-card>
             </q-item-section>
 
-            <div class="w-[3%] !min-h-[100px] rounded-[5pt] shadow-lg cursor-help" :class="StatusEnum[task.status].color">
+            <div class="w-[5%] !min-h-[100px] rounded-[5pt] shadow-lg cursor-help" :class="StatusEnum[task.status].color">
                 <q-tooltip
                     anchor="top middle"
                     self="bottom middle"

@@ -9,6 +9,8 @@ const props = defineProps({
     mode: {type: String, default: 'read'}
 })
 
+const emit = defineEmits(['update-list'])
+
 const q = useQuasar()
 const localModel = ref(JSON.parse(JSON.stringify(props.model)))
 const buffOptions = ref([])
@@ -19,7 +21,7 @@ const confirmNotify = () => q.notify({
     color: 'red-5',
     message: 'Вы уверены?',
     actions: [
-        {label: 'Подтвердить', color: 'white', handler: async () => {await axios.delete(`/api/user/class?id=${localModel.value.id}`)}},
+        {label: 'Подтвердить', color: 'white', handler: async () => {await axios.delete(`/api/user/class?id=${localModel.value.id}`); emit('update-list')}},
         {label: 'Отменить', color: 'white'}
 ]})
 
@@ -33,6 +35,7 @@ async function send() {
         response = await axios.patch('/api/user/class', localModel.value)
 
     if (response?.status == 200) successNotify()
+    emit('update-list')
 }
 
 async function lazyLoad(url) {
