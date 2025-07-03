@@ -36,19 +36,18 @@ import ChangePass_ from '@/components/forms/ChangePass_.vue';
             <NavigationColumn section='Office' />
         </header>
         
-        <main class="flex flex-row flex-grow overflow-y-auto  justify-evenly">
+        <main class="flex flex-row flex-grow overflow-y-auto gap-x-2 justify-between h-[calc(100vh-100px)]">
             <div class="flex flex-col gap-y-8 min-w-[400px] max-w-[525px] flex-shrink-0">
                 <EventsTile/>    
+                
             </div>
 
             <div class="flex flex-col gap-y-8 min-w-[500px] flex-grow max-w-[700px] flex-shrink-0">
-            <Suspense>
-                <CRMCalendar class="font-jetbrains-mono"/>
-            </Suspense>
-
-            <TasksTile/>
+                <Suspense>
+                    <CRMCalendar class="font-jetbrains-mono"/>
+                </Suspense>
+                <TasksTile/>
             </div>
-            
         </main>
     </div>
     <ChangePass_/>

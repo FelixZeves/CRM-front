@@ -34,29 +34,25 @@ onMounted(() => {updateList()})
             </div>
         </div>
     </div> -->
-    <div class="q-px-lg q-py-md">
-        <q-timeline
-            color="brand-velvet"
+    <q-timeline color="brand-velvet">
+        <q-timeline-entry heading>
+            Мероприятия
+        </q-timeline-entry>
+
+        <q-timeline-entry
+            v-for="event in events"
+            :title="event.title"
+            :subtitle="`${event.at != event.to ? `${event.at} - ${event.to}` : event.to} : ${event.creator.init_name}`"
         >
-            <q-timeline-entry heading>
-                Мероприятия
-            </q-timeline-entry>
+            <div class="text-xl text-stone-700]">
+                {{ event.description }}
+            </div>
+            <div class="text-lg text-stone-600">
+                {{ event.place }}
+            </div>
+        </q-timeline-entry>
 
-            <q-timeline-entry
-                v-for="event in events"
-                :title="event.title"
-                :subtitle="`${event.at != event.to ? `${event.at} - ${event.to}` : event.to} : ${event.creator.init_name}`"
-            >
-                <div class="text-xl text-stone-700">
-                    {{ event.description }}
-                </div>
-                <div class="text-lg text-stone-600">
-                    {{ event.place }}
-                </div>
-            </q-timeline-entry>
-
-        </q-timeline>
-    </div>
+    </q-timeline>
 </template>
 
 <style scoped>

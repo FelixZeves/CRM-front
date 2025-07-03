@@ -47,7 +47,7 @@ let attrs = ref([
 </script>
 
 <template>
-    <div class="flex justify-center">
+    <div class="flex justify-end pe-6">
         <VCalendar
         borderless
         trim-weeks
