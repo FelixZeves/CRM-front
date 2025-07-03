@@ -1,17 +1,19 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import axios from 'axios';
 import NavigationColumn from '@/components/menus/NavigationColumn.vue';
 import DocumentsList from '@/components/layouts/DocumentsList.vue';
 import DocumentsDropdownNSearch from '@/components/menus/DocumentsDropdownNSearch.vue';
 import AddDoc from '@/components/forms/AddDoc.vue';
 
-const events = ref([])
+const docs = ref([])
 const visible = ref(false)
 
 async function updateList() {
-    
+    docs.value = (await axios.get('/api/user/file')).data.data
 }
 
+onMounted(async () => {updateList()})
 </script>
 
 
@@ -27,7 +29,7 @@ async function updateList() {
             <div class="flex-grow">
                 <DocumentsDropdownNSearch @show-dialog="visible = true"></DocumentsDropdownNSearch>
                 <AddDoc v-model:visible='visible' @update-list="updateList"></AddDoc>
-                <DocumentsList/>
+                <DocumentsList :docs="docs"/>
             </div>
         </main>
     </div>

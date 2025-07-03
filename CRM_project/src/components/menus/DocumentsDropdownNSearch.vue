@@ -49,7 +49,7 @@ function onFocusClick(res){
               </q-list>
             </q-btn-dropdown>
       
-            <q-btn-dropdown
+            <!-- <q-btn-dropdown
             menu-anchor="bottom right"
             :menu-offset="[5, 5]"
             class="shadow-xl rounded-[15pt]"
@@ -76,7 +76,7 @@ function onFocusClick(res){
                 </q-item>
       
               </q-list>
-            </q-btn-dropdown>
+            </q-btn-dropdown> -->
       
             <q-btn-dropdown menu-anchor="bottom right" class="shadow-xl rounded-[15pt]" color="white" text-color="black" :label=focusesFilter :menu-offset="[0, 5]">
               <q-list>
