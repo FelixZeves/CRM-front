@@ -61,7 +61,7 @@ async function remove() {
 </script>
 
 <template>
- <div class="w-full h-full flex flex-row p-5 pb-1 gap-10">
+ <div class="w-[100vw] h-[100vh] flex flex-row p-5 pb-1 gap-10">
     <div class="flex-grow max-w-[65%] pe-1 h-full overflow-y-auto">
         <q-list bordered>
             <q-expansion-item

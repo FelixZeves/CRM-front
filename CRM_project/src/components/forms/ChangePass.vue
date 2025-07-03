@@ -1,6 +1,7 @@
 <script setup>
 import axios from 'axios'
 import router from '@/router';
+import { useQuasar } from 'quasar';
 import { ref } from 'vue'
 
 const passwordVerification = ref("")
@@ -8,9 +9,18 @@ const password = ref("")
 
 const authorizationError = ref("")
 
+const q = useQuasar()
+const completeNotify = () => q.notify({
+        type: 'positive',
+        position: 'top',
+        color: 'brand-complete',
+        message: 'Пароль сменён успешно!',
+        })
+
 async function passwordCheck(){
     await axios.put('/api/user/change-pass', {password: password.value})
 
+    completeNotify()
     router.push('/')
 }
 </script>

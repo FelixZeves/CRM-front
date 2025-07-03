@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref, watch, computed } from 'vue';
 import { useQuasar } from 'quasar'
 import axios from 'axios';
 
@@ -12,7 +12,13 @@ const props = defineProps({
 const emit = defineEmits(['update-list'])
 
 const q = useQuasar()
-const localModel = ref(JSON.parse(JSON.stringify(props.model)))
+// const localModel = ref(JSON.parse(JSON.stringify(props.model)))
+
+const localModel = computed({
+    get: () => JSON.parse(JSON.stringify(props.model))
+})
+
+
 const buffOptions = ref([{title: 'Пусто', id: null}])
 const staffOptions = ref([...props.model.staff])
 const managerOption = ref([props.model.manager])

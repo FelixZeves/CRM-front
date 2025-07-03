@@ -6,8 +6,6 @@ import axios from 'axios';
 const email = ref("")
 const password = ref("")
 
-const authorizationError = ref("")
-
 async function loginUser(){
     try {
         const response = await axios.post('/api/login', {
@@ -38,14 +36,13 @@ async function loginUser(){
                 required 
                 :rules="[val => !!val || 'Обязательное поле', val => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || 'Введите корректный email']"/>
             <q-input
-                type="text"
+                type="password"
                 v-model="password"
                 placeholder="Пароль"
                 outlined 
                 required
                 :rules="[val => (val && val.length >= 6 && val.length <= 12) || 'Длина должна быть от 6 до 12 символов']"/>
             <q-btn type="submit" color="brand-velvet" class="!text-base !w-full !flex !justify-center !items-center mt-5 !text-white"> Войти </q-btn>
-            <div class="verificationError">{{authorizationError}}</div>
         </q-form>
     </div>
 </template>
