@@ -18,14 +18,14 @@ async function deleteEvent(){
 <template>
     <q-card class="my-6 mx-3 max-h-[200px]">
         <q-card-section class="flex flex-row gap-x-4 items-center">
-            <div class="flex flex-col gap-y-2 w-[20%]">
-                <div class="text-lg text-gray-700">{{ deadline }}</div>
-                <div class="text-base text-gray-600">{{ place }}</div>
+            <div class="flex flex-col gap-y-2 w-[20%] overflow-hidden">
+                <div class="text-lg text-gray-700 max-w-[90%] truncate">{{ deadline }}</div>
+                <div class="text-base text-gray-600 max-w-[90%] truncate">{{ place }}</div>
             </div>
-            <div class="flex flex-col gap-y-2 flex-grow">
+            <div class="flex flex-col gap-y-2 flex-grow w-[60%]">
                 <div class="text-xl font-bold text-gray-700">{{ name }}</div>
                 <div class="text-base text-gray-600">{{ creator}}</div>
-                <div class="text-lg text-gray-600 w-[80%]">{{ description }}</div>
+                <div class="text-lg text-gray-600 ">{{ description }}</div>
             </div>
             <q-btn class="!w-[15%]" label="Закрыть мероприятие" color="brand-velvet" text-color="white" @click="deleteEvent"/>
         </q-card-section>

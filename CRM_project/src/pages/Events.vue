@@ -27,10 +27,9 @@ updateList()
             />
         </header>
 
-        <main class="flex flex-grow">
-            <div class="flex-grow">
+        <main class="flex flex-grow max-w-[80%]">
+            <div>
                 <EventsDropdown @show-dialog="visible = true"></EventsDropdown>
-                <EventCreationDialog v-model:visible='visible' @update-list="updateList"/>
                 <Suspense>
                     <EventsList :events="events" @update-list="updateList"/>
                     <template #fallbkack>
@@ -39,7 +38,7 @@ updateList()
                         </div>
                     </template>
                 </Suspense>
-                
+                <EventCreationDialog v-model:visible='visible' @update-list="updateList"/>
             </div>
         </main>
     </div>

@@ -44,7 +44,7 @@ onMounted(() => {updateList()})
             :title="event.title"
             :subtitle="`${event.at != event.to ? `${event.at} - ${event.to}` : event.to} : ${event.creator.init_name}`"
         >
-            <div class="text-xl text-stone-700]">
+            <div class="text-xl text-stone-700 text-ellipsis line-clamp-2">
                 {{ event.description }}
             </div>
             <div class="text-lg text-stone-600">
