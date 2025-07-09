@@ -29,7 +29,7 @@ const fileIcons = {
     'pptx': 'fa-regular fa-file-powerpoint',
     'xlsx': 'fa-regular fa-file-excel',
     'txt': 'fa-regular fa-file-lines',
-    'zip': 'fa-regular fa-file-zipper'
+    '7z': 'fa-regular fa-file-zipper'
 }
 
 </script>

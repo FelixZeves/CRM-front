@@ -48,11 +48,12 @@ async function lazyLoad() {
                     <div class="flex flex-row gap-x-4">
                         <q-file
                             v-model="form.body"
-                            label="Прикрепить файлы"
+                            label="Прикрепите файл"
                             outlined
                             hide-bottom-space=""
                             bg-color="brand-wait"
                             clearable
+                            accept=".pdf, .jpg, .png, .docx, .pptx, .xlsx, .txt, .7z"
                             class="!w-[60%]"
                             :rules="[val => val != null|| 'Обязательно прикрепите файл']">
                                 <template v-slot:append><q-icon name="attach_file" /></template>
