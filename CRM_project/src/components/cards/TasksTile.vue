@@ -48,20 +48,20 @@ get()
     <q-list class="!max-h-[40vh] overflow-y-auto flex-grow px-2">
         <q-item
             v-for="task in tasks"
-            class="items-center !max-h-[250px] !min-h-[100px] flex items-stretch gap-x-2 !px-0">
+            class="items-center !max-h-[250px] !min-h-[100px] flex items-stretch gap-x-2 !px-0 !pt-0">
             <q-item-section>
                 <q-card class="overflow-hidden flex flex-row">
                     <q-card-section class="flex flex-row flex-grow justify-between content-center max-w-[97%]">
-                        <div class="flex-grow">
+                        <div class="flex-grow max-w-[70%]">
                             <div class="text-xl text-stone-700 shrink-0 truncate">{{ task.title }}</div>
-                            <div class="text-lg text-stone-600 w-full shrink-0 truncate">{{ task.description }}</div>
+                            <div class="text-lg text-stone-600 max-h-[200px] overflow-hidden text-ellipsis line-clamp-2"> {{ task.description }} </div>
                         </div>
                         <div class="w-[25%] text-end pe-2">
                             <div class="text-base text-stone-600">{{ task.steps[0].user.init_name }}</div>
                             <div class="text-base text-stone-600">{{ task.deadline }}</div>
                         </div>
                     </q-card-section>
-                    <div class="max-w-[3%] flex-grow h-full !rounded-none justify-self-end" :class="StatusEnum[task.status].color"></div>
+                    <div class="w-[3%] h-full !rounded-none justify-self-end" :class="StatusEnum[task.status].color"></div>
                 </q-card>
             </q-item-section>
 

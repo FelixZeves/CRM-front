@@ -19,7 +19,7 @@ const btn = ref({
 </script>
 
 <template>
-    <q-card class="flex flex-col flex-grow bg-white !rounded-[15pt] mx-2 my-2 pt-3 pb-5 px-5 !min-h-[250px] !max-h-[500px]">
+    <q-card class="flex flex-col flex-grow bg-white mx-2 my-2 pt-3 pb-5 px-5 !min-h-[250px] !max-h-[500px]">
         <div class="flex flex-row w-[70%] justify-between">
             <span class="lg:text-lg 2xl:text-xl font-bold text-sm lg:text-base 2xl:text-lg mb-2">{{ body.title }}</span>
             <div v-if="user.role != R.TEACHER">
@@ -69,7 +69,7 @@ const btn = ref({
         animated>
           <q-tab-panel name="main">
             <p class="text-base m-0 justify-self-end text-end text-gray-600 pb-4"><span class="text-lg text-gray-700">Срок выполнения:</span> <br/> {{ body.deadline }}</p>
-            <div class="text-base text-gray-600 text-pretty truncate max-h-[70%]">{{ body.description }}</div>
+            <div class="text-base text-gray-600 text-pretty max-h-[70%] text-ellipsis line-clamp-3">{{ body.description }}</div>
           </q-tab-panel>
 
           <q-tab-panel name="details" class="overflow-y-auto">
