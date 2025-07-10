@@ -24,7 +24,7 @@ function onFocusClick(res){
 </script>
 
 <template>
-    <div class="q-pa-md border-2 flex-grow !w-[80%] flex flex-row justify-between justify-self-center mx-3">
+    <div class="q-pa-md border-2 w-[97%] flex flex-row justify-between justify-self-center">
         <div class="flex flex-row items-center gap-x-2">
             <q-btn-dropdown menu-anchor="bottom right" class="shadow-xl rounded-[15pt]" color="white" text-color="black" :label=typesFilter :menu-offset="[0, 5]">
               <q-list>
@@ -49,7 +49,7 @@ function onFocusClick(res){
               </q-list>
             </q-btn-dropdown>
       
-            <!-- <q-btn-dropdown
+            <q-btn-dropdown
             menu-anchor="bottom right"
             :menu-offset="[5, 5]"
             class="shadow-xl rounded-[15pt]"
@@ -76,7 +76,7 @@ function onFocusClick(res){
                 </q-item>
       
               </q-list>
-            </q-btn-dropdown> -->
+            </q-btn-dropdown>
       
             <q-btn-dropdown menu-anchor="bottom right" class="shadow-xl rounded-[15pt]" color="white" text-color="black" :label=focusesFilter :menu-offset="[0, 5]">
               <q-list>
@@ -103,7 +103,7 @@ function onFocusClick(res){
         </div>
         <div class="flex flex-row gap-x-2">
           <div class="flex flex-row items-center border-2">
-            <q-input v-model="searchText" borderless label-color="black" label="Поиск документа">
+            <q-input v-model="searchText" borderless label-color="black" class="ps-2 pe-1 brand-description" label="Поиск документа">
 
                 <template v-slot:append>
                     <q-icon v-if="searchText !== ''" name="close" color="black" size="sm" @click="searchText = ''" class="cursor-pointer" />
@@ -119,6 +119,7 @@ function onFocusClick(res){
           </div>
           <q-btn
           icon-right="add"
+          unelevated
           color="brand-wait"
           text-color="black"
           @click="$emit('show-dialog')">

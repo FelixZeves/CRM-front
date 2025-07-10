@@ -1,6 +1,5 @@
 <script setup>
 import LogIn from '@/components/forms/LogIn.vue';
-import AuthorizationHeader from '@/components/layouts/AuthorizationHeader.vue';
 </script>
 
 <template>

@@ -69,12 +69,12 @@ defineExpose({send, remove})
 <template>
     <q-list>
         <q-item>
-            <q-input class="w-full" outlined label="Название" :readonly="status" v-model="localModel.title"/>
+            <q-input class="w-full brand-description" outlined label="Название" :readonly="status" v-model="localModel.title"/>
         </q-item>
         <q-item>
             <q-select
                 label="Руководитель"
-                class="w-full"
+                class="w-full brand-description"
                 outlined
                 emit-value
                 map-options
@@ -89,7 +89,7 @@ defineExpose({send, remove})
         <q-item>
             <q-select
                 label="Вышестоящее руководство"
-                class="w-full"
+                class="w-full brand-description"
                 outlined
                 emit-value
                 map-options
@@ -106,7 +106,7 @@ defineExpose({send, remove})
         <q-item>
             <q-select
                 label="Дочерние отделы"
-                class="w-full"
+                class="w-full brand-text"
                 outlined
                 emit-value
                 map-options
@@ -123,7 +123,7 @@ defineExpose({send, remove})
         <q-item>
             <q-select
                 label="Сотрудники"
-                class="w-full"
+                class="w-full brand-text"
                 outlined
                 emit-value
                 map-options
@@ -136,7 +136,7 @@ defineExpose({send, remove})
             />
         </q-item>
         <q-item>
-            <q-input class="w-full" borderless readonly label="Обновлен" v-model="localModel.update_at"/>
+            <q-input class="w-full brand-description" borderless readonly label="Обновлен" v-model="localModel.update_at"/>
         </q-item>
     </q-list>
 </template>

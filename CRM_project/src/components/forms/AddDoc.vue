@@ -19,11 +19,11 @@ async function send() {
 
     fd.append('title', form.value.title)
     fd.append('body', form.value.body)
-    fd.append('infinitely', form.value.infinitely)
+    fd.append('permanent', form.value.permanent)
     form.value.departments.forEach(dep => fd.append('departments', dep))
     form.value.tags.forEach(tag => fd.append('tags', tag))
 
-    await axios.post('/api/user/file', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+    await axios.post('/api/user/file/docs', fd, {headers: {'Content-Type': 'multipart/form-data'}})
     emit('update-list')
 }
 
@@ -43,6 +43,7 @@ async function lazyLoad() {
                         v-model="form.title"
                         outlined
                         type="text"
+                        class="brand-description"
                         :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
                     />
                     <div class="flex flex-row gap-x-4">
@@ -59,14 +60,14 @@ async function lazyLoad() {
                                 <template v-slot:append><q-icon name="attach_file" /></template>
                         </q-file>
                         <q-checkbox
-                            class="text-gray-700 text-base !w-[35%]"
+                            class="brand-description !w-[35%]"
                             label="Бессрочный"
                             indeterminate-value
                             keep-color
                             color="brand-velvet"
                             checked-icon="fa-solid fa-circle"
                             unchecked-icon="fa-solid fa-circle-notch"
-                            v-model="form.infinitely"
+                            v-model="form.permanent"
                         />
                     </div>
                     
@@ -95,7 +96,7 @@ async function lazyLoad() {
                         label="Направленность"
 
                         />
-                    <q-btn label="Создать" type="submit" color="brand-velvet"/>
+                    <q-btn label="Создать" class="brand-description" type="submit" color="brand-velvet"/>
                 </q-card-section>
             </q-form>
         </q-card>

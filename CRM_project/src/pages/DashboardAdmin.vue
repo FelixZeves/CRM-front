@@ -68,6 +68,7 @@ async function remove() {
                 v-for="table in tables"
                 switch-toggle-side
                 expand-separator
+                header-class="brand-description"
                 :label="table.label"
                 @show="table.get()"
                 >
@@ -75,9 +76,10 @@ async function remove() {
                     <q-table
                         :rows="table.data"
                         :columns="table.columns"
+                        class="brand-description"
                         @row-click="(evt, row, index) => {table.choose(row)}"
                     />
-                    <q-btn @click="table.add()" label="Добавить" flat color="brand-velvet" icon="add"/>
+                    <q-btn @click="table.add()" class="brand-description" label="Добавить" flat color="brand-velvet" icon="add"/>
                 </q-card>
             </q-expansion-item>
         </q-list>
@@ -112,11 +114,11 @@ async function remove() {
                         :unelevated="status == 'delete' ? true : false"
                     />
                 </div>
-                <span class="font-bold text-gray-800 text-xl text-start">Описание</span>
-                <span v-if="typeForm && tables.find(t => t.name.includes(typeForm))" class="font-normal 2xl:text-base text-gray-700 text-start whitespace-pre-line">
+                <span class="brand-title text-start">Описание</span>
+                <span v-if="typeForm && tables.find(t => t.name.includes(typeForm))" class="brand-description text-start whitespace-pre-line">
                 {{ tables.find(t => t.name.includes(typeForm)).info }}
                 </span>
-                <span v-else class="font-normal 2xl:text-base text-gray-700 text-start">
+                <span v-else class="brand-description text-start">
                 На этой странице вы можете управлять пользователями,
                 отделами и уроками вашего образовательного центра,
                 а также добавлять новые записи. Также здесь можно
@@ -126,7 +128,7 @@ async function remove() {
             </div>
 
             <q-card class="!min-h-[40vh] p-2">
-                <q-card-section class="text-h5"> {{ status === 'edit' ? 'Редактировать' : status === 'create' ? 'Создать' : 'Подробности' }} </q-card-section>
+                <q-card-section class="brand-title"> {{ status === 'edit' ? 'Редактировать' : status === 'create' ? 'Создать' : 'Подробности' }} </q-card-section>
                 <q-separator inset />
                 <q-card-section class="flex flex-col justify-center">
                     <q-form @submit="save">

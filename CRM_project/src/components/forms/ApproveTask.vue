@@ -39,7 +39,7 @@ const form = ref({
         <q-card style="max-width: 50%; min-width: 50%;" class="py-4 px-3 min-w-[50%] max-w-[50%]">
             
             <q-card-section>
-                <div class="text-xl font-bold text-center">{{ body.title }}</div>
+                <div class="brand-title text-center">{{ body.title }}</div>
                 <q-stepper
                     v-model="step"
                     active-color="brand-velvet"
@@ -63,7 +63,7 @@ const form = ref({
                 >
                     <div class="flex flex-col px-8 gap-y-4">
                         <template v-if="s.status !== St.PROGRESS">
-                            <div v-if="s.type === T.CREATOR" class="text-lg pb-10 max-h-[250px] overflow-y-auto mb-4">{{ body.description }}</div>
+                            <div v-if="s.type === T.CREATOR" class="brand-description pb-10 max-h-[250px] overflow-y-auto mb-4">{{ body.description }}</div>
                             <div class="flex flex-row gap-x-4 pb-10">
                                 <q-icon name="fa-solid fa-file-export" size="sm">
                                     <q-tooltip
@@ -72,13 +72,13 @@ const form = ref({
                                     :offset="[10, 10]"
                                     max-width="200px"
                                     class="!text-sm text-center">
-                                        {{ documents }}
+                                        {{ body.files }}
                                     </q-tooltip>
                                 </q-icon>
                             </div>
                             <div class="flex flex-col">
-                                <div class="text-xl pb-2 text-semibold underline underline-offset-4">Комментарий</div>
-                                <div class="flex-grow text-lg max-h-[250px] overflow-y-auto">{{ s.comment }}</div>
+                                <div class="pb-2 brand-title underline underline-offset-4">Комментарий</div>
+                                <div class="flex-grow brand-description max-h-[250px] overflow-y-auto">{{ s.comment }}</div>
                             </div>
                         </template>
                         <template v-else-if="s.type === T.EXECUTOR && s.status !== St.APPROVED">
@@ -107,6 +107,7 @@ const form = ref({
                                 outlined
                                 type="textarea"
                                 :rules="[val => val.length <= 255 || 'Максимальная длина 255 символов']"
+                                class="brand-description"
                                 label="Комментарий"
                             />
                             <div class="flex flex-row flex-grow justify-end">
@@ -119,6 +120,7 @@ const form = ref({
                                 outlined
                                 type="textarea"
                                 :rules="[val => val.length <= 255 || 'Максимальная длина 255 символов']"
+                                class="brand-description"
                                 label="Комментарий"/>
                             <q-file
                                 v-model="form.files"
@@ -134,8 +136,8 @@ const form = ref({
                             <template v-slot:append><q-icon name="attach_file" /></template>
                             </q-file>
                             <div class="flex flex-row flex-grow justify-between">
-                                <q-btn color="brand-danger" @click="send(St.REJECTED)" label="Отклонить" class="navigation-btn opacity-[80%]" />
-                                <q-btn color="brand-velvet" @click="send(St.APPROVED)" :label="s.type == T.REVIEWER ? 'Согласовать' : 'Утвердить'" class="navigation-btn" />
+                                <q-btn color="brand-danger" @click="send(St.REJECTED)" label="Отклонить" class="navigation-btn opacity-[80%] brand-description" />
+                                <q-btn color="brand-velvet" @click="send(St.APPROVED)" :label="s.type == T.REVIEWER ? 'Согласовать' : 'Утвердить'" class="navigation-btn brand-description" />
                             </div>
                         </template>
                     </div>

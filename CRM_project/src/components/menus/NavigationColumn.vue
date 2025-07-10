@@ -29,50 +29,53 @@ onMounted(async () => {await getUser()})
             <q-btn :to="{name: 'Office'}" flat>
             <div class="flex flex-col">
                 <q-img src="@\assets\worker-photo.jpg" class="!rounded-full"></q-img>
-                <span class="select-none font-bold text-lg mt-2" :class="section == 'Office' ? 'text-brand-wait' : 'text-white'">{{ fio }}</span>
+                <span class="brand-description !font-bold mt-2" :class="section == 'Office' ? 'text-brand-wait' : 'text-white'">{{ fio }}</span>
             </div>
             </q-btn>
             <q-btn 
             flat
             disable
-            class="cursor-not-allowed"
+            class="cursor-not-allowed brand-description"
             label="Учебная деятельность"
             :class="section == 'Education' ? 'text-brand-wait' : 'text-white'"/>
             <q-btn
             flat
+            class="brand-description"
             :class="section == 'Tasks' ? 'text-brand-wait' : 'text-white'"
             :to="{name : 'Tasks'}"
             label="Задачи"/>
             <q-btn
             flat
+            class="brand-description"
             :class="section == 'Events' ? 'text-brand-wait' : 'text-white'"
             :to="{name : 'Events'}"
             label="Мероприятия"/>
             <q-btn
             flat
+            class="brand-description"
             :class="section == 'Documents' ? 'text-brand-wait' : 'text-white'"
             :to="{name : 'Documents'}"
             label="Документы"/>
             <q-btn 
             flat
             disable
-            class="cursor-not-allowed"
+            class="cursor-not-allowed brand-description"
             label="Архив"
             :class="section == 'Archive' ? 'text-brand-wait' : 'text-white'"/>
             <q-btn
             v-if="role == 0"
             flat
             label="Админ. панель"
-            class="text-white"
+            class="text-white brand-title"
             :to="{name : 'Database'}">
             </q-btn>
         </div>
 
         <div class="flex flex-col gap-y-4 items-center">
-            <q-btn @click="visibleBugReport = true" label="Нашли ошибку?" color="brand-white" unelevated>
+            <q-btn @click="visibleBugReport = true" label="Нашли ошибку?" color="brand-white brand-description" unelevated>
             <ModalError v-model:visible="visibleBugReport" />
             </q-btn>
-            <q-btn flat class="text-white" to="/" label="Выйти"></q-btn>
+            <q-btn flat class="text-white brand-description" to="/" label="Выйти"></q-btn>
         </div>
     </div>
 </template>

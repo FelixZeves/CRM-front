@@ -4,7 +4,7 @@ import axios from 'axios'
 const props = defineProps(['body'])
 
 async function downloadFile(){
-    const response = await axios.get(`/api/user/file/download?id=${props.body.id}`, { responseType: 'stream' })
+    const response = await axios.get(`/api/user/file/download/?id=${props.body.id}`, { responseType: 'stream' })
     const fileName = decodeURIComponent(response.headers['content-disposition'].split('filename=')[1]?.replace(/["']/g, ''))
     const blob = new Blob([response.data], { type: 'application/octet-stream' })
     const url = window.URL.createObjectURL(blob)
@@ -35,12 +35,12 @@ const fileIcons = {
 </script>
 
 <template>
-    <q-item class="w-[90%] !ms-3 justify-self-center">
+    <q-item class="my-4 mx-3 max-h-[200px]">
         <q-card class="flex-grow !min-w-[90%]">
             <q-card-section class="flex flex-row items-center">
                 <q-icon :name="fileIcons[extension] || 'fa-regular fa-file'" size="xl" class="!max-w-[5%]"/>
                 <div class="flex flex-col px-4 !max-w-[90%] !min-w-[90%]">
-                    <div class="font-bold text-sm lg:text-base 2xl:text-lg !max-w-full truncate pb-4">{{ body.title }}</div>
+                    <div class="brand-title !max-w-full text-ellipsis line-clamp-2 pb-4">{{ body.title }}</div>
                     <div class="flex flex-row justify-end">
                         <q-chip v-for="tag in body.tags" clickable outline square color="grey-8" :label="tag.title"/>
                         <q-chip outline square color="grey-8" :label="body.create_at"></q-chip>

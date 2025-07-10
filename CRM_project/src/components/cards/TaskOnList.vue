@@ -40,7 +40,7 @@ const btn = ref({
                 anchor="top right"
                 self="bottom right"
                 :offset="[10, 10]"
-                class="!text-sm text-center"
+                class="brand-text text-center"
                 :class="S[body.status].color, S[body.status].textColor">
                     {{ S[body.status].description }}
                 </q-tooltip>
@@ -58,7 +58,7 @@ const btn = ref({
         >
           <q-tab name="main" class="!normal-case text-lg" label="Основная информация" />
           <q-tab name="details" class="!normal-case" label="Дополнительная информация" />
-          <q-tab name="files" class="!normal-case" label="Прикреплённые файлы" />
+          <q-tab v-if="Array.isArray(body.steps[0].files) && body.steps[0].files.length > 0" name="files" class="!normal-case" label="Прикреплённые файлы" />
         </q-tabs>
 
         <q-tab-panels
@@ -68,17 +68,17 @@ const btn = ref({
         transition-prev="slide-down"
         animated>
           <q-tab-panel name="main">
-            <p class="text-base m-0 justify-self-end text-end text-gray-600 pb-4"><span class="text-lg text-gray-700">Срок выполнения:</span> <br/> {{ body.deadline }}</p>
-            <div class="text-base text-gray-600 text-pretty max-h-[70%] text-ellipsis line-clamp-3">{{ body.description }}</div>
+            <p class="brand-text m-0 justify-self-end text-end pb-4"><span class="brand-text">Срок выполнения:</span> <br/> {{ body.deadline }}</p>
+            <div class="brand-description text-pretty text-ellipsis line-clamp-3">{{ body.description }}</div>
           </q-tab-panel>
 
           <q-tab-panel name="details" class="overflow-y-auto">
-            <p class="text-base m-0 justify-self-end text-end text-gray-600 pb-4"><span class="text-lg text-gray-700">Поставил(а) задачу: </span> <br/>{{ body.steps[0].user.fio }}</p>
-            <p class="text-base text-gray-600">{{ body.steps[0].comment }}</p>
+            <p class="brand-text m-0 justify-self-end text-end pb-4"><span class="brand-text">Поставил(а) задачу: </span> <br/>{{ body.steps[0].user.fio }}</p>
+            <p class="brand-description">{{ body.steps[0].comment }}</p>
           </q-tab-panel>
 
           <q-tab-panel name="files" class="overflow-y-auto">
-            <div class="flex flex-row" v-for="document in documents">
+            <div class="flex flex-row" v-for="document in body.steps[0].files">
                 <q-icon name="fa-solid fa-file-export pe-4" size="sm" color="gray-600">
                     <q-tooltip
                     anchor="top middle"
@@ -94,7 +94,7 @@ const btn = ref({
           </q-tab-panel>
         </q-tab-panels>
         <div class="flex flex-row justify-end items-center mt-7">
-          <q-btn :label="btn[me.type]" @click="visibleApprove = true" color="brand-velvet"/>
+          <q-btn :label="btn[me.type]" @click="visibleApprove = true" class="brand-text" color="brand-velvet"/>
         </div>
     </q-card>
     <ApproveTaskForm 

@@ -53,15 +53,15 @@ defineExpose({ send, remove })
 <template>
     <q-list>
         <q-item>
-            <q-input class="w-full" outlined label="Класс" :readonly="status" v-model="localModel.number"/>
+            <q-input class="w-full brand-description" outlined label="Класс" :readonly="status" v-model="localModel.number"/>
         </q-item>
         <q-item>
-            <q-input class="w-full" outlined label="Параллель" :readonly="status" v-model="localModel.parallel"/>
+            <q-input class="w-full brand-description" outlined label="Параллель" :readonly="status" v-model="localModel.parallel"/>
         </q-item>
         <q-item>
             <q-select
                 label="Уклон"
-                class="w-full"
+                class="w-full brand-description"
                 outlined
                 emit-value
                 map-options
@@ -75,7 +75,7 @@ defineExpose({ send, remove })
             />
         </q-item>
         <q-item>
-            <q-input class="w-full" borderless readonly label="Обновлен" v-model="localModel.update_at"/>
+            <q-input class="w-full brand-description" borderless readonly label="Обновлен" v-model="localModel.update_at"/>
         </q-item>
     </q-list>
 </template>

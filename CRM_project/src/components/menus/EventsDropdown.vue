@@ -16,7 +16,7 @@ function onDateClick(res){
 </script>
 
 <template>
-    <div class="q-pa-md border-2 flex-grow !max-w-[90%] !min-w-[90%] flex flex-row justify-between mx-3 justify-self-center">
+    <div class="q-pa-md border-2 w-[98%] flex flex-row justify-between justify-self-center">
       <div class="flex flex-row items-center">
         <q-btn-dropdown class="shadow-xl rounded-[20pt] me-5 !normal-case" color="white" text-color="black" :label=statusFilter :menu-offset="[0, 5]">
           <q-list>
@@ -64,7 +64,7 @@ function onDateClick(res){
         </q-list>
         </q-btn-dropdown>
       </div>
-      <q-btn class="!border-[5pt]  !bg-[--crm-c-light-yellow] !normal-case" unelevated text-color="black" icon-right="add" label="Добавить мероприятие" @click="$emit('show-dialog')"></q-btn>
+      <q-btn color="brand-wait" unelevated text-color="black" icon-right="add" label="Создать" @click="$emit('show-dialog')"></q-btn>
 
     </div>
   </template>

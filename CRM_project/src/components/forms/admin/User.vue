@@ -74,11 +74,11 @@ defineExpose({send, remove})
 <template>
     <q-list>
         <q-item>
-            <q-input class="w-full" outlined label="Email" :readonly="status" v-model="model.email"/>
+            <q-input class="w-full brand-description" outlined label="Email" :readonly="status" v-model="model.email"/>
         </q-item>
         <q-item>
             <q-checkbox
-                class="w-full text-gray-700 text-base"
+                class="w-full brand-description"
                 label="Стандартный пароль"
                 disable
                 keep-color
@@ -90,7 +90,7 @@ defineExpose({send, remove})
         </q-item>
         <q-item>
             <q-checkbox
-                class="w-full text-gray-700 text-base"
+                class="w-full brand-description"
                 label="Сбросить пароль"
                 indeterminate-value
                 :disable="status"
@@ -103,7 +103,7 @@ defineExpose({send, remove})
         </q-item>
         <q-item>
             <q-select
-                class="w-full"
+                class="w-full brand-description"
                 outlined
                 label="Уровень доступа"
                 :readonly="status"
@@ -113,16 +113,16 @@ defineExpose({send, remove})
                 v-model="model.role"
             />
         </q-item>
-        <q-expansion-item class="w-full text-gray-700 text-xl" label="Профиль">
+        <q-expansion-item class="w-full brand-title" label="Профиль">
             <q-item>
-                <q-input class="w-full" outlined label="Ф.И.О." :readonly="status" v-model="model.profile.fio"/>
+                <q-input class="w-full brand-description" outlined label="Ф.И.О." :readonly="status" v-model="model.profile.fio"/>
             </q-item>
             <q-item>
-                <q-input class="w-full" outlined label="Должность" :readonly="status" v-model="model.profile.post"/>
+                <q-input class="w-full brand-description" outlined label="Должность" :readonly="status" v-model="model.profile.post"/>
             </q-item>
             <q-item>
                 <q-select
-                    class="w-full"
+                    class="w-full brand-description"
                     outlined
                     label="Классное руководство"
                     :readonly="status"
@@ -133,7 +133,7 @@ defineExpose({send, remove})
             </q-item>
             <q-item>
                 <q-select
-                    class="w-full"
+                    class="w-full brand-description"
                     outlined
                     label="Проводимые уроки"
                     :readonly="status"
@@ -145,7 +145,7 @@ defineExpose({send, remove})
             <q-item>
                 <q-select
                     label="Руководитель"
-                    class="w-full"
+                    class="w-full brand-description"
                     outlined
                     emit-value
                     map-options
@@ -160,7 +160,7 @@ defineExpose({send, remove})
             <q-item>
                 <q-select
                     label="Сотрудник"
-                    class="w-full"
+                    class="w-full brand-description"
                     outlined
                     emit-value
                     map-options
@@ -174,10 +174,10 @@ defineExpose({send, remove})
             </q-item>
         </q-expansion-item>
         <q-item>
-            <q-input class="w-full" borderless readonly label="Создан" v-model="model.profile.create_at"/>
+            <q-input class="w-full brand-description" borderless readonly label="Создан" v-model="model.profile.create_at"/>
         </q-item>
         <q-item>
-            <q-input class="w-full" borderless readonly label="Обновлен" v-model="model.profile.update_at"/>
+            <q-input class="w-full brand-description" borderless readonly label="Обновлен" v-model="model.profile.update_at"/>
         </q-item>
     </q-list>
 </template>

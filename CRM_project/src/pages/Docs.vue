@@ -18,14 +18,14 @@ onMounted(async () => {updateList()})
 
 
 <template>
-    <div class="h-full flex flex-row h-[100vh] w-[100vw] items-center px-8 gap-x-2">
-        <header>
+    <div class="h-full flex flex-row h-[100vh] w-[100vw] items-center px-8 gap-x-2 !flex-nowrap">
+        <header class="min-w-[225px]">
             <NavigationColumn
             section='Documents'
             />
         </header>
 
-        <main class="flex flex-grow max-w-[80%]">
+        <main class="flex flex-grow h-[80vh]">
             <div class="flex-grow">
                 <DocumentsDropdownNSearch @show-dialog="visible = true"></DocumentsDropdownNSearch>
                 <AddDoc v-model:visible='visible' @update-list="updateList"></AddDoc>

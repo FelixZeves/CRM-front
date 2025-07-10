@@ -34,6 +34,7 @@ async function loginUser(){
                 placeholder="email" 
                 outlined 
                 required 
+                class="brand-description"
                 :rules="[val => !!val || 'Обязательное поле', val => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || 'Введите корректный email']"/>
             <q-input
                 type="password"
@@ -41,8 +42,9 @@ async function loginUser(){
                 placeholder="Пароль"
                 outlined 
                 required
+                class="brand-description"
                 :rules="[val => (val && val.length >= 6 && val.length <= 12) || 'Длина должна быть от 6 до 12 символов']"/>
-            <q-btn type="submit" color="brand-velvet" class="!text-base !w-full !flex !justify-center !items-center mt-5 !text-white"> Войти </q-btn>
+            <q-btn type="submit" color="brand-velvet" class="brand-description w-full flex justify-center items-center mt-5"> Войти </q-btn>
         </q-form>
     </div>
 </template>

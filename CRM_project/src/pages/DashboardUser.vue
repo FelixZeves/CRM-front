@@ -7,45 +7,21 @@ import ChangePass_ from '@/components/forms/ChangePass_.vue';
 </script>
 
 <template>
-    <div class="flex flex-row h-[100vh] w-[100vw] items-center px-8 gap-x-8 !flex-nowrap">
-        <!-- <div class="flex flex-row h-[100vh] w-[100vw] items-center px-8 gap-x-8">
-            <header>
-                <NavigationColumn
-                section='Office'
-                />
-            </header>
-
-            <main class="flex flex-col gap-y-8 flex-grow">
-                <div class="flex flex-row gap-x-4">
-                    <div class="flex-grow">
-                        <TasksTile/>
-                    </div>
-                    <div class="w-1/4">
-                        <Suspense>
-                            <CRMCalendar class="font-jetbrains-mono"/>
-                        </Suspense>
-                    </div>
-                </div>
-                <Suspense>
-                    <EventsTile class=""/>
-                </Suspense>
-            </main>
-        </div> -->
-
+    <div class="flex flex-row h-[100vh] w-[100vw] items-center px-8 gap-x-4 !flex-nowrap">
         <header class="min-w-[225px]">
             <NavigationColumn section='Office' />
         </header>
         
-        <main class="flex flex-row flex-grow overflow-y-auto gap-x-2 justify-between h-[calc(100vh-100px)]">
-            <div class="flex flex-col gap-y-8 max-w-[40%] flex-shrink-0">
-                <EventsTile/>
+        <main class="flex flex-row flex-grow overflow-y-auto gap-x-2 justify-evenly h-[80vh]">
+            <div class="flex flex-col gap-y-8 max-w-[55%] flex-shrink-0">
+                <TasksTile/>
             </div>
 
-            <div class="flex flex-col gap-y-8 flex-grow max-w-[55%] flex-shrink-0">
+            <div class="flex flex-col gap-y-8 flex-grow max-w-[40%] flex-shrink-0">
                 <Suspense>
                     <CRMCalendar class="font-jetbrains-mono"/>
                 </Suspense>
-                <TasksTile/>
+                <EventsTile/>
             </div>
         </main>
     </div>

@@ -25,13 +25,13 @@ async function sendBugReport() {
     <q-dialog v-model="visible" backdrop-filter="blur(4px)">
         <q-card class="text-black !rounded-[15pt]">
             <q-form @submit="sendBugReport" class="bg-tile p-5 flex flex-col gap-y-2 w-full">
-                <q-card-section class="text-xl font-bold text-left pb-5"> Отчёт об ошибке </q-card-section>
+                <q-card-section class="brand-title text-left pb-5"> Отчёт об ошибке </q-card-section>
                 <q-separator inset />
-                <q-card-section class="text-base font-normal text-gray-700 text-start">
+                <q-card-section class="brand-description text-gray-700 text-start">
                     Пожалуйста, добавьте любые детали, которые могут помочь в решении проблемы 
                     (например, версия браузера или скриншоты) и прикрепите его к отчету.
                     Опишите проблему в текстовом блоке ниже, например, указав следующую информацию:
-                    <ul class="font-normal mt-5 flex gap-y-2 text-gray-600">
+                    <ul class="brand-description mt-5 flex gap-y-2">
                         <li>
                             <span class="font-semibold text-gray-700">Шаги:</span>
                             Опишите последовательность действий, которая привела к возникновению ошибки.
@@ -48,7 +48,7 @@ async function sendBugReport() {
                 </q-card-section>
                 <q-separator inset />
                 <q-card-section class="flex flex-col gap-y-2">
-                    <q-input v-model="comment" outlined clearable type="textarea" label="Введите описание ошибки"/>
+                    <q-input class="brand-description" v-model="comment" outlined clearable type="textarea" label="Введите описание ошибки"/>
                     <q-file
                         v-model="attachFiles"
                         label="Прикрепить файлы"
@@ -60,7 +60,7 @@ async function sendBugReport() {
                     </q-file>
                 </q-card-section>
                 <q-card-actions align="center">
-                    <q-btn @click="visible = false" label="Отправить" type="submit" color="brand-velvet"/>
+                    <q-btn @click="visible = false" label="Отправить" type="submit" class="brand-description" color="brand-velvet"/>
                 </q-card-actions>
             </q-form>
         </q-card>

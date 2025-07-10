@@ -53,6 +53,7 @@ async function createEvent() {
                         outlined
                         type="text"
                         :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
+                        class="brand-description"
                     />
                     <q-input
                         label="Место проведения"
@@ -60,6 +61,7 @@ async function createEvent() {
                         outlined
                         type="text"
                         :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
+                        class="brand-description"
                     />
                     <q-input label="Дата мероприятия" v-model="formatDate" readonly outlined>
                         <template v-slot:append>
@@ -71,6 +73,7 @@ async function createEvent() {
                                         range
                                         mask="DD.MM.YYYY"
                                         @update:model-value="selectDate"
+                                        class="brand-description"
                                         >
                                         <q-btn class="flex flex-row" v-close-popup label="Закрыть" flat/>
                                     </q-date>
@@ -86,9 +89,10 @@ async function createEvent() {
                         v-model="form.description"
                         outlined
                         type="textarea"
+                        class="brand-description"
                         :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 255 || 'Максимальная длина 255 символов']"
                     />
-                    <q-btn label="Создать" type="submit" color="brand-velvet"/>
+                    <q-btn label="Создать" type="submit" class="brand-description" color="brand-velvet"/>
                 </q-card-section>
 
             </q-form>

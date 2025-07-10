@@ -79,7 +79,7 @@ export function getFormSchema(name) {
         file: {
             title: '',
             body: [],
-            infinitely: false,
+            permanent: false,
             tags: [],
             departments: []
         }

@@ -28,15 +28,15 @@ async function updateList() {
 
 
 <template>
-    <div class="flex flex-row h-[100vh] w-[100vw] items-center px-8 gap-x-8">
-        <header>
+    <div class="flex flex-row h-[100vh] w-[100vw] items-center px-8 gap-x-8 !flex-nowrap">
+        <header class="min-w-[225px]">
             <NavigationColumn
             section='Tasks'
             />
         </header>
 
-        <main class="flex flex-grow max-w-[80%]">
-            <div>
+        <main class="flex flex-grow h-[80vh]">
+            <div class="flex-grow">
                 <TasksDropdown @show-dialog="visible = true"></TasksDropdown>
                 <TasksList :tasks="tasks" :user="user"/>
                 <AddTask v-model:visible="visible" @update-list="updateList"></AddTask>

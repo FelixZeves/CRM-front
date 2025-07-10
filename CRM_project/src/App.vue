@@ -71,4 +71,16 @@
   @apply !bg-white !rounded-[15pt]
 }
 
+.brand-title{
+  @apply !text-xl text-stone-700 !font-semibold
+}
+
+.brand-description{
+  @apply !text-lg text-stone-600 !font-medium
+}
+
+.brand-text{
+  @apply !text-base !text-stone-500
+}
+
 </style>

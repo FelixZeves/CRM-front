@@ -172,12 +172,11 @@ async function send() {
                     :name="D.APPLICATION"
                     :title="`Создание ${labelChanges()}`"
                     icon="fa-regular fa-file-lines"
-                    class="row-grow"
+                    class="row-grow brand-description"
                     :done="step > D.APPLICATION"
                 >
                 <q-tabs
                     v-model="task.type"
-                    class="!text-lg !font-bold"
                     active-color="primary"
                     indicator-color="primary"
                     align="justify"
@@ -209,7 +208,7 @@ async function send() {
                                     type="text"
                                     label="Название задачи"
                                     :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
-                                    class="!flex-grow"
+                                    class="!flex-grow brand-description"
                                 />
                             </div>
                                 <q-input
@@ -217,13 +216,16 @@ async function send() {
                                     outlined
                                     type="textarea"
                                     label="Описание задачи"
-                                    :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 1000 || 'Максимальная длина 1000 символов']"/>
-                                    <q-input
+                                    :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 1000 || 'Максимальная длина 1000 символов']"
+                                    class="brand-description"
+                                />
+                                <q-input
                                     v-model="task.comment"
                                     outlined
                                     type="textarea"
                                     label="Дополнительный комментарий"
                                     :rules="[val => val.length <= 255 || 'Максимальная длина 255 символов']"
+                                    class="brand-description"
                                 />
                         </div>
                         <div class="flex flex-col gap-y-8 w-1/2">
@@ -236,7 +238,7 @@ async function send() {
                                                 minimal
                                                 mask="DD.MM.YYYY"
                                                 >
-                                                <q-btn class="flex flex-row" v-close-popup label="Закрыть" flat/>
+                                                <q-btn class="flex flex-row brand-description" v-close-popup label="Закрыть" flat/>
                                             </q-date>
                                         </q-popup-proxy>
                                     </q-icon>
@@ -251,7 +253,8 @@ async function send() {
                                 :counter-label="({filesNumber, maxFiles, totalSize}) => `${filesNumber} из ${maxFiles} (общий размер ${totalSize})`"
                                 max-files="5"
                                 use-chips
-                                multiple>
+                                multiple
+                                class="brand-description">
                                 <template v-slot:append><q-icon name="attach_file" /></template>
                             </q-file>
                             
@@ -330,10 +333,15 @@ async function send() {
                 >
                     <q-form @submit="checkDock" class=" p-5 !flex flex-row h-full gap-x-12">
                         <div class="flex flex-col gap-y-8 w-1/2">
-                            <q-toggle v-model="activeEvent" label="Создать мероприятие исполнителям"></q-toggle>
+                            <q-toggle
+                                v-model="activeEvent"
+                                class="brand-description"
+                                label="Создать мероприятие исполнителям"
+                            />
                             <q-toggle 
                                 :disable="!activeEvent"
                                 v-model="eventForMe"
+                                class="brand-description"
                                 label="Создать для себя"
                                 @update:model-value="eventForMe ? evtUsers.add(me.profile.id) : evtUsers.delete(me.profile.id)"
                             />
@@ -370,23 +378,29 @@ async function send() {
                         </div>
                         <div class="flex flex-col gap-y-8 w-1/2">
                         <q-input
-                        :disable="!activeEvent"
-                        outlined
-                        v-model="event.title"
-                        :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
-                        label="Название мероприятия"></q-input>
+                            :disable="!activeEvent"
+                            outlined
+                            v-model="event.title"
+                            :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
+                            label="Название мероприятия"
+                            class="brand-description"
+                        />
                         <q-input
-                        :disable="!activeEvent"
-                        outlined
-                        v-model="event.place"
-                        label="Место проведения"></q-input>
+                            :disable="!activeEvent"
+                            outlined
+                            v-model="event.place"
+                            label="Место проведения"
+                            class="brand-description"
+                        />
                         <q-input
                         :disable="!activeEvent"
                         outlined
                         v-model="event.description"
                         :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 255 || 'Максимальная длина 255 символов']"
                         label="Описание мероприятия"
-                        type="textarea" input-style="min-height: 165px; resize: vertical;" ></q-input>
+                        type="textarea" input-style="min-height: 150px; resize: vertical;"
+                        class="brand-description"
+                        />
                         </div>
                     </q-form>
                 
@@ -395,9 +409,9 @@ async function send() {
                 
             </q-card-section>
             <q-card-section class="flex flex-row justify-between mx-12">
-                <q-btn :disable="step == 1 ? true : false" @click="step = 1" color="brand-velvet" label="Назад" class="navigation-btn" />
-                <q-btn v-if="step == 1 & task.type == D.ORDER" @click="step++; throwData()" color="brand-velvet" label="Далее" class="navigation-btn" />
-                <q-btn v-if="step == 2 || task.type != D.ORDER" @click="send" color="brand-velvet" label="Создать" class="navigation-btn" />
+                <q-btn :disable="step == 1 ? true : false" @click="step = 1" color="brand-velvet" label="Назад" class="navigation-btn brand-description" />
+                <q-btn v-if="step == 1 & task.type == D.ORDER" @click="step++; throwData()" color="brand-velvet" label="Далее" class="navigation-btn brand-description" />
+                <q-btn v-if="step == 2 || task.type != D.ORDER" @click="send" color="brand-velvet" label="Создать" class="navigation-btn brand-description" />
             </q-card-section>
         </q-card>
     </q-dialog>
