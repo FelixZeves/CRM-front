@@ -177,12 +177,12 @@ async function send() {
                 >
                 <q-tabs
                     v-model="task.type"
-                    active-color="primary"
-                    indicator-color="primary"
+                    active-color="brand-velvet"
+                    indicator-color="brand-velvet"
                     align="justify"
                     narrow-indicator
                 >
-                    <q-tab v-if="role != R.TEACHER" :name="D.ORDER" label="Задача" />
+                    <q-tab v-if="role != R.TEACHER" :name="D.ORDER" label="Задача"></q-tab>
                     <q-tab :name="D.MEMO" label="Служебная записка" />
                     <q-tab :name="D.APPLICATION" label="Заявка" />
                 </q-tabs>

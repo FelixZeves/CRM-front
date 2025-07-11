@@ -19,7 +19,7 @@ import ChangePass_ from '@/components/forms/ChangePass_.vue';
 
             <div class="flex flex-col gap-y-8 flex-grow max-w-[40%] flex-shrink-0">
                 <Suspense>
-                    <CRMCalendar class="font-jetbrains-mono"/>
+                    <CRMCalendar/>
                 </Suspense>
                 <EventsTile/>
             </div>

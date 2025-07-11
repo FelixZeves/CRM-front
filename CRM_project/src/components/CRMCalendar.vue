@@ -52,7 +52,7 @@ let attrs = ref([
         borderless
         trim-weeks
         title-position="left"
-        class="shadow-2xl min-w-[300px] max-w-full"
+        class="shadow-2xl min-w-[300px] w-full brand-description font-jetbrains-mono"
         color="velvet"
         :attributes="attrs"
     />

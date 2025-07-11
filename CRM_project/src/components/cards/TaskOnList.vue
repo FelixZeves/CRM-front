@@ -50,14 +50,14 @@ const btn = ref({
         <q-tabs
           v-model="tab"
           dense
-          class="!w-3/4 text-grey mb-4"
+          class="!w-3/4 brand-description mb-4"
           active-color="brand-velvet"
           indicator-color="brand-velvet"
           align="left"
           narrow-indicator
         >
-          <q-tab name="main" class="!normal-case text-lg" label="Основная информация" />
-          <q-tab name="details" class="!normal-case" label="Дополнительная информация" />
+          <q-tab name="main" class="brand-description !normal-case" label="Основная информация" />
+          <q-tab name="details" class="brand-description !normal-case" label="Дополнительная информация" />
           <q-tab v-if="Array.isArray(body.steps[0].files) && body.steps[0].files.length > 0" name="files" class="!normal-case" label="Прикреплённые файлы" />
         </q-tabs>
 
