@@ -16,7 +16,7 @@ onMounted(() => {updateList()})
 
 <template>
     <q-timeline color="brand-velvet"
-    class=" h-[40vh] overflow-y-auto !pe-2"
+    class="h-[40vh] overflow-y-auto !pe-2"
     side="left"
     >
         <q-timeline-entry
@@ -29,7 +29,7 @@ onMounted(() => {updateList()})
             </template>
 
             <template #subtitle>
-                <div>
+                <div >
                     {{ event.at !== event.to ? `${event.at} - ${event.to}` : event.to }} : {{ event.creator.init_name }}
                 </div>
             </template>

@@ -172,7 +172,7 @@ async function send() {
                     :name="D.APPLICATION"
                     :title="`Создание ${labelChanges()}`"
                     icon="fa-regular fa-file-lines"
-                    class="row-grow brand-description"
+                    class="row-grow"
                     :done="step > D.APPLICATION"
                 >
                 <q-tabs
@@ -237,6 +237,7 @@ async function send() {
                                                 v-model="task.deadline"
                                                 minimal
                                                 mask="DD.MM.YYYY"
+                                                class="brand-description"
                                                 >
                                                 <q-btn class="flex flex-row brand-description" v-close-popup label="Закрыть" flat/>
                                             </q-date>

@@ -25,7 +25,7 @@ async function deleteEvent(){
             <div class="flex flex-col gap-y-2 flex-grow w-[60%]">
                 <div class="brand-title">{{ name }}</div>
                 <div class="brand-text">{{ creator}}</div>
-                <div class="brand-description">{{ description }}</div>
+                <div class="brand-description text-ellipsis line-clamp-2">{{ description }}</div>
             </div>
             <q-btn class="!w-[10%]" label="Завершить" color="brand-velvet" text-color="white" @click="deleteEvent"/>
         </q-card-section>

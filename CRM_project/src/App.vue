@@ -31,16 +31,13 @@
 .bg-brand-velvet {
   background: #825AFF !important;
 }
-.q-table__card{
-  @apply !rounded-[10pt]
+
+.q-table thead tr th {
+  @apply !text-lg text-stone-800 !font-semibold !z-10 !sticky top-0 !bg-white
 }
 
 .q-table tbody tr td {
-  @apply text-base
-}
-
-.q-table thead tr th {
-  @apply text-base font-bold border-b-2
+  @apply !text-base text-stone-700 !font-medium
 }
 
 .submit-btn{
@@ -80,7 +77,7 @@
 }
 
 .brand-text{
-  @apply !text-base !text-stone-500
+  @apply !text-base !text-stone-500 !font-medium
 }
 
 </style>

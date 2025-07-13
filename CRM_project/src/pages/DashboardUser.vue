@@ -12,12 +12,12 @@ import ChangePass_ from '@/components/forms/ChangePass_.vue';
             <NavigationColumn section='Office' />
         </header>
         
-        <main class="flex flex-row flex-grow overflow-y-auto gap-x-2 justify-evenly h-[80vh]">
-            <div class="flex flex-col gap-y-8 max-w-[55%] flex-shrink-0">
+        <main class="flex flex-row flex-grow overflow-y-hidden gap-x-4 justify-evenly h-[80vh]">
+            <div class="flex flex-col gap-y-8 w-[60%] flex-shrink-0">
                 <TasksTile/>
             </div>
 
-            <div class="flex flex-col gap-y-8 flex-grow max-w-[40%] flex-shrink-0">
+            <div class="flex flex-col gap-y-8 flex-grow w-[35%] flex-shrink-0">
                 <Suspense>
                     <CRMCalendar/>
                 </Suspense>

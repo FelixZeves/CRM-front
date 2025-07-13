@@ -101,7 +101,11 @@ let attrs = ref([
 }
 
 .vc-container{
-    @apply !w-full !rounded-[15pt] !px-3 pt-3
+    @apply !rounded-[15pt] !px-3 pt-3
+}
+
+.vc-title{
+    @apply !text-xl !text-stone-700 !font-semibold
 }
 
 .vc-week{

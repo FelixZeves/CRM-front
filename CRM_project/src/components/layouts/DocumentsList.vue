@@ -6,7 +6,7 @@ const props = defineProps(['docs'])
 </script>
 
 <template>
-    <q-list class="h-[70vh] w-full overflow-y-auto justify-self-center">
+    <q-list class="h-[72vh] w-full overflow-y-auto justify-self-center">
         <DocumentOnList v-for="doc in docs" :body="doc"/>
     </q-list>
 

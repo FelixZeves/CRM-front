@@ -15,6 +15,7 @@ const url = ref(null)
 const typeForm = ref(null)
 const formSubmit = ref(null)
 const details = ref(null)
+const pagination = ref({rowsPerPage: 0})
 
 const forms = {
     user: User,
@@ -76,7 +77,10 @@ async function remove() {
                     <q-table
                         :rows="table.data"
                         :columns="table.columns"
-                        class="brand-description"
+                        class="max-h-[400px] pb-2 !rounded-none"
+                        virtual-scroll
+                        v-model:pagination="pagination"
+                        :rows-per-page-options="[0]"
                         @row-click="(evt, row, index) => {table.choose(row)}"
                     />
                     <q-btn @click="table.add()" class="brand-description" label="Добавить" flat color="brand-velvet" icon="add"/>

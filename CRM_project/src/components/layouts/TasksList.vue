@@ -5,7 +5,7 @@ const props = defineProps(['tasks', 'user'])
 </script>
 
 <template>
-    <q-list class="h-[70vh] overflow-y-auto !justify-self-center">
+    <q-list class="h-[72vh] overflow-y-auto !justify-self-center">
         <q-item v-for="task in tasks">
             <TaskOnList
                 :key="task.id" 

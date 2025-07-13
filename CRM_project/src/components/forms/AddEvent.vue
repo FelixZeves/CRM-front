@@ -65,7 +65,7 @@ async function createEvent() {
                     />
                     <q-input label="Дата мероприятия" v-model="formatDate" readonly outlined>
                         <template v-slot:append>
-                            <q-icon name="event">
+                            <q-icon name="event" color="brand-velvet">
                                 <q-popup-proxy cover transition-show="scale" transition-hide="scale">
                                     <q-date
                                         v-model="date"

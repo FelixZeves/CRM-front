@@ -69,7 +69,7 @@ const btn = ref({
         animated>
           <q-tab-panel name="main">
             <p class="brand-text m-0 justify-self-end text-end pb-4"><span class="brand-text">Срок выполнения:</span> <br/> {{ body.deadline }}</p>
-            <div class="brand-description text-pretty text-ellipsis line-clamp-3">{{ body.description }}</div>
+            <div class="brand-description text-pretty text-ellipsis line-clamp-2">{{ body.description }}</div>
           </q-tab-panel>
 
           <q-tab-panel name="details" class="overflow-y-auto">
