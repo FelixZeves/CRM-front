@@ -3,20 +3,21 @@ import axios from 'axios'
 
 const props = defineProps(['body'])
 
+// FIXME
 async function downloadFile(){
-    const response = await axios.get(`/api/user/file/download/?id=${props.body.id}`, { responseType: 'stream' })
-    const fileName = decodeURIComponent(response.headers['content-disposition'].split('filename=')[1]?.replace(/["']/g, ''))
-    const blob = new Blob([response.data], { type: 'application/octet-stream' })
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
+    const response = await axios.get(`/api/user/file/download?id=${props.body.id}`, {responseType: 'blob'});
+    const disposition = response.headers['content-disposition'] || '';
+    const fileNameMatch = disposition.match(/filename="?([^"]+)"?/);
+    const fileName = fileNameMatch ? decodeURIComponent(fileNameMatch[1]) : 'file.bin';
 
-    link.href = url
-    link.download = fileName
-    document.body.appendChild(link)
-    link.click()
-
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
+    const url = window.URL.createObjectURL(response.data);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
 }
 
 const extension = props.body.title.split('.').pop();

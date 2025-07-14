@@ -40,6 +40,20 @@ export function getToday() {
     return new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+export async function sendFile(files, title = null) {
+    const fd = new FormData()
+
+    if (title)
+        fd.append('title', title)
+
+    if (Array.isArray(files))
+        files.forEach(file => fd.append('body', file))
+    else
+        fd.append('body', files)
+
+    await axios.post('/api/user/file/upload', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+}
+
 export function getFormSchema(name) {
     const formSchemas = {
         user: {
