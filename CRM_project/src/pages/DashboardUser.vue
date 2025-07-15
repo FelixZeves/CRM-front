@@ -3,7 +3,10 @@ import CRMCalendar from '@/components/CRMCalendar.vue';
 import EventsTile from '@/components/cards/EventsTile.vue';
 import NavigationColumn from '@/components/menus/NavigationColumn.vue';
 import TasksTile from '@/components/cards/TasksTile.vue';
-import ChangePass_ from '@/components/forms/ChangePass_.vue';
+import { checkPass } from '@/components/Notifies';
+import { onMounted } from 'vue';
+
+onMounted(() => {checkPass()})
 </script>
 
 <template>
@@ -25,5 +28,4 @@ import ChangePass_ from '@/components/forms/ChangePass_.vue';
             </div>
         </main>
     </div>
-    <ChangePass_/>
 </template>

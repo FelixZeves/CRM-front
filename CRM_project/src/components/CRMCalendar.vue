@@ -1,6 +1,6 @@
 <script setup>
 import { ref, toRaw } from 'vue';
-import { getEvents } from './Utils';
+import { getEvents } from '@/components/Utils';
 
 const events = ref()
 

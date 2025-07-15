@@ -1,7 +1,7 @@
 <script setup>
 import { RoleEnum } from '@/components/Enums.vue';
-import { useQuasar, copyToClipboard } from 'quasar'
 import { ref } from 'vue';
+import { successNotify, passClipboardNotify, confirmNotify } from '@/components/Notifies';
 import axios from 'axios';
 
 const props = defineProps({
@@ -12,33 +12,19 @@ const props = defineProps({
 
 const emit = defineEmits(['update-list'])
 
-const q = useQuasar()
 const isPassReset = ref(false)
 const roleOptions = Object.entries(RoleEnum).map(([key, value]) => ({label: value.translation, value: Number(key)}))
 const buffOptions = ref([{title: 'Пусто', id: null}])
 
-const passNotify = (newPass) => q.notify({
-    type: 'positive',
-    position: 'top',
-    color: 'brand-velvet',
-    progress: true,
-    message: newPass,
-    caption: 'Это ваш временный пароль',
-    actions: [
-        {label: 'Копировать', color: 'white', handler: copyToClipboard(newPass)}
-]})
-
-const confirmNotify = () => q.notify({
-    type: 'ongoing',
-    position: 'top',
-    color: 'red-5',
-    message: 'Вы уверены?',
-    actions: [
-        {label: 'Подтвердить', color: 'white', handler: async () => {await axios.delete('/api/user', { params: { id: props.model.id } }); emit('update-list')}},
-        {label: 'Отменить', color: 'white'}
-]})
-
-const successNotify = () => q.notify({type: 'positive', position: 'top', message: 'Успех!'})
+// const confirmNotify = () => q.notify({
+//     type: 'ongoing',
+//     position: 'top',
+//     color: 'red-5',
+//     message: 'Вы уверены?',
+//     actions: [
+//         {label: 'Подтвердить', color: 'white', handler: async () => {await axios.delete('/api/user', { params: { id: props.model.id } }); emit('update-list')}},
+//         {label: 'Отменить', color: 'white'}
+// ]})
 
 async function lazyLoad(url) {
     const data = (await axios.get(url)).data.data
@@ -49,13 +35,13 @@ async function send() {
     if (!props.status) {
         if (isPassReset.value) {
             let response = await axios.put('/api/user/pass-reset', {id: props.model.id})
-            if (response.data?.password) passNotify(response.data.password)
+            if (response.data?.password) passClipboardNotify(response.data.password)
         }
         if (props.model.profile.department?.id) {props.model.profile.department = props.model.profile.department.id}
 
         if (props.mode == 'create') {
             let response = await axios.post('/api/user', props.model);
-            if (response.data?.password) passNotify(response.data.password)
+            if (response.data?.password) passClipboardNotify(response.data.password)
         }
 
         if (props.mode == 'edit') {await axios.patch('/api/user', props.model); successNotify()}
@@ -65,7 +51,7 @@ async function send() {
 }
 
 async function remove() {
-    if (!props.status &&  props.model?.id) confirmNotify()
+    if (!props.status &&  props.model?.id) confirmNotify(async () => {await axios.delete('/api/user', { params: { id: props.model.id } }); emit('update-list')})
 }
 
 defineExpose({send, remove})

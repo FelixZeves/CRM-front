@@ -3,14 +3,13 @@ import axios from 'axios'
 import { computed, ref, onMounted } from 'vue'
 import { DocEnum as D, RoleEnum_ as R} from '@/components/Enums.vue'
 import { getFormSchema, getToday, getMe } from '@/components/Utils.js'
-import { useQuasar } from 'quasar'
+import { successNotify } from '@/components/Notifies'
 
 const props = defineProps(['visible', 'body'])
 const emit = defineEmits(['update:visible', 'update-list'])
 
 onMounted(async () => {me.value = (await getMe()).data})
 
-const q = useQuasar()
 const role = ref()
 const step = ref(1)
 const activeEvent = ref(false)
@@ -19,8 +18,6 @@ const peopleOptions = ref([])
 const departmentOptions = ref([])
 const me = ref()
 const evtUsers = ref(new Set())
-
-const successNotify = () => q.notify({type: 'positive', position: 'top', message: 'Успех!'})
 
 const today = getToday();
 const date = ref({ from: today, to: today });

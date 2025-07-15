@@ -5,10 +5,8 @@ import Department from '@/components/forms/admin/Deparment.vue'
 import Class from '@/components/forms/admin/Class.vue'
 import Lesson from '@/components/forms/admin/Lesson.vue'
 import axios from 'axios'
-import { useQuasar, copyToClipboard } from 'quasar'
 import { computed, ref } from 'vue'
 
-const q = useQuasar()
 const status = ref('read')
 const isRead = computed(() => status.value != 'read'? false: true)
 const url = ref(null)

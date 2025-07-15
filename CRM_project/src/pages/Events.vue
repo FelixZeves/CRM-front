@@ -1,7 +1,7 @@
 <script setup>
 import NavigationColumn from '@/components/menus/NavigationColumn.vue';
 import EventsList from '@/components/layouts/EventsList.vue';
-import EventCreationDialog from '@/components/forms/AddEvent.vue';
+import AddEvent from '@/components/forms/AddEvent.vue';
 import { ref } from 'vue'
 import EventsDropdown from '@/components/menus/EventsDropdown.vue';
 import { getEvents } from  '@/components/Utils.js';
@@ -38,7 +38,7 @@ updateList()
                         </div>
                     </template>
                 </Suspense>
-                <EventCreationDialog v-model:visible='visible' @update-list="updateList"/>
+                <AddEvent v-model:visible='visible' @update-list="updateList"/>
             </div>
         </main>
     </div>

@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import axios from 'axios'
 import { getFormSchema } from '@/components/Utils'
+import { successNotify } from '@/components/Notifies'
 
 const props = defineProps(['visible'])
 const emit = defineEmits(['update:visible', 'update-list'])
@@ -36,7 +37,9 @@ newDate = { from: val, to: val };
 const form = ref(getFormSchema('event'));
 
 async function createEvent() {
-    await axios.post('/api/user/event', form.value)
+    let response = await axios.post('/api/user/event', form.value)
+    
+    if (response.status == 200) successNotify()
     emit('update-list')
 }
 </script>

@@ -1,7 +1,8 @@
 <script setup>
 import { reactive, ref, watch, computed } from 'vue';
 import { useQuasar } from 'quasar'
-import axios from 'axios';
+import axios from 'axios'
+import { successNotify, confirmNotify } from '@/components/Notifies';
 
 const props = defineProps({
     model: {type: Object, required: true, default: {}},
@@ -11,7 +12,6 @@ const props = defineProps({
 
 const emit = defineEmits(['update-list'])
 
-const q = useQuasar()
 // const localModel = ref(JSON.parse(JSON.stringify(props.model)))
 
 const localModel = computed({
@@ -22,16 +22,15 @@ const localModel = computed({
 const buffOptions = ref([{title: 'Пусто', id: null}])
 const staffOptions = ref([...props.model.staff])
 const managerOption = ref([props.model.manager])
-const successNotify = () => q.notify({type: 'positive', position: 'top', message: 'Успех!'})
-const confirmNotify = () => q.notify({
-    type: 'ongoing',
-    position: 'top',
-    color: 'red-5',
-    message: 'Вы уверены?',
-    actions: [
-        {label: 'Подтвердить', color: 'white', handler: async () => {await axios.delete(`/api/user/department?id=${localModel.value.id}`); emit('update-list')}},
-        {label: 'Отменить', color: 'white'}
-]})
+// const confirmNotify = () => q.notify({
+//     type: 'ongoing',
+//     position: 'top',
+//     color: 'red-5',
+//     message: 'Вы уверены?',
+//     actions: [
+//         {label: 'Подтвердить', color: 'white', handler: async () => {await axios.delete(`/api/user/department?id=${localModel.value.id}`); emit('update-list')}},
+//         {label: 'Отменить', color: 'white'}
+// ]})
 
 watch(() => props.model, (val) => {
   Object.assign(localModel, JSON.parse(JSON.stringify(val)))
@@ -60,7 +59,7 @@ async function lazyLoad(url) {
 }
 
 async function remove() {
-    if (!props.status && localModel.value?.id) confirmNotify()
+    if (!props.status && localModel.value?.id) confirmNotify(async () => {await axios.delete(`/api/user/department?id=${localModel.value.id}`); emit('update-list')})
 }
 
 defineExpose({send, remove})

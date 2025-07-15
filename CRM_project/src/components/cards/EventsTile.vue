@@ -1,14 +1,15 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import { getEvents } from '@/components/Utils';
-import EventCreationDialog from '@/components/forms/AddEvent.vue';
 import axios from 'axios';
+import { getEvents } from '@/components/Utils';
 
 const events = ref([])
 const visible = ref(false)
 
 async function updateList() {
-    events.value = (await axios.get('/api/user/event?limit=7')).data.data
+    let response = await getEvents(5)
+
+    events.value = response.data.data
 }
 
 onMounted(() => {updateList()})

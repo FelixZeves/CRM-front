@@ -1,24 +1,8 @@
 <script setup>
 import axios from 'axios'
+import { downloadFile } from '@/components/Utils';
 
 const props = defineProps(['body'])
-
-// FIXME
-async function downloadFile(){
-    const response = await axios.get(`/api/user/file/download?id=${props.body.id}`, {responseType: 'blob'});
-    const disposition = response.headers['content-disposition'] || '';
-    const fileNameMatch = disposition.match(/filename="?([^"]+)"?/);
-    const fileName = fileNameMatch ? decodeURIComponent(fileNameMatch[1]) : 'file.bin';
-
-    const url = window.URL.createObjectURL(response.data);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-}
 
 const extension = props.body.title.split('.').pop();
 
@@ -47,7 +31,7 @@ const fileIcons = {
                         <q-chip outline square class="brand-text" :label="body.create_at"></q-chip>
                     </div>
                 </div>
-                <q-btn flat class="!max-w-[5%] !px-1" @click="downloadFile">
+                <q-btn flat class="!max-w-[5%] !px-1" @click="downloadFile(body.id)">
                     <q-icon name="download" size="lg"></q-icon>
                 </q-btn>
             </q-card-section>

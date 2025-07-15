@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
-import { useQuasar } from 'quasar';
+import { successNotify, confirmNotify } from '@/components/Notifies';
 
 const props = defineProps({
     model: {type: Object, required: true, default: {}},
@@ -11,19 +11,9 @@ const props = defineProps({
 
 const emit = defineEmits(['update-list'])
 
-const q = useQuasar()
 const localModel = ref(JSON.parse(JSON.stringify(props.model)))
 const buffOptions = ref([])
-const successNotify = () => q.notify({type: 'positive', position: 'top', message: 'Успех!'})
-const confirmNotify = () => q.notify({
-    type: 'ongoing',
-    position: 'top',
-    color: 'red-5',
-    message: 'Вы уверены?',
-    actions: [
-        {label: 'Подтвердить', color: 'white', handler: async () => {await axios.delete(`/api/user/class?id=${localModel.value.id}`); emit('update-list')}},
-        {label: 'Отменить', color: 'white'}
-]})
+
 
 async function send() {
     let response = null
@@ -44,7 +34,7 @@ async function lazyLoad(url) {
 }
 
 async function remove() {
-    if (props.mode != 'read') confirmNotify()
+    if (props.mode != 'read') confirmNotify(async () => {await axios.delete(`/api/user/class?id=${localModel.value.id}`); emit('update-list')})
 }
 
 defineExpose({ send, remove })

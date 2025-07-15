@@ -6,6 +6,7 @@ import TasksList from '@/components/layouts/TasksList.vue';
 import TasksDropdown from '@/components/menus/TasksDropdown.vue';
 import AddTask from '@/components/forms/AddTask.vue';
 import { StatusEnum_ } from '@/components/Enums.vue';
+import { getTasks } from '@/components/Utils';
 
 const visible = ref(false)
 const tasks = ref([])
@@ -14,15 +15,7 @@ const user = ref()
 onMounted(async () => {user.value = (await axios.get('/api/user/me')).data; await updateList()})
 
 async function updateList() {
-    tasks.value = (await axios.get('/api/user/task')).data.data
-    for (const task of tasks.value) {
-        const currentStep = task.steps.find(step => step.status !== StatusEnum_.APPROVED)
-
-        if (currentStep)
-            task.status = currentStep.status
-        else
-            task.status = StatusEnum_.APPROVED
-    }
+    tasks.value = await getTasks()
 }
 </script>
 

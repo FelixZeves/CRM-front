@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RoleEnum } from './Enums.vue';
+import { RoleEnum, StatusEnum_ } from '@/components/Enums.vue';
 
 export async function getMe(){
     const response = await axios.get('/api/user/me')
@@ -14,9 +14,29 @@ export async function getDepartments(id = null){
     return (await axios.get(url)).data
 }
 
-export async function getEvents(){
+export async function getTasks(limit = null){
+    let url = '/api/user/task'
+    let tasks = (await axios.get(url)).data.data
+    for (const task of tasks) {
+        const currentStep = task.steps.find(step => step.status !== StatusEnum_.APPROVED)
+
+        if (currentStep)
+            task.status = currentStep.status
+        else
+            task.status = StatusEnum_.APPROVED
+    }
+    return tasks
+}
+
+export async function getEvents(limit = null){
     try{
-        const response = await axios.get('/api/user/event')
+        let response
+        if(limit != null){
+            response = (await axios.get(`/api/user/event?limit=${limit}`))
+        }
+        else {
+            response = await axios.get('/api/user/event')
+        }
         return response
     } catch (error) {
         console.error('Ошибка создания евента:', error);
@@ -52,6 +72,22 @@ export async function sendFile(files, title = null) {
         fd.append('body', files)
 
     await axios.post('/api/user/file/upload', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+}
+
+export async function downloadFile(id){
+    const response = await axios.get(`/api/user/file/download/${id}`, {responseType: 'blob'});
+    const disposition = response.headers['content-disposition'] || '';
+    const fileNameMatch = disposition.match(/filename="?([^"]+)"?/);
+    const fileName = fileNameMatch ? decodeURIComponent(fileNameMatch[1]) : 'file.bin';
+
+    const url = window.URL.createObjectURL(response.data);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
 }
 
 export function getFormSchema(name) {

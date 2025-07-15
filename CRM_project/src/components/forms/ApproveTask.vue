@@ -2,14 +2,13 @@
 import { ref, computed } from 'vue'
 import { StatusEnum_ as St, TaskTypeEnum as T } from '../Enums.vue'
 import axios from 'axios'
+import { successNotify } from '@/components/Notifies'
 
 const emit = defineEmits(['update:visible'])
 const props = defineProps(['visible', 'body', 'user'])
 
 const curStep = ref(props.body.steps.find(step => step.status !== St.APPROVED) ?? props.body.steps[0]);
 const step =  ref(props.body.steps.findIndex(step => step.user.id == props.user.profile.id))
-
-const successNotify = () => q.notify({type: 'positive', position: 'top', message: 'Успех!'})
 
 const visible = computed({
   get: () => props.visible,

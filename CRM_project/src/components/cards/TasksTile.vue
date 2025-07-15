@@ -2,19 +2,12 @@
 import axios from 'axios'
 import { StatusEnum, StatusEnum_ } from '@/components/Enums.vue'
 import { ref } from 'vue';
+import { getTasks } from '../Utils';
 
 const tasks = ref([])
 
 async function get() {
-    tasks.value = (await axios.get('/api/user/task')).data.data
-    for (const task of tasks.value) {
-        const currentStep = task.steps.find(step => step.status !== StatusEnum_.APPROVED)
-
-        if (currentStep)
-            task.status = currentStep.status
-        else
-            task.status = StatusEnum_.APPROVED
-    }
+    tasks.value = await getTasks()
 }
 
 get()

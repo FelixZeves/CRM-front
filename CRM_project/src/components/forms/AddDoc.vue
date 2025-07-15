@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { getDepartments, getFormSchema} from '@/components/Utils'
 import axios from 'axios'
+import { successNotify } from '@/components/Notifies'
 
 const props = defineProps(['visible'])
 const emit = defineEmits(['update:visible', 'update-list'])
@@ -23,7 +24,8 @@ async function send() {
     form.value.departments.forEach(dep => fd.append('departments', dep))
     form.value.tags.forEach(tag => fd.append('tags', tag))
 
-    await axios.post('/api/user/file/docs', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+    let response = await axios.post('/api/user/file/docs', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+    if (response.status == 200) successNotify()
     emit('update-list')
 }
 

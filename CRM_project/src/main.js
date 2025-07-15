@@ -5,6 +5,7 @@ import langRu from 'quasar/lang/ru'
 import App from './App.vue'
 import VCalendar from 'v-calendar'
 
+
 import 'v-calendar/style.css'
 import '@quasar/extras/material-icons/material-icons.css'
 import '@quasar/extras/material-icons-round/material-icons-round.css'
@@ -16,6 +17,7 @@ import '@quasar/extras/fontawesome-v6/fontawesome-v6.css'
 import './assets/main.css'
 
 import 'quasar/src/css/index.sass'
+import { errorNotify } from './components/Notifies.js'
 
 import axios from 'axios'
 
@@ -34,29 +36,25 @@ axios.interceptors.response.use((response) => response, (error) => {
 
     if (!error.response) {
         r.message = 'Сервер недоступен. Попробуйте позже.'
-        Notify.create(r)
+        errorNotify(r)
         return
     }
 
     switch (error.response.status) {
         case 401:
             localStorage.removeItem('jwtToken');
-            r.message = 'У вас истек срок действия сессии, пожалуйста, войдите снова';
             window.location.href = '/';
-            Notify.create(r);
+            r.message = 'У вас истек срок действия сессии, пожалуйста, войдите снова';
+            errorNotify(r)
             break;
 
         case 403:
             r.message = 'У вас нет прав для выполнения этого действия';
-            Notify.create(r);
+            errorNotify(r)
             break;
 
         default:
-            Notify.create({
-                type: 'negative',
-                position: 'top',
-                message: `Ошибка: ${error.response.data?.msg || ''}`,
-            });
+            errorNotify(error.response.data?.msg || '')
             break;
     }
 });
