@@ -117,13 +117,13 @@ function checkDock(){
 
 function labelChanges(){
     if (task.value.type == D.ORDER){
-        return 'задачи'
+        return 'ЗАДАЧИ'
     }
     else if (task.value.type == D.MEMO){
-        return 'служебной записки'
+        return 'СЗ'
     }
     else{
-        return 'заявки'
+        return 'ЗАЯВКИ'
     }
 }
 
@@ -170,7 +170,7 @@ async function send() {
                 >
                 <q-step
                     :name="D.APPLICATION"
-                    :title="`Создание ${labelChanges()}`"
+                    :title="`СОЗДАНИЕ ${labelChanges()}`"
                     icon="fa-regular fa-file-lines"
                     class="row-grow"
                     :done="step > D.APPLICATION"
@@ -327,7 +327,7 @@ async function send() {
                 <q-step
                     v-if="task.type == D.ORDER"
                     :name="2"
-                    title="Создание мероприятия"
+                    title="СОЗДАНИЕ МЕРОПРИЯТИЯ"
                     class="row-grow"
                     icon="add"
                     :done="step > 2"
@@ -337,13 +337,13 @@ async function send() {
                             <q-toggle
                                 v-model="activeEvent"
                                 class="brand-description"
-                                label="Создать мероприятие исполнителям"
+                                label="для исполнителей"
                             />
                             <q-toggle 
                                 :disable="!activeEvent"
                                 v-model="eventForMe"
                                 class="brand-description"
-                                label="Создать для себя"
+                                label="для себя"
                                 @update:model-value="eventForMe ? evtUsers.add(me.profile.id) : evtUsers.delete(me.profile.id)"
                             />
                             <div class="flex flex-row gap-x-2">

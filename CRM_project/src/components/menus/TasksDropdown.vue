@@ -4,7 +4,7 @@ import {ref} from 'vue'
 
 const emit = defineEmits(['show-dialog'])
 
-const statusFilter = ref("Все состояния задач")
+const statusFilter = ref("Все задачи")
 
 const datesFilter = ref("Старые задачи")
 
@@ -28,21 +28,27 @@ function onDateClick(res){
       text-color="black"
       :label=statusFilter>
         <q-list>
-          <q-item clickable v-close-popup @click="onStatusClick('Все состояния задач')">
+          <q-item clickable v-close-popup @click="onStatusClick('Все задачи')">
             <q-item-section>
-              <q-item-label>Все состояния задач</q-item-label>
+              <q-item-label>Все задачи</q-item-label>
             </q-item-section>
           </q-item>
 
-          <q-item clickable v-close-popup @click="onStatusClick('Ожидает выполнения')">
+          <q-item clickable v-close-popup @click="onStatusClick('В работе')">
             <q-item-section>
-              <q-item-label>Ожидает выполения</q-item-label>
+              <q-item-label>В работе</q-item-label>
             </q-item-section>
           </q-item>
-  
-          <q-item clickable v-close-popup @click="onStatusClick('На согласовании')">
+
+          <q-item clickable v-close-popup @click="onStatusClick('Просрочено')">
             <q-item-section>
-              <q-item-label>На согласовании</q-item-label>
+              <q-item-label>Просрочено</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item clickable v-close-popup @click="onStatusClick('Отклонено')">
+            <q-item-section>
+              <q-item-label>Отклонено</q-item-label>
             </q-item-section>
           </q-item>
   

@@ -69,15 +69,19 @@
 }
 
 .brand-title{
-  @apply !text-xl text-stone-700 !font-semibold
+  @apply !text-xl text-stone-800 !font-semibold
 }
 
 .brand-description{
-  @apply !text-lg text-stone-600 !font-medium
+  @apply !text-lg text-stone-700 !font-medium
 }
 
 .brand-text{
-  @apply !text-base !text-stone-500 !font-medium
+  @apply !text-base !text-stone-600 !font-semibold
+}
+
+.q-chip{
+  @apply !rounded-[5pt]
 }
 
 </style>

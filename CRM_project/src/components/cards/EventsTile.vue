@@ -29,7 +29,7 @@ onMounted(() => {updateList()})
             </template>
 
             <template #subtitle>
-                <div >
+                <div class="!text-base !normal-case">
                     {{ event.at !== event.to ? `${event.at} - ${event.to}` : event.to }} : {{ event.creator.init_name }}
                 </div>
             </template>
@@ -43,42 +43,3 @@ onMounted(() => {updateList()})
         </q-timeline-entry>
     </q-timeline>
 </template>
-
-<style scoped>
-
-#eventsTile{
-    @apply bg-white rounded-[15pt] pb-4
-}
-
-#eventsHead{
-    align-items: center;
-}
-
-#eventsTile button{
-    justify-self: right;
-    width: max-content;
-}
-
-.event{
-    border-radius: 10pt;
-}
-
-.event:hover{
-    background-color: var(--vt-c-white-mute);
-    transition: 0.5s;
-}
-
-.event .mainInfo{
-    align-self: center;
-}
-
-.event .date{
-    text-align: center;
-    align-self: center;
-}
-
-.event .place{
-    text-align: center;
-    align-self: center;
-}
-</style>

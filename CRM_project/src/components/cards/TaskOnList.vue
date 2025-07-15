@@ -56,8 +56,8 @@ const btn = ref({
           align="left"
           narrow-indicator
         >
-          <q-tab name="main" class="brand-description !normal-case" label="Основная информация" />
-          <q-tab name="details" class="brand-description !normal-case" label="Дополнительная информация" />
+          <q-tab name="main" class="brand-description" label="Основная" />
+          <q-tab name="details" class="brand-description" label="Дополнительная" />
           <q-tab v-if="Array.isArray(body.steps[0].files) && body.steps[0].files.length > 0" name="files" class="!normal-case" label="Прикреплённые файлы" />
         </q-tabs>
 
@@ -68,7 +68,8 @@ const btn = ref({
         transition-prev="slide-down"
         animated>
           <q-tab-panel name="main">
-            <p class="brand-text m-0 justify-self-end text-end pb-4"><span class="brand-text">Срок выполнения:</span> <br/> {{ body.deadline }}</p>
+            
+            <p class="brand-text m-0 justify-self-end text-end pb-4"><span class="brand-text">Получена: {{ body.steps[0].update_at }} <br/> <span>Срок: {{ body.deadline }}</span> </span></p>
             <div class="brand-description text-pretty text-ellipsis line-clamp-2">{{ body.description }}</div>
           </q-tab-panel>
 
@@ -85,7 +86,7 @@ const btn = ref({
                     self="bottom middle"
                     :offset="[10, 10]"
                     max-width="200px"
-                    class="!text-sm text-center">
+                    class="brand-text text-center">
                         {{ document }}
                     </q-tooltip>
                 </q-icon>
