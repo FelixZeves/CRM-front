@@ -20,8 +20,8 @@ get()
             class="items-center !max-h-[250px] !min-h-[100px] flex items-stretch gap-x-2 !px-0 !py-1">
             <q-item-section>
                 <q-card class="overflow-hidden flex flex-row">
-                    <q-card-section class="flex flex-row flex-grow justify-between content-center max-w-[97%]">
-                        <div class="flex-grow max-w-[70%]">
+                    <q-card-section class="flex flex-row flex-grow justify-between content-center w-[97%]">
+                        <div class="flex-grow w-[70%]">
                             <div class="brand-title text-ellipsis line-clamp-1">{{ task.title }}</div>
                             <div class="brand-description overflow-hidden text-ellipsis line-clamp-2"> {{ task.description }} </div>
                         </div>
