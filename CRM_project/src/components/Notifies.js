@@ -52,6 +52,7 @@ export function confirmNotify(func){
 }
 
 export function errorNotify(msg){
+    console.log(msg)
     Notify.create({
         type: 'negative',
         position: 'top',

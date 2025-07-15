@@ -32,11 +32,10 @@ axios.interceptors.request.use((config) => {
 })
 
 axios.interceptors.response.use((response) => response, (error) => {
-    let r = {type: 'negative', position: 'top', message: 'Ошибка'};
-
+    let message = ''
     if (!error.response) {
-        r.message = 'Сервер недоступен. Попробуйте позже.'
-        errorNotify(r)
+        message = 'Сервер недоступен. Попробуйте позже.'
+        errorNotify(message)
         return
     }
 
@@ -44,13 +43,13 @@ axios.interceptors.response.use((response) => response, (error) => {
         case 401:
             localStorage.removeItem('jwtToken');
             window.location.href = '/';
-            r.message = 'У вас истек срок действия сессии, пожалуйста, войдите снова';
-            errorNotify(r)
+            message = 'У вас истек срок действия сессии, пожалуйста, войдите снова';
+            errorNotify(message)
             break;
 
         case 403:
-            r.message = 'У вас нет прав для выполнения этого действия';
-            errorNotify(r)
+            message = 'У вас нет прав для выполнения этого действия';
+            errorNotify(message)
             break;
 
         default:
