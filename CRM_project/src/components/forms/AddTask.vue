@@ -10,7 +10,6 @@ const emit = defineEmits(['update:visible', 'update-list'])
 
 onMounted(async () => {me.value = (await getMe()).data})
 
-const role = ref()
 const step = ref(1)
 const activeEvent = ref(false)
 const eventForMe =  ref(false)
@@ -187,7 +186,7 @@ async function send() {
                     align="justify"
                     narrow-indicator
                 >
-                    <q-tab v-if="role != R.TEACHER" :name="D.ORDER" label="Задача"></q-tab>
+                    <q-tab v-if="me.role != R.TEACHER" :name="D.ORDER" label="Задача"></q-tab>
                     <q-tab :name="D.MEMO" label="Служебная записка" />
                     <q-tab :name="D.APPLICATION" label="Заявка" />
                 </q-tabs>
@@ -195,7 +194,7 @@ async function send() {
                     <q-form class=" p-5 !flex flex-row h-full gap-x-12">
                         <div class="flex flex-col gap-y-8 w-1/2">
                             <div class="flex flex-row gap-x-2">
-                                <q-btn icon="refresh" color="brand-danger opacity-[80%]" @click="clearForm()">
+                                <q-btn icon="refresh" color="brand-danger opacity-[80%] !h-[56px]" @click="clearForm()">
                                     <q-tooltip
                                         anchor="top middle"
                                         self="bottom middle"
@@ -255,9 +254,15 @@ async function send() {
                                 label="Прикрепить файлы"
                                 outlined
                                 bg-color="brand-wait"
-                                counter
-                                :counter-label="({filesNumber, maxFiles, totalSize}) => `${filesNumber} из ${maxFiles} (общий размер ${totalSize})`"
-                                max-files="5"
+                                :rules="[
+                                            val => !val || val.length < 5 || 'Достигнут лимит в 5 файлов. Объедините их в zip архив',
+                                            val => {
+                                                        if (!val) return true
+                                                        const totalSize = val.reduce((sum, file) => sum + file.size, 0)
+                                                        const sizeInMB = totalSize / (1024 * 1024)
+                                                        return totalSize <= 30 * 1024 * 1024 || `Общий размер файлов не должен превышать 30MB. Размер ${sizeInMB.toFixed(2)}MB`
+                                                    }
+                                        ]"
                                 use-chips
                                 multiple
                                 class="brand-description">
@@ -352,7 +357,7 @@ async function send() {
                                 @update:model-value="eventForMe ? evtUsers.add(me.profile.id) : evtUsers.delete(me.profile.id)"
                             />
                             <div class="flex flex-row gap-x-2">
-                                <q-btn icon="refresh" color="brand-danger opacity-[80%]" @click="clearForm()">
+                                <q-btn icon="refresh" color="brand-danger opacity-[80%] !h-[56px]" @click="clearForm()">
                                     <q-tooltip
                                     anchor="top middle"
                                     self="bottom middle"

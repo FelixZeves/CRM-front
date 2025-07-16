@@ -16,16 +16,6 @@ const isPassReset = ref(false)
 const roleOptions = Object.entries(RoleEnum).map(([key, value]) => ({label: value.translation, value: Number(key)}))
 const buffOptions = ref([{title: 'Пусто', id: null}])
 
-// const confirmNotify = () => q.notify({
-//     type: 'ongoing',
-//     position: 'top',
-//     color: 'red-5',
-//     message: 'Вы уверены?',
-//     actions: [
-//         {label: 'Подтвердить', color: 'white', handler: async () => {await axios.delete('/api/user', { params: { id: props.model.id } }); emit('update-list')}},
-//         {label: 'Отменить', color: 'white'}
-// ]})
-
 async function lazyLoad(url) {
     const data = (await axios.get(url)).data.data
     buffOptions.value = [{title: 'Пусто', id: null}, ...data]

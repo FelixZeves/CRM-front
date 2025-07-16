@@ -110,7 +110,7 @@ async function remove() {
                         icon="fa-solid fa-trash"
                         padding="10px"
                         size="sm"
-                        @click="remove"
+                        @click="remove(); status = 'read'"
                         :color="status == 'delete' ? 'brand-velvet' : 'grey-4'"
                         :text-color="status == 'delete' ? 'white' : 'blue-grey-8'"
                         :unelevated="status == 'delete' ? true : false"
@@ -133,7 +133,7 @@ async function remove() {
                 <q-card-section class="brand-title"> {{ status === 'edit' ? 'Редактировать' : status === 'create' ? 'Создать' : 'Подробности' }} </q-card-section>
                 <q-separator inset />
                 <q-card-section class="flex flex-col justify-center">
-                    <q-form @submit="save">
+                    <q-form @submit="save(); status = 'read'">
                         <component ref="formSubmit" :is="forms[typeForm]" :model="details" :status="isRead" :mode="status" @update-list="tables.find(t => t.name.includes(typeForm)).get()"/>
                         <q-btn v-if="!isRead" type="submit" label="Сохранить" color="brand-velvet" class="mt-2"/>
                     </q-form>

@@ -2,20 +2,20 @@
 import axios from 'axios'
 import { onMounted, ref } from 'vue'
 import ModalError from '@/components/forms/BugReport.vue';
+import { getMe } from '../Utils';
 
-const props = defineProps(['name', 'role', 'section'])
+const props = defineProps(['name', 'section'])
 const fio = ref("");
 const role = ref("");
 const defaultPass =  ref(false)
 const visibleBugReport = ref(false);
 
 async function getUser(){
+    const me = (await getMe()).data
 
-    const response = (await axios.get('/api/user/me')).data;
-
-    fio.value = response.profile.initials_name;
-    role.value = response.role;
-    defaultPass.value = response.default_pass
+    fio.value = me.profile.initials_name;
+    role.value = me.role;
+    defaultPass.value = me.default_pass
 
 }
 
