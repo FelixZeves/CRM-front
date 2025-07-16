@@ -10,7 +10,6 @@ const emit = defineEmits(['update:visible', 'update-list'])
 
 onMounted(async () => {me.value = (await getMe()).data})
 
-const role = ref()
 const step = ref(1)
 const activeEvent = ref(false)
 const eventForMe =  ref(false)
@@ -179,7 +178,7 @@ async function send() {
                     align="justify"
                     narrow-indicator
                 >
-                    <q-tab v-if="role != R.TEACHER" :name="D.ORDER" label="Задача"></q-tab>
+                    <q-tab v-if="me.role != R.TEACHER" :name="D.ORDER" label="Задача"></q-tab>
                     <q-tab :name="D.MEMO" label="Служебная записка" />
                     <q-tab :name="D.APPLICATION" label="Заявка" />
                 </q-tabs>

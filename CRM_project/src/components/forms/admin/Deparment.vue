@@ -22,15 +22,6 @@ const localModel = computed({
 const buffOptions = ref([{title: 'Пусто', id: null}])
 const staffOptions = ref([...props.model.staff])
 const managerOption = ref([props.model.manager])
-// const confirmNotify = () => q.notify({
-//     type: 'ongoing',
-//     position: 'top',
-//     color: 'red-5',
-//     message: 'Вы уверены?',
-//     actions: [
-//         {label: 'Подтвердить', color: 'white', handler: async () => {await axios.delete(`/api/user/department?id=${localModel.value.id}`); emit('update-list')}},
-//         {label: 'Отменить', color: 'white'}
-// ]})
 
 watch(() => props.model, (val) => {
   Object.assign(localModel, JSON.parse(JSON.stringify(val)))
