@@ -18,11 +18,11 @@ export async function checkPass(){
 
 }
 
-export function successNotify(){
+export function successNotify(msg='Успех!'){
     Notify.create({
         type: 'positive',
         position: 'top',
-        message: 'Успех!'})
+        message: msg})
 }
 
 export function passClipboardNotify(newPass){

@@ -139,14 +139,22 @@ async function lazyLoad() {
 }
 
 async function send() {
-    let response = await axios.post('/api/user/task', task.value)
+    const fd = new FormData()
 
-    if (activeEvent.value) {
+    for (const key of ['title', 'description', 'comment', 'deadline', 'type'])
+        fd.append(key, task.value[key])
+
+    for (const key of ['files', 'executors', 'reviewers', 'checkers'])
+        task.value[key].forEach(elem => fd.append(key, elem))
+
+    let response = await axios.post('/api/user/task', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+
+    if (activeEvent.value && response.status == 200) {
         event.value.user = [...evtUsers.value]
-        await axios.post('/api/user/event', event.value)
+        response = await axios.post('/api/user/event', event.value)
     }
 
-    if (response.status == 200) successNotify()
+    if (response.status == 200) successNotify('Задача поставлена')
     emit('update-list')
 }
 </script>
