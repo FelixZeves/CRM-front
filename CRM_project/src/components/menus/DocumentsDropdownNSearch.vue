@@ -1,11 +1,13 @@
 <script setup>
-import {ref} from 'vue'
+import {onMounted, ref} from 'vue'
+import { getMe } from '@/components/Utils';
+import { RoleEnum_ as R} from '@/components/Enums.vue';
 
 const emit = defineEmits(['show-dialog']);
 const typesFilter = ref("Все документы")
 const datesFilter = ref("Все года")
 const focusesFilter = ref("Любая направленность")
-
+const role = ref(null)
 
 const searchText =ref("")
 
@@ -20,6 +22,8 @@ function onDateClick(res){
 function onFocusClick(res){
     focusesFilter.value=res
 }
+
+onMounted(async () => {role.value = (await getMe()).data.role})
 
 </script>
 
@@ -118,6 +122,7 @@ function onFocusClick(res){
             </q-input>
           </div>
           <q-btn
+          v-if="role == R.LEADER"
           icon-right="add"
           unelevated
           color="brand-wait"
