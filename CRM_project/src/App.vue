@@ -40,12 +40,16 @@
   @apply !text-base text-stone-700 !font-medium
 }
 
+.q-table__bottom{
+  @apply !text-lg text-stone-700
+}
+
 .submit-btn{
   @apply !bg-[--crm-c-light-velvet] !w-1/4 !rounded-[5pt] !text-white;
 }
 
-.q-field__messages{
-    @apply !text-xs
+.q-field__bottom{
+  @apply !text-base text-stone-600
 }
 
 .gray-menu{
