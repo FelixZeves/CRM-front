@@ -53,4 +53,15 @@ export const DocEnum=Object.freeze({
     MEMO: 2
 })
 
+export const fileIconsEnum = Object.freeze({
+    'pdf': 'fa-regular fa-file-pdf',
+    'jpg': 'fa-regular fa-file-image',
+    'png': 'fa-regular fa-file-image',
+    'docx': 'fa-regular fa-file-word',
+    'pptx': 'fa-regular fa-file-powerpoint',
+    'xlsx': 'fa-regular fa-file-excel',
+    'txt': 'fa-regular fa-file-lines',
+    'zip': 'fa-regular fa-file-zipper'
+})
+
 </script>

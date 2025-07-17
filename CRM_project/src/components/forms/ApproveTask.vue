@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { StatusEnum_ as St, TaskTypeEnum as T } from '../Enums.vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import { StatusEnum_ as St, TaskTypeEnum as T, fileIconsEnum as FI} from '@/components/Enums.vue'
 import axios from 'axios'
+import { downloadFile } from '@/components/Utils'
 import { successNotify } from '@/components/Notifies'
 
 const emit = defineEmits(['update:visible'])
@@ -31,11 +32,25 @@ const form = ref({
     files: []
 })
 
+const files = ref(null)
+
+async function lazyLoad(index){
+    console.log(props.body.steps[index])
+    if(props.body.steps[index].status != St.PROGRESS)
+        files.value = (await axios.get(`/api/user/file?id=${props.body.steps[index].files}`)).data.data
+}
+
+watch(step, (newVal, oldVal) => {
+    lazyLoad(newVal);
+});
+
+onMounted(() => lazyLoad(step.value))
+
 </script>
 
 <template>
     <q-dialog v-model="visible" backdrop-filter="blur(4px)">
-        <q-card style="max-width: 50%; min-width: 50%;" class="py-4 px-3 min-w-[50%] max-w-[50%]">
+        <q-card style="max-width: 50%; min-width: 50%;" class="py-4 px-3 min-w-[50%] max-w-[50%] !flex-nowrap">
             
             <q-card-section>
                 <div class="brand-title text-center">{{ body.title }}</div>
@@ -62,18 +77,16 @@ const form = ref({
                 >
                     <div class="flex flex-col px-8 gap-y-4">
                         <template v-if="s.status !== St.PROGRESS">
-                            <div v-if="s.type === T.CREATOR" class="brand-description pb-10 max-h-[250px] overflow-y-auto mb-4">{{ body.description }}</div>
-                            <div class="flex flex-row gap-x-4 pb-10">
-                                <q-icon name="fa-solid fa-file-export" size="sm">
-                                    <q-tooltip
-                                    anchor="top middle"
-                                    self="bottom middle"
-                                    :offset="[10, 10]"
-                                    max-width="200px"
-                                    class="!text-sm text-center">
-                                        {{ body.files }}
-                                    </q-tooltip>
-                                </q-icon>
+                            <div v-if="s.type === T.CREATOR" class="brand-description pb-2 max-h-[250px] overflow-y-auto mb-4">{{ body.description }}</div>
+                            <div class="flex flex-row gap-x-4 pb-4">
+                                <q-list class="!flex !flex-col !gap-y-2 w-full">
+                                    <q-item v-for="file in files" class="gap-x-2 !px-0 !items-center !flex-nowrap">
+                                        <q-icon :name="FI[file.title.split('.').pop()] || 'fa-regular fa-file'" size="md"/>
+                                        <span class="brand-text flex-grow text-ellipsis line-clamp-1">{{ file.title }}</span>
+                                        <span class="brand-text w-[15%]">{{ `${(file.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
+                                        <q-btn color="brand-wait" class="!w-[185px] brand-text" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile(file.id)"/>
+                                    </q-item>
+                                </q-list>
                             </div>
                             <div class="flex flex-col">
                                 <div class="pb-2 brand-title underline underline-offset-4">Комментарий</div>

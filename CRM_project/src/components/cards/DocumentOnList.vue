@@ -1,21 +1,10 @@
 <script setup>
-import axios from 'axios'
+import { fileIconsEnum as fileIcons } from '@/components/Enums.vue';
 import { downloadFile } from '@/components/Utils';
 
 const props = defineProps(['body'])
 
 const extension = props.body.title.split('.').pop();
-
-const fileIcons = {
-    'pdf': 'fa-regular fa-file-pdf',
-    'jpg': 'fa-regular fa-file-image',
-    'png': 'fa-regular fa-file-image',
-    'docx': 'fa-regular fa-file-word',
-    'pptx': 'fa-regular fa-file-powerpoint',
-    'xlsx': 'fa-regular fa-file-excel',
-    'txt': 'fa-regular fa-file-lines',
-    '7z': 'fa-regular fa-file-zipper'
-}
 
 </script>
 

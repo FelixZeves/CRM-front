@@ -1,8 +1,10 @@
 <script setup>
 import { ref } from 'vue'
 import ApproveTaskForm from '@/components/forms/ApproveTask.vue'
-import { TaskTypeEnum as T, StatusEnum as S, RoleEnum_ as R} from '@/components/Enums.vue'
+import { TaskTypeEnum as T, StatusEnum as S, RoleEnum_ as R, fileIconsEnum as FI} from '@/components/Enums.vue'
 import AddTask from '../forms/AddTask.vue'
+import axios from 'axios'
+import { downloadFile } from '../Utils'
 
 const props = defineProps(['body', 'user'])
 const tab = ref('main')
@@ -15,10 +17,16 @@ const btn = ref({
   [T.CHECKER]: 'Утвердить',
   [T.CREATOR]: 'Ознакомиться'
 })
+
+const files = ref(null)
+
+async function lazyLoad(){
+  files.value = (await axios.get(`/api/user/file?id=${props.body.steps[0].files}`)).data.data
+}
 </script>
 
 <template>
-    <q-card class="flex flex-col flex-grow bg-white mx-2 my-2 pt-3 pb-5 px-5 !min-h-[250px] !max-h-[500px]">
+    <q-card class="flex flex-col flex-grow bg-white mx-2 my-2 pt-3 pb-5 px-5 !min-h-[250px] !max-h-[500px] !flex-nowrap">
         <div class="flex flex-row w-[70%] justify-between">
             <span class="lg:text-lg 2xl:text-xl font-bold text-sm lg:text-base 2xl:text-lg mb-2">{{ body.title }}</span>
             <div v-if="user.role != R.TEACHER">
@@ -57,7 +65,7 @@ const btn = ref({
         >
           <q-tab name="main" class="brand-description" label="Основная" />
           <q-tab name="details" class="brand-description" label="Дополнительная" />
-          <q-tab v-if="Array.isArray(body.steps[0].files) && body.steps[0].files.length > 0" name="files" class="!normal-case" label="Прикреплённые файлы" />
+          <q-tab v-if="Array.isArray(body.steps[0].files) && body.steps[0].files.length > 0" name="files" label="файлы" @click="lazyLoad()"/>
         </q-tabs>
 
         <q-tab-panels
@@ -68,7 +76,7 @@ const btn = ref({
         animated>
           <q-tab-panel name="main">
             
-            <p class="brand-text m-0 justify-self-end text-end pb-4"><span class="brand-text">Получена: {{ body.steps[0].update_at }} <br/> <span>Срок: {{ body.deadline }}</span> </span></p>
+            <p class="brand-text m-0 justify-self-end text-end pb-4"><span>Получена: {{ body.steps[0].update_at }} <br/> <span>Срок: {{ body.deadline }}</span> </span></p>
             <div class="brand-description text-pretty text-ellipsis line-clamp-2">{{ body.description }}</div>
           </q-tab-panel>
 
@@ -78,19 +86,14 @@ const btn = ref({
           </q-tab-panel>
 
           <q-tab-panel name="files" class="overflow-y-auto">
-            <div class="flex flex-row" v-for="document in body.steps[0].files">
-                <q-icon name="fa-solid fa-file-export pe-4" size="sm" color="gray-600">
-                    <q-tooltip
-                    anchor="top middle"
-                    self="bottom middle"
-                    :offset="[10, 10]"
-                    max-width="200px"
-                    class="brand-text text-center">
-                        {{ document }}
-                    </q-tooltip>
-                </q-icon>
-                <p class="text-base text-gray-600">{{ document }}</p>
-            </div>
+            <q-list class="!flex !flex-col !gap-y-2">
+              <q-item v-for="file in files" class="gap-x-2 !px-0 !items-center">
+                <q-icon :name="FI[file.title.split('.').pop()] || 'fa-regular fa-file'" size="md"/>
+                <span class="brand-description flex-grow text-ellipsis line-clamp-1">{{ file.title }}</span>
+                <span class="brand-description w-[10%]">{{ `${(file.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
+                <q-btn color="brand-wait" class="!w-[225px]" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile(file.id)"/>
+              </q-item>
+            </q-list>
           </q-tab-panel>
         </q-tab-panels>
         <div class="flex flex-row justify-end items-center mt-7">

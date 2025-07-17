@@ -255,7 +255,7 @@ async function send() {
                                 outlined
                                 bg-color="brand-wait"
                                 :rules="[
-                                            val => !val || val.length < 5 || 'Достигнут лимит в 5 файлов. Объедините их в zip архив',
+                                            val => !val || val.length <= 5 || 'Достигнут лимит в 5 файлов. Объедините их в zip архив',
                                             val => {
                                                         if (!val) return true
                                                         const totalSize = val.reduce((sum, file) => sum + file.size, 0)
@@ -264,6 +264,7 @@ async function send() {
                                                     }
                                         ]"
                                 use-chips
+                                accept=".pdf, .jpg, .png, .docx, .pptx, .xlsx, .txt, .zip"
                                 multiple
                                 class="brand-description">
                                 <template v-slot:append><q-icon name="attach_file" /></template>
