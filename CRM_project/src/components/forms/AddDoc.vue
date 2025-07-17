@@ -24,7 +24,7 @@ async function send() {
     form.value.departments.forEach(dep => fd.append('departments', dep))
     form.value.tags.forEach(tag => fd.append('tags', tag))
 
-    let response = await axios.post('/api/user/file/docs', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+    let response = await axios.post('/api/user/file/upload?target=department', fd, {headers: {'Content-Type': 'multipart/form-data'}})
     if (response.status == 200) successNotify()
     emit('update-list')
 }
