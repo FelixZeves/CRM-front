@@ -17,7 +17,7 @@ get()
     <q-list class="!max-h-[80vh] overflow-y-auto flex-grow px-2">
         <q-item
             v-for="task in tasks"
-            class="items-center !max-h-[250px] !min-h-[100px] flex items-stretch gap-x-2 !px-0 !py-1">
+            class="items-center !max-h-[250px] !min-h-[100px] flex items-stretch gap-x-2 !px-0 !pb-2 !pt-0">
             <q-item-section>
                 <q-card class="overflow-hidden flex flex-row">
                     <q-card-section class="flex flex-row flex-grow justify-between content-center w-[97%]">
