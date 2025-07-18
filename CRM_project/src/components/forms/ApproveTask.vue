@@ -35,7 +35,6 @@ const form = ref({
 const files = ref(null)
 
 async function lazyLoad(index){
-    console.log(props.body.steps[index])
     if(props.body.steps[index].status != St.PROGRESS)
         files.value = (await axios.get(`/api/user/file?id=${props.body.steps[index].files}`)).data.data
 }
