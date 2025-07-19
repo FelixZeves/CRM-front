@@ -7,6 +7,7 @@ import axios from 'axios'
 import { downloadFile } from '../Utils'
 
 const props = defineProps(['body', 'user'])
+const emit = defineEmits(['update-list'])
 const tab = ref('main')
 const visibleApprove = ref(false)
 const visibleAdd = ref(false)
@@ -101,12 +102,15 @@ async function lazyLoad(){
         </div>
     </q-card>
     <ApproveTaskForm 
+      @update-list="emit('update-list')"
       v-model:visible="visibleApprove"
       :user="user"
       :body="body">
     </ApproveTaskForm>
     <AddTask
-    v-model:visible="visibleAdd"
-    :body="body"
+      @update-list="emit('update-list')"
+      v-model:visible="visibleAdd"
+      :body="body"
+      :me="user"
     />
 </template>

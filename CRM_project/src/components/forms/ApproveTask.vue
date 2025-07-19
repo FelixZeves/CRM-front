@@ -5,7 +5,7 @@ import axios from 'axios'
 import { downloadFile } from '@/components/Utils'
 import { successNotify } from '@/components/Notifies'
 
-const emit = defineEmits(['update:visible'])
+const emit = defineEmits(['update:visible', 'update-list'])
 const props = defineProps(['visible', 'body', 'user'])
 
 const curStep = ref(props.body.steps.find(step => step.status !== St.APPROVED) ?? props.body.steps[0]);
@@ -16,18 +16,35 @@ const visible = computed({
   set: val => emit('update:visible', val)
 })
 
+const body = computed({
+    get:  () => props.body
+})
+
 async function send(status) {
     form.value.status = status
     form.value.step = props.body.steps[step.value].id
-    let response = await axios.put('/api/user/task/approve', form.value)
 
-    if (response.status == 200) successNotify()
+    const fd = new FormData()
+
+    for (const key of ['step', 'status', 'comment']){
+        fd.append(key, form.value[key])
+    }
+        
+
+    for (const key of ['files'])
+        form.value[key].forEach(elem => fd.append(key, elem))
+
+    let response = await axios.put('/api/user/task/approve', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+
+    if (response.status == 200){
+        successNotify()
+        emit('update-list')
+    }
 }
 
 const form = ref({
     step: null,
     status: St.PROGRESS,
-    report: "",
     comment: null,
     files: []
 })
@@ -40,10 +57,28 @@ async function lazyLoad(index){
 }
 
 watch(step, (newVal, oldVal) => {
-    lazyLoad(newVal);
-});
+    if(props.body.steps[newVal].files.length > 0)
+        lazyLoad(newVal)
+    else
+        files.value = null
+})
 
-onMounted(() => lazyLoad(step.value))
+watch(() => props.body, (newBody) => {
+    curStep.value = props.body.steps.find(step => step.status !== St.APPROVED) ?? props.body.steps[0];
+    step.value =  props.body.steps.findIndex(step => step.user.id == props.user.profile.id)
+    if(props.body.steps[step.value].files.length > 0)
+        lazyLoad(step.value)
+    else
+        files.value = null
+})
+
+onMounted(() => {
+    if(props.body.steps[step.value].files.length > 0)
+        lazyLoad(step.value)
+    else
+        files.value = null
+
+})
 
 </script>
 
@@ -65,7 +100,7 @@ onMounted(() => lazyLoad(step.value))
                     v-for="(s, index) in body.steps"
                     :name="index"
                     :title="s.user.fio"
-                    :caption="s.id !== curStep.id ? s.update_at : body.deadline"
+                    :caption="s.status !== St.PROGRESS ? s.update_at : body.deadline"
                     icon="settings"
                     :active-icon="s.status == St.PROGRESS ? 'fa-regular fa-edit' : 'fa-regular fa-eye'"
                     :done-icon="s.status == St.APPROVED ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"
@@ -91,36 +126,40 @@ onMounted(() => lazyLoad(step.value))
                                 <div class="pb-2 brand-title underline underline-offset-4">Комментарий</div>
                                 <div class="flex-grow brand-description max-h-[250px] overflow-y-auto">{{ s.comment }}</div>
                             </div>
+                            <div v-if="s.status == St.REJECTED && body.steps[0].user.id  == user.profile.id" class="flex flex-row flex-grow justify-between">
+                                <q-btn color="brand-danger" @click="" label="В архив" class="navigation-btn opacity-[80%] brand-description" />
+                                <q-btn color="brand-velvet" @click="" label="Сбросить задачу" class="navigation-btn brand-description" />
+                            </div>
                         </template>
                         <template v-else-if="s.type === T.EXECUTOR && s.status !== St.APPROVED">
-                            <!-- <q-input
-                                v-model="form.report"
+                            <q-input
+                                v-model="form.comment"
                                 outlined
                                 type="textarea"
-                                :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 255 || 'Максимальная длина 255 символов']"
-                                label="Текст отчёта"
-                            /> -->
+                                :rules="[val => !val || val.length <= 1000 || 'Максимальная длина 1000 символов',
+                                        val => !val || val.length>=4 || 'Минимальная длина 4 символа']"
+                                class="brand-description"
+                                label="Отчёт"
+                            />
                             <q-file
                                 v-model="form.files"
                                 label="Прикрепить файлы"
                                 outlined
                                 bg-color="brand-wait"
-                                counter
-                                :counter-label="({filesNumber, maxFiles, totalSize}) => `${filesNumber} из ${maxFiles} (общий размер ${totalSize})`"
-                                max-files="5"
+                                :rules="[
+                                            val => !val || val.length <= 5 || 'Достигнут лимит в 5 файлов. Объедините их в zip архив',
+                                            val => {
+                                                        if (!val) return true
+                                                        const totalSize = val.reduce((sum, file) => sum + file.size, 0)
+                                                        const sizeInMB = totalSize / (1024 * 1024)
+                                                        return totalSize <= 30 * 1024 * 1024 || `Общий размер файлов не должен превышать 30MB. Размер ${sizeInMB.toFixed(2)}MB`
+                                                    }
+                                        ]"
                                 use-chips
                                 multiple
                             >
                                 <template v-slot:append><q-icon name="attach_file" /></template>
                             </q-file>
-                            <q-input
-                                v-model="form.comment"
-                                outlined
-                                type="textarea"
-                                :rules="[val => val.length <= 255 || 'Максимальная длина 255 символов']"
-                                class="brand-description"
-                                label="Комментарий"
-                            />
                             <div class="flex flex-row flex-grow justify-end">
                                 <q-btn color="brand-velvet" @click="send(St.APPROVED)" label="Отправить" class="navigation-btn" />
                             </div>
@@ -130,7 +169,8 @@ onMounted(() => lazyLoad(step.value))
                                 v-model="form.comment"
                                 outlined
                                 type="textarea"
-                                :rules="[val => val.length <= 255 || 'Максимальная длина 255 символов']"
+                                :rules="[val => !val || val.length <= 1000 || 'Максимальная длина 1000 символов',
+                                        val => !val || val.length>=4 || 'Минимальная длина 4 символа']"
                                 class="brand-description"
                                 label="Комментарий"/>
                             <q-file
@@ -138,9 +178,15 @@ onMounted(() => lazyLoad(step.value))
                                 label="Прикрепить файлы"
                                 outlined
                                 bg-color="brand-wait"
-                                counter
-                                :counter-label="({filesNumber, maxFiles, totalSize}) => `${filesNumber} из ${maxFiles} (общий размер ${totalSize})`"
-                                max-files="5"
+                                :rules="[
+                                            val => !val || val.length <= 5 || 'Достигнут лимит в 5 файлов. Объедините их в zip архив',
+                                            val => {
+                                                        if (!val) return true
+                                                        const totalSize = val.reduce((sum, file) => sum + file.size, 0)
+                                                        const sizeInMB = totalSize / (1024 * 1024)
+                                                        return totalSize <= 30 * 1024 * 1024 || `Общий размер файлов не должен превышать 30MB. Размер ${sizeInMB.toFixed(2)}MB`
+                                                    }
+                                        ]"
                                 use-chips
                                 multiple
                             >
@@ -162,7 +208,7 @@ onMounted(() => lazyLoad(step.value))
 <style scoped>
 
 .navigation-btn{
-    @apply !w-[150px]
+    @apply !min-w-[150px]
 }
 
 </style>

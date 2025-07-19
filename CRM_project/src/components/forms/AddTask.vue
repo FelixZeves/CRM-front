@@ -5,17 +5,14 @@ import { DocEnum as D, RoleEnum_ as R} from '@/components/Enums.vue'
 import { getFormSchema, getToday, getMe } from '@/components/Utils.js'
 import { successNotify } from '@/components/Notifies'
 
-const props = defineProps(['visible', 'body'])
+const props = defineProps(['visible', 'body', 'me'])
 const emit = defineEmits(['update:visible', 'update-list'])
-
-onMounted(async () => {me.value = (await getMe()).data})
 
 const step = ref(1)
 const activeEvent = ref(false)
 const eventForMe =  ref(false)
 const peopleOptions = ref([])
 const departmentOptions = ref([])
-const me = ref()
 const evtUsers = ref(new Set())
 
 const today = getToday();
@@ -153,8 +150,10 @@ async function send() {
         response = await axios.post('/api/user/event', event.value)
     }
 
-    if (response.status == 200) successNotify('Задача поставлена')
-    emit('update-list')
+    if (response.status == 200){
+        successNotify('Задача поставлена')
+        emit('update-list')
+    }
 }
 </script>
 
@@ -211,7 +210,8 @@ async function send() {
                                     hide-bottom-space
                                     type="text"
                                     label="Название"
-                                    :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
+                                    :rules="[val => !val || val.length <= 1000 || 'Максимальная длина 1000 символов',
+                                        val => !val || val.length>=4 || 'Минимальная длина 4 символа']"
                                     class="!flex-grow brand-description"
                                 />
                             </div>
@@ -220,7 +220,8 @@ async function send() {
                                     outlined
                                     type="textarea"
                                     label="Описание"
-                                    :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 1000 || 'Максимальная длина 1000 символов']"
+                                    :rules="[val => !val || val.length <= 1000 || 'Максимальная длина 1000 символов',
+                                        val => !val || val.length>=4 || 'Минимальная длина 4 символа']"
                                     class="brand-description"
                                 />
                                 <q-input
@@ -228,7 +229,8 @@ async function send() {
                                     outlined
                                     type="textarea"
                                     label="Дополнительный комментарий"
-                                    :rules="[val => val.length <= 255 || 'Максимальная длина 255 символов']"
+                                    :rules="[val => !val || val.length <= 1000 || 'Максимальная длина 1000 символов',
+                                        val => !val || val.length>=4 || 'Минимальная длина 4 символа']"
                                     class="brand-description"
                                 />
                         </div>

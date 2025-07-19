@@ -31,8 +31,8 @@ async function updateList() {
         <main class="flex flex-grow h-[80vh]">
             <div class="flex-grow">
                 <TasksDropdown @show-dialog="visible = true"></TasksDropdown>
-                <TasksList :tasks="tasks" :user="user"/>
-                <AddTask v-model:visible="visible" @update-list="updateList"></AddTask>
+                <TasksList @update-list="updateList" :tasks="tasks" :user="user"/>
+                <AddTask v-model:visible="visible" @update-list="updateList" :me="user"></AddTask>
             </div>
         </main>
     </div>
