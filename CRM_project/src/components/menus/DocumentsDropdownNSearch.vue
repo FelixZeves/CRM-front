@@ -49,7 +49,6 @@ onMounted(async () => {role.value = (await getMe()).data.role})
                     <q-item-label>Нормативные документы</q-item-label>
                   </q-item-section>
                 </q-item>
-                
               </q-list>
             </q-btn-dropdown>
       
@@ -67,15 +66,21 @@ onMounted(async () => {role.value = (await getMe()).data.role})
                   </q-item-section>
                 </q-item>
       
-                <q-item clickable v-close-popup @click="onDateClick('Этот учебный год')">
+                <q-item clickable v-close-popup @click="onDateClick('Текущий год')">
                   <q-item-section>
-                    <q-item-label>Этот учебный год</q-item-label>
+                    <q-item-label>Текущий год</q-item-label>
                   </q-item-section>
                 </q-item>
         
-                <q-item clickable v-close-popup @click="onDateClick('Самые старые')">
+                <q-item clickable v-close-popup @click="onDateClick('Сначала старые')">
                   <q-item-section>
-                    <q-item-label>Самые старые</q-item-label>
+                    <q-item-label>Сначала старые</q-item-label>
+                  </q-item-section>
+                </q-item>
+
+                <q-item clickable v-close-popup @click="onDateClick('Сначала новые')">
+                  <q-item-section>
+                    <q-item-label>Сначала новые</q-item-label>
                   </q-item-section>
                 </q-item>
       
@@ -101,7 +106,30 @@ onMounted(async () => {role.value = (await getMe()).data.role})
                     <q-item-label>Отчётность</q-item-label>
                   </q-item-section>
                 </q-item>
-      
+                
+                <q-item clickable v-close-popup @click="onTypeClick('Финансы')">
+                  <q-item-section>
+                    <q-item-label>Финансы</q-item-label>
+                  </q-item-section>
+                </q-item>
+
+                <q-item clickable v-close-popup @click="onTypeClick('Кадровая служба')">
+                  <q-item-section>
+                    <q-item-label>Кадровая служба</q-item-label>
+                  </q-item-section>
+                </q-item>
+
+                <q-item clickable v-close-popup @click="onTypeClick('Договоры')">
+                  <q-item-section>
+                    <q-item-label>Договоры</q-item-label>
+                  </q-item-section>
+                </q-item>
+
+                <q-item clickable v-close-popup @click="onTypeClick('Материально-техническая часть')">
+                  <q-item-section>
+                    <q-item-label>МТ часть</q-item-label>
+                  </q-item-section>
+                </q-item>
               </q-list>
             </q-btn-dropdown>
         </div>

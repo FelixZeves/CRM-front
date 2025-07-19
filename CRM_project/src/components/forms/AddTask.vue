@@ -210,7 +210,7 @@ async function send() {
                                     outlined
                                     hide-bottom-space
                                     type="text"
-                                    label="Название задачи"
+                                    label="Название"
                                     :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
                                     class="!flex-grow brand-description"
                                 />
@@ -219,7 +219,7 @@ async function send() {
                                     v-model="task.description"
                                     outlined
                                     type="textarea"
-                                    label="Описание задачи"
+                                    label="Описание"
                                     :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 1000 || 'Максимальная длина 1000 символов']"
                                     class="brand-description"
                                 />
