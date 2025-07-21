@@ -84,7 +84,7 @@ function clearForm() {
 
 function throwData(){
     evtUsers.value.clear()
-    if (eventForMe.value) evtUsers.value.add(me.value.profile.id)
+    if (eventForMe.value) evtUsers.value.add(props.me.profile.id)
     let tmp = [...task.value.executors, ...task.value.reviewers, ...task.value.checkers].forEach(id => evtUsers.value.add(id))
 
     event.value.title = task.value.title
@@ -122,14 +122,14 @@ function labelChanges(){
 
 async function lazyLoad() {
     let department = null
-    if (me.value.role == R.LEADER){
-        department = (await axios.get(`/api/user/department?id=${me.value.profile.manager.id}`)).data.data[0]
+    if (props.me.role == R.LEADER){
+        department = (await axios.get(`/api/user/department?id=${props.me.profile.manager.id}`)).data.data[0]
         peopleOptions.value = [...department.staff.map(staff => ({id: staff.id, fio: `${staff.fio} (Сотрудник)`})),
                                ...department.childrens.filter(child => child.manager !== null)
                                                       .map(child => ({id: child.manager.id, fio: `${child.manager.fio} (${child.title})`}))]
         departmentOptions.value = [...department.parents.map(p => ({id: p.id, title: `${p.title} (${p.manager?.fio})`}))]
     } else {
-        department = (await axios.get(`/api/user/department?id=${me.value.profile.department.id}`)).data.data[0]
+        department = (await axios.get(`/api/user/department?id=${props.me.profile.department.id}`)).data.data[0]
         peopleOptions.value = [{id: department.manager.id, fio: `${department.manager.fio} (${department.title})`}]
     }
 }
@@ -193,7 +193,7 @@ async function send() {
                     <q-form class=" p-5 !flex flex-row h-full gap-x-12">
                         <div class="flex flex-col gap-y-8 w-1/2">
                             <div class="flex flex-row gap-x-2">
-                                <q-btn icon="refresh" color="brand-danger opacity-[80%] !h-[56px]" @click="clearForm()">
+                                <q-btn unelevated icon="refresh " class="text-brand-danger opacity-[80%] !h-[56px]" @click="clearForm()">
                                     <q-tooltip
                                         anchor="top middle"
                                         self="bottom middle"
@@ -208,6 +208,7 @@ async function send() {
                                     v-model="task.title"
                                     outlined
                                     hide-bottom-space
+                                    required
                                     type="text"
                                     label="Название"
                                     :rules="[val => !val || val.length <= 1000 || 'Максимальная длина 1000 символов',
@@ -218,6 +219,7 @@ async function send() {
                                 <q-input
                                     v-model="task.description"
                                     outlined
+                                    required
                                     type="textarea"
                                     label="Описание"
                                     :rules="[val => !val || val.length <= 1000 || 'Максимальная длина 1000 символов',
@@ -360,7 +362,7 @@ async function send() {
                                 @update:model-value="eventForMe ? evtUsers.add(me.profile.id) : evtUsers.delete(me.profile.id)"
                             />
                             <div class="flex flex-row gap-x-2">
-                                <q-btn icon="refresh" color="brand-danger opacity-[80%] !h-[56px]" @click="clearForm()">
+                                <q-btn :disable="!activeEvent" unelevated icon="refresh " class="text-brand-danger opacity-[80%] !h-[56px]" @click="clearForm()">
                                     <q-tooltip
                                     anchor="top middle"
                                     self="bottom middle"
