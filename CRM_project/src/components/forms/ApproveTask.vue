@@ -7,6 +7,7 @@ import { successNotify } from '@/components/Notifies'
 
 const emit = defineEmits(['update:visible', 'update-list'])
 const props = defineProps(['visible', 'body', 'user'])
+const tab = ref('comment')
 
 const visible = computed({
   get: () => props.visible,
@@ -19,6 +20,7 @@ const body = computed({
 
 const curStep = ref(body.value.steps.find(step => step.status !== St.APPROVED) ?? body.value.steps[0]);
 const step =  ref(body.value.steps.findIndex(step => step.user.id == props.user.profile.id))
+const isCreator = (type) => { return type === T.CREATOR }
 
 async function send(status) {
     form.value.status = status
@@ -107,69 +109,77 @@ onMounted(() => {
                     :title="s.user.fio"
                     :caption="s.status !== St.PROGRESS ? s.update_at : body.deadline"
                     icon="settings"
-                    :active-icon="s.status == St.PROGRESS ? 'fa-regular fa-edit' : 'fa-regular fa-eye'"
+                    :active-icon="s.status == St.PROGRESS ? 'fa-regular fa-edit' : 'fa-solid fa-info'"
                     :done-icon="s.status == St.APPROVED ? 'fa-solid fa-check' : 'fa-solid fa-xmark'"
                     :done-color="s.status == St.APPROVED ? 'brand-complete' : 'brand-danger'"
                     :active-color="s.status === St.PROGRESS ? 'brand-velvet' : s.status === St.APPROVED ? 'brand-complete' : 'brand-danger'"
                     :done="s.status == St.APPROVED || s.status == St.REJECTED"
                     :disable="s.status == St.PROGRESS && s.user.id != user.profile.id"
                 >
-                    <div class="flex flex-col px-8 gap-y-4">
+                    <div class="flex flex-col">
                         <template v-if="s.status !== St.PROGRESS">
-                            <div v-if="s.type === T.CREATOR" class="brand-description pb-2 max-h-[250px] overflow-y-auto mb-4">{{ body.description }}</div>
-                            <q-list class="pb-4" v-if="s.files.length > 0">
-                                <q-expansion-item
-                                        switch-toggle-side
-                                        header-class="brand-description"
-                                        label="Файлы"
-                                        >
-                                    <q-list class="!flex !flex-col !gap-y-2 w-full">
-                                        <q-item v-for="file in s.files" class="gap-x-2 !px-0 !items-center !flex-nowrap">
-                                            <q-icon :name="FI[file.title.split('.').pop()] || 'fa-regular fa-file'" size="md"/>
-                                            <span class="brand-text flex-grow text-ellipsis line-clamp-1">{{ file.title }}</span>
-                                            <span class="brand-text w-[15%]">{{ `${(file.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
-                                            <q-btn color="brand-wait" class="!w-[185px] brand-text" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile(file.id)"/>
-                                        </q-item>
-                                    </q-list>
-                                </q-expansion-item>
-                            </q-list>
-                            
-                            <div class="flex flex-col">
-                                <div class="pb-2 brand-title underline underline-offset-4">Комментарий</div>
-                                <div class="flex-grow brand-description max-h-[250px] overflow-y-auto">{{ s.comment }}</div>
-                            </div>
-                            <q-list v-if="s.type === T.CREATOR">
-                                <q-expansion-item
-                                    switch-toggle-side
-                                    header-class="brand-description"
-                                    label="История выполнения"
+                            <q-tabs
+                                v-model="tab"
+                                dense
+                                class="!w-2/3 brand-description"
+                                active-color="brand-velvet"
+                                indicator-color="brand-velvet"
+                                align="left"
+                                narrow-indicator
+                                >
+                                <q-tab name="details" class="brand-description" label="Описание" v-if="isCreator(s.type)"/>
+                                <q-tab name="comment" class="brand-description" label="Комментарий" />
+                                <q-tab name="files" class="brand-description" label="Файлы" v-if="s.files.length > 0"/>
+                                <q-tab name="history" class="brand-description" label="История" v-if="isCreator(s.type)  && body.history.length > 0"/>
+                            </q-tabs>
+
+                            <q-tab-panels
+                                class="!max-h-[65%] !min-h-[350px]"
+                                v-model="tab"
+                                transition-next="slide-left"
+                                transition-prev="slide-right"
+                                animated
+                            >
+                            <q-tab-panel name="details" class="brand-description overflow-y-auto" v-if="isCreator(s.type)">{{ body.description }}</q-tab-panel>
+                            <q-tab-panel name="comment" class="brand-description overflow-y-auto">{{ s.comment }}</q-tab-panel>
+                            <q-tab-panel name="files" v-if="s.files.length > 0">
+                                <q-list class="!flex !flex-col !gap-y-2 w-full">
+                                    <q-item v-for="file in s.files" class="gap-x-2 !px-0 !items-center !flex-nowrap">
+                                        <q-icon :name="file.title ? FI[file.title.split('.').pop()] : 'fa-regular fa-file'" size="md"/>
+                                        <span class="brand-text flex-grow text-ellipsis line-clamp-1">{{ file.title }}</span>
+                                        <span class="brand-text w-[15%]">{{ `${(file.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
+                                        <q-btn color="brand-wait" class="!w-[185px] brand-text" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile(file.id)"/>
+                                    </q-item>
+                                </q-list>
+                            </q-tab-panel>
+                            <q-tab-panel name="history" v-if="isCreator(s.type) && body.history.length > 0">
+                                <q-list>
+                                    <q-expansion-item
+                                        v-for="hs in body.history"
+                                        group="history steps"
+                                        :icon="hs.status == St.APPROVED ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark'"
+                                        :label="hs.user.init_name"
+                                        :caption="hs.update_at"
+                                        :header-class="hs.status == St.APPROVED ? 'text-positive text-lg' : 'text-negative text-lg'"
+                                        @click="() => {if(hs.files.length > 0) lazyLoad(hs)}"
                                     >
-                                    <div class="brand-description" v-for="his_step in body.history">
-                                        <div v-if="his_step.status !== St.PROGRESS">
-                                            <div>{{his_step.user.init_name}}</div>
-                                            <div><span>Комментарий: </span><br/>{{ his_step.comment }}</div>
-                                            <q-list class="pb-4" v-if="his_step.files.length > 0">
-                                                <q-expansion-item
-                                                        @click="() => {if(his_step.files.length > 0) lazyLoad(his_step)}"
-                                                        switch-toggle-side
-                                                        header-class="brand-description"
-                                                        label="Файлы"
-                                                        >
-                                                    <q-list class="!flex !flex-col !gap-y-2 w-full">
-                                                        <q-item v-for="hf in his_step.files" class="gap-x-2 !px-0 !items-center !flex-nowrap">
-                                                            <!-- <q-icon :name="FI[hf.title.split('.').pop()] || 'fa-regular fa-file'" size="md"/> -->
+                                        <q-card>
+                                        <q-card-section class="brand-description min-h-[150px]">{{ hs.comment }}</q-card-section>
+                                        <q-card-section>
+                                            <q-list>
+                                                <q-item v-for="hf in hs.files" class="gap-x-2 !px-0 !items-center !flex-nowrap">
+                                                            <q-icon :name="hf.title ? FI[hf.title.split('.').pop()] : 'fa-regular fa-file'" size="md"/>
                                                             <span class="brand-text flex-grow text-ellipsis line-clamp-1">{{ hf.title }}</span>
                                                             <span class="brand-text w-[15%]">{{ `${(hf.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
                                                             <q-btn color="brand-wait" class="!w-[185px] brand-text" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile(hf.id)"/>
-                                                        </q-item>
-                                                    </q-list>
-                                                </q-expansion-item>
+                                                </q-item>
                                             </q-list>
-                                        </div>
-                                        <q-separator/>
-                                    </div>
+                                        </q-card-section>
+                                    </q-card>
                                 </q-expansion-item>
-                            </q-list>
+                                </q-list>                                
+                            </q-tab-panel>
+                            </q-tab-panels>
                             
                             <div v-if="s.status == St.REJECTED && body.steps[0].user.id  == user.profile.id" class="flex flex-row flex-grow justify-between pt-2">
                                 <q-btn v-if="isReset != true" color="brand-danger" @click="" label="В архив" class="navigation-btn opacity-[80%] brand-description" />
