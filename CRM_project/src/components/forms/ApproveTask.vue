@@ -8,9 +8,6 @@ import { successNotify } from '@/components/Notifies'
 const emit = defineEmits(['update:visible', 'update-list'])
 const props = defineProps(['visible', 'body', 'user'])
 
-const curStep = ref(props.body.steps.find(step => step.status !== St.APPROVED) ?? props.body.steps[0]);
-const step =  ref(props.body.steps.findIndex(step => step.user.id == props.user.profile.id))
-
 const visible = computed({
   get: () => props.visible,
   set: val => emit('update:visible', val)
@@ -20,9 +17,12 @@ const body = computed({
     get:  () => props.body
 })
 
+const curStep = ref(body.value.steps.find(step => step.status !== St.APPROVED) ?? body.value.steps[0]);
+const step =  ref(body.value.steps.findIndex(step => step.user.id == props.user.profile.id))
+
 async function send(status) {
     form.value.status = status
-    form.value.step = props.body.steps[step.value].id
+    form.value.step = body.value.steps[step.value].id
 
     const fd = new FormData()
 
@@ -42,6 +42,19 @@ async function send(status) {
     }
 }
 
+const isReset = ref(false)
+const deadline = ref(body.value.deadline)
+
+async function reset(){
+    console.log(body.value)
+    let response = await axios.patch('/api/user/task/reset', {tid: body.value.id, deadline: deadline.value})
+
+    if (response.status == 200){
+        successNotify()
+        emit('update-list')
+    }
+}
+
 const form = ref({
     step: null,
     status: St.PROGRESS,
@@ -49,35 +62,27 @@ const form = ref({
     files: []
 })
 
-const files = ref(null)
-
-async function lazyLoad(index){
-    if(props.body.steps[index].status != St.PROGRESS)
-        files.value = (await axios.get(`/api/user/file?id=${props.body.steps[index].files}`)).data.data
+async function lazyLoad(step){
+    if(!step.files[0].title)
+        step.files = (await axios.get(`/api/user/file?id=${step.files}`)).data.data
 }
 
 watch(step, (newVal, oldVal) => {
-    if(props.body.steps[newVal].files.length > 0)
-        lazyLoad(newVal)
-    else
-        files.value = null
+    if(body.value.steps[newVal].files.length > 0)
+        lazyLoad(body.value.steps[newVal])
 })
 
 watch(() => props.body, (newBody) => {
-    curStep.value = props.body.steps.find(step => step.status !== St.APPROVED) ?? props.body.steps[0];
-    step.value =  props.body.steps.findIndex(step => step.user.id == props.user.profile.id)
-    if(props.body.steps[step.value].files.length > 0)
-        lazyLoad(step.value)
-    else
-        files.value = null
+    body.value = newBody
+    curStep.value = newBody.steps.find(step => step.status !== St.APPROVED) ?? newBody.steps[0];
+    step.value =  newBody.steps.findIndex(step => step.user.id == props.user.profile.id)
+    if(body.value.steps[step.value].files.length > 0)
+        lazyLoad(body.value.steps[step.value])
 })
 
 onMounted(() => {
-    if(props.body.steps[step.value].files.length > 0)
-        lazyLoad(step.value)
-    else
-        files.value = null
-
+    if(body.value.steps[step.value].files.length > 0)
+        lazyLoad(body.value.steps[step.value])
 })
 
 </script>
@@ -112,23 +117,101 @@ onMounted(() => {
                     <div class="flex flex-col px-8 gap-y-4">
                         <template v-if="s.status !== St.PROGRESS">
                             <div v-if="s.type === T.CREATOR" class="brand-description pb-2 max-h-[250px] overflow-y-auto mb-4">{{ body.description }}</div>
-                            <div class="flex flex-row gap-x-4 pb-4">
-                                <q-list class="!flex !flex-col !gap-y-2 w-full">
-                                    <q-item v-for="file in files" class="gap-x-2 !px-0 !items-center !flex-nowrap">
-                                        <q-icon :name="FI[file.title.split('.').pop()] || 'fa-regular fa-file'" size="md"/>
-                                        <span class="brand-text flex-grow text-ellipsis line-clamp-1">{{ file.title }}</span>
-                                        <span class="brand-text w-[15%]">{{ `${(file.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
-                                        <q-btn color="brand-wait" class="!w-[185px] brand-text" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile(file.id)"/>
-                                    </q-item>
-                                </q-list>
-                            </div>
+                            <q-list class="pb-4" v-if="s.files.length > 0">
+                                <q-expansion-item
+                                        switch-toggle-side
+                                        header-class="brand-description"
+                                        label="Файлы"
+                                        >
+                                    <q-list class="!flex !flex-col !gap-y-2 w-full">
+                                        <q-item v-for="file in s.files" class="gap-x-2 !px-0 !items-center !flex-nowrap">
+                                            <q-icon :name="FI[file.title.split('.').pop()] || 'fa-regular fa-file'" size="md"/>
+                                            <span class="brand-text flex-grow text-ellipsis line-clamp-1">{{ file.title }}</span>
+                                            <span class="brand-text w-[15%]">{{ `${(file.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
+                                            <q-btn color="brand-wait" class="!w-[185px] brand-text" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile(file.id)"/>
+                                        </q-item>
+                                    </q-list>
+                                </q-expansion-item>
+                            </q-list>
+                            
                             <div class="flex flex-col">
                                 <div class="pb-2 brand-title underline underline-offset-4">Комментарий</div>
                                 <div class="flex-grow brand-description max-h-[250px] overflow-y-auto">{{ s.comment }}</div>
                             </div>
-                            <div v-if="s.status == St.REJECTED && body.steps[0].user.id  == user.profile.id" class="flex flex-row flex-grow justify-between">
-                                <q-btn color="brand-danger" @click="" label="В архив" class="navigation-btn opacity-[80%] brand-description" />
-                                <q-btn color="brand-velvet" @click="" label="Сбросить задачу" class="navigation-btn brand-description" />
+                            <q-list v-if="s.type === T.CREATOR">
+                                <q-expansion-item
+                                    switch-toggle-side
+                                    header-class="brand-description"
+                                    label="История выполнения"
+                                    >
+                                    <div class="brand-description" v-for="his_step in body.history">
+                                        <div v-if="his_step.status !== St.PROGRESS">
+                                            <div>{{his_step.user.init_name}}</div>
+                                            <div><span>Комментарий: </span><br/>{{ his_step.comment }}</div>
+                                            <q-list class="pb-4" v-if="his_step.files.length > 0">
+                                                <q-expansion-item
+                                                        @click="() => {if(his_step.files.length > 0) lazyLoad(his_step)}"
+                                                        switch-toggle-side
+                                                        header-class="brand-description"
+                                                        label="Файлы"
+                                                        >
+                                                    <q-list class="!flex !flex-col !gap-y-2 w-full">
+                                                        <q-item v-for="hf in his_step.files" class="gap-x-2 !px-0 !items-center !flex-nowrap">
+                                                            <!-- <q-icon :name="FI[hf.title.split('.').pop()] || 'fa-regular fa-file'" size="md"/> -->
+                                                            <span class="brand-text flex-grow text-ellipsis line-clamp-1">{{ hf.title }}</span>
+                                                            <span class="brand-text w-[15%]">{{ `${(hf.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
+                                                            <q-btn color="brand-wait" class="!w-[185px] brand-text" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile(hf.id)"/>
+                                                        </q-item>
+                                                    </q-list>
+                                                </q-expansion-item>
+                                            </q-list>
+                                        </div>
+                                        <q-separator/>
+                                    </div>
+                                </q-expansion-item>
+                            </q-list>
+                            
+                            <div v-if="s.status == St.REJECTED && body.steps[0].user.id  == user.profile.id" class="flex flex-row flex-grow justify-between pt-2">
+                                <q-btn v-if="isReset != true" color="brand-danger" @click="" label="В архив" class="navigation-btn opacity-[80%] brand-description" />
+                                <q-btn v-if="isReset != true" color="brand-velvet" @click="isReset = true" label="Сбросить задачу" class="navigation-btn brand-description" />
+                                <q-form @submit.prevent="reset" v-if="isReset == true" class="flex flex-row w-full gap-x-2">
+                                    <q-btn unelevated icon="fa-solid fa-arrow-left" class="text-brand-danger opacity-[80%] !h-[56px]" @click="isReset=false">
+                                        <q-tooltip
+                                            anchor="top middle"
+                                            self="bottom middle"
+                                            :offset="[10, 10]"
+                                            max-width="200px"
+                                            class="!text-sm text-center bg-brand-danger opacity-[80%]"
+                                        >
+                                            Вернуться назад
+                                        </q-tooltip>
+                                    </q-btn>
+                                    <q-input
+                                        label="Новый срок выполнения"
+                                        class="flex-grow"
+                                        v-model="deadline"
+                                        required
+                                        
+                                        outlined
+                                        :rules="[val => !val || val.length > 0 || 'Обязательное поле']"
+                                    >
+                                        <template v-slot:append>
+                                            <q-icon name="event" color="brand-velvet">
+                                                <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                                    <q-date
+                                                        v-model="deadline"
+                                                        minimal
+                                                        mask="DD.MM.YYYY"
+                                                        class="brand-description"
+                                                        >
+                                                        <q-btn class="flex flex-row brand-description" v-close-popup label="Закрыть" flat/>
+                                                    </q-date>
+                                                </q-popup-proxy>
+                                            </q-icon>
+                                        </template>
+                                    </q-input>
+                                    <q-btn type="submit" class="brand-description !h-[56px]" color="brand-velvet" label="Принять"/>
+                                </q-form>
                             </div>
                         </template>
                         <template v-else-if="s.type === T.EXECUTOR && s.status !== St.APPROVED">
