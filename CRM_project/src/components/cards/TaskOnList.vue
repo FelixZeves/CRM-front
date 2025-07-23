@@ -19,10 +19,9 @@ const btn = ref({
   [T.CREATOR]: 'Ознакомиться'
 })
 
-const files = ref(null)
-
-async function lazyLoad(){
-  files.value = (await axios.get(`/api/user/file?id=${props.body.steps[0].files}`)).data.data
+async function lazyLoad(step){
+    if(!step.files[0].title)
+        step.files = (await axios.get(`/api/user/file?id=${step.files}`)).data.data
 }
 </script>
 
@@ -66,7 +65,7 @@ async function lazyLoad(){
         >
           <q-tab name="main" class="brand-description" label="Основная" />
           <q-tab name="details" class="brand-description" label="Дополнительная" />
-          <q-tab v-if="Array.isArray(body.steps[0].files) && body.steps[0].files.length > 0" name="files" label="файлы" @click="lazyLoad()"/>
+          <q-tab v-if="Array.isArray(body.steps[0].files) && body.steps[0].files.length > 0" name="files" label="файлы" @click="lazyLoad(body.steps[0])"/>
         </q-tabs>
 
         <q-tab-panels
@@ -88,7 +87,7 @@ async function lazyLoad(){
 
           <q-tab-panel name="files" class="overflow-y-auto">
             <q-list class="!flex !flex-col !gap-y-2">
-              <q-item v-for="file in files" class="gap-x-2 !px-0 !items-center">
+              <q-item v-for="file in body.steps[0].files" class="gap-x-2 !px-0 !items-center">
                 <q-icon :name="FI[file.title.split('.').pop()] || 'fa-regular fa-file'" size="md"/>
                 <span class="brand-description flex-grow text-ellipsis line-clamp-1">{{ file.title }}</span>
                 <span class="brand-description w-[10%]">{{ `${(file.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
