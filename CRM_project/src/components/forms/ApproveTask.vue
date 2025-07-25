@@ -48,7 +48,6 @@ const isReset = ref(false)
 const deadline = ref(body.value.deadline)
 
 async function reset(){
-    console.log(body.value)
     let response = await axios.patch('/api/user/task/reset', {tid: body.value.id, deadline: deadline.value})
 
     if (response.status == 200){

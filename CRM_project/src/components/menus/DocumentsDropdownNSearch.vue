@@ -49,6 +49,16 @@ onMounted(async () => {role.value = (await getMe()).data.role})
                     <q-item-label>Нормативные документы</q-item-label>
                   </q-item-section>
                 </q-item>
+                <q-item clickable v-close-popup @click="onTypeClick('Сметы')">
+                  <q-item-section>
+                    <q-item-label>Сметы</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item clickable v-close-popup @click="onTypeClick('Заявления')">
+                  <q-item-section>
+                    <q-item-label>Заявления</q-item-label>
+                  </q-item-section>
+                </q-item>
               </q-list>
             </q-btn-dropdown>
       

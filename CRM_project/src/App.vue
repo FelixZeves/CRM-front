@@ -32,6 +32,14 @@
   background: #825AFF !important;
 }
 
+.text-brand-grey {
+  color: #F2F2F2 !important;
+}
+
+.bg-brand-grey {
+  background: #F2F2F2 !important
+}
+
 .q-table thead tr th {
   @apply !text-lg text-stone-800 !font-semibold !z-10 !sticky top-0 !bg-white
 }

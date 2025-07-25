@@ -14,9 +14,9 @@ export async function getDepartments(id = null){
     return (await axios.get(url)).data
 }
 
-export async function getTasks(limit = null){
+export async function getTasks(limit = null, params = {}){
     let url = '/api/user/task'
-    let tasks = (await axios.get(url)).data.data
+    let tasks = (await axios.get(url, { params })).data.data
     for (const task of tasks) {
         const currentStep = task.steps.find(step => step.status !== StatusEnum_.APPROVED)
 

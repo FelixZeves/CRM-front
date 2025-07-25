@@ -14,8 +14,11 @@ const user = ref()
 
 onMounted(async () => {user.value = (await axios.get('/api/user/me')).data; await updateList()})
 
-async function updateList() {
-    tasks.value = await getTasks()
+const filterParams = ref({})
+
+async function updateList(params = {}) {
+    filterParams.value = params;
+    tasks.value = await getTasks(null, filterParams.value);
 }
 </script>
 
@@ -30,7 +33,7 @@ async function updateList() {
 
         <main class="flex flex-grow h-[80vh]">
             <div class="flex-grow">
-                <TasksDropdown @show-dialog="visible = true"></TasksDropdown>
+                <TasksDropdown @show-dialog="visible = true" @apply-filters="updateList"></TasksDropdown>
                 <TasksList @update-list="updateList" :tasks="tasks" :user="user"/>
                 <AddTask v-model:visible="visible" @update-list="updateList" :me="user"></AddTask>
             </div>
