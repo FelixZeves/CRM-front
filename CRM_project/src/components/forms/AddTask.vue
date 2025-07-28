@@ -1,8 +1,8 @@
 <script setup>
 import axios from 'axios'
-import { computed, ref, onMounted } from 'vue'
-import { DocEnum as D, RoleEnum_ as R} from '@/components/Enums.vue'
-import { getFormSchema, getToday, getMe } from '@/components/Utils.js'
+import { computed, ref } from 'vue'
+import { DocEnum as D, PlaceDirectorEnum, PlaceEnum, RoleEnum_ as R} from '@/components/Enums.vue'
+import { getFormSchema, getToday } from '@/components/Utils.js'
 import { successNotify } from '@/components/Notifies'
 
 const props = defineProps(['visible', 'body', 'me'])
@@ -17,6 +17,9 @@ const evtUsers = ref(new Set())
 
 const today = getToday();
 const date = ref({ from: today, to: today });
+
+const placeOptions = Object.values(PlaceEnum);
+const directorOptions = Object.values(PlaceDirectorEnum)
 
 const task = ref({
     title: '',
@@ -257,6 +260,7 @@ async function send() {
                                 v-model="task.files"
                                 label="Прикрепить файлы"
                                 outlined
+                                hide-bottom-space
                                 bg-color="brand-wait"
                                 :rules="[
                                             val => !val || val.length <= 5 || 'Достигнут лимит в 5 файлов. Объедините их в zip архив',
@@ -277,7 +281,7 @@ async function send() {
                             <q-select
                                 v-if="task.type == D.ORDER"
                                 label="Исполнитель (-и)"
-                                class="w-full"
+                                class="w-full pb-5"
                                 outlined
                                 emit-value
                                 map-options
@@ -321,17 +325,28 @@ async function send() {
                             />
                             <q-select
                                 v-if="task.type == D.APPLICATION"
-                                label="Отделы"
+                                label="Образовательное пространство"
                                 class="w-full"
                                 outlined
                                 emit-value
                                 map-options
                                 clearable
-                                multiple
-                                :options="departmentOptions"
+                                :options="placeOptions"
                                 :option-label="'title'"
                                 :option-value="'id'"
-                                @focus="lazyLoad"
+                                v-model="task.executors"
+                            />
+                            <q-select
+                                v-if="task.type == D.APPLICATION"
+                                label="Получатель"
+                                class="w-full"
+                                outlined
+                                emit-value
+                                map-options
+                                clearable
+                                :options="directorOptions"
+                                :option-label="'title'"
+                                :option-value="'id'"
                                 v-model="task.executors"
                             />
                         </div>
