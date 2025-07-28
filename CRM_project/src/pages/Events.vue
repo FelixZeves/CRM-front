@@ -9,8 +9,12 @@ import { getEvents } from  '@/components/Utils.js';
 const events = ref([])
 const visible = ref(false)
 
-async function updateList() {
-    await getEvents().then(response => {
+const filterParams = ref({})
+
+async function updateList(params = {}) {
+    filterParams.value = params;
+    console.log(filterParams.value)
+    await getEvents(null, filterParams.value).then(response => {
         events.value = response.data.data
     })
 }
@@ -29,19 +33,10 @@ updateList()
 
         <main class="flex flex-grow h-[80vh]">
             <div class="flex-grow">
-                <EventsDropdown @show-dialog="visible = true"></EventsDropdown>
-                <Suspense>
-                    <EventsList :events="events" @update-list="updateList"/>
-                    <template #fallbkack>
-                        <div>
-                            Загрузка информации
-                        </div>
-                    </template>
-                </Suspense>
+                <EventsDropdown @show-dialog="visible = true" @apply-filters="updateList"></EventsDropdown>
+                <EventsList :events="events" @update-list="updateList"/>
                 <AddEvent v-model:visible='visible' @update-list="updateList"/>
             </div>
         </main>
     </div>
-
-
 </template>

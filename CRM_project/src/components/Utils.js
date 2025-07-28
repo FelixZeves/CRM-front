@@ -28,14 +28,15 @@ export async function getTasks(limit = null, params = {}){
     return tasks
 }
 
-export async function getEvents(limit = null){
+export async function getEvents(limit = null, params = {}){
+    let url = '/api/user/event'
     try{
         let response
         if(limit != null){
-            response = (await axios.get(`/api/user/event?limit=${limit}`))
+            response = (await axios.get(`${url}?limit=${limit}`))
         }
         else {
-            response = await axios.get('/api/user/event')
+            response = await axios.get(url, { params })
         }
         return response
     } catch (error) {

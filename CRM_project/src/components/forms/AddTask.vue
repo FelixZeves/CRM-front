@@ -326,7 +326,7 @@ async function send() {
                             <q-select
                                 v-if="task.type == D.APPLICATION"
                                 label="Образовательное пространство"
-                                class="w-full"
+                                class="w-full pb-5"
                                 outlined
                                 emit-value
                                 map-options

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, toRaw } from 'vue';
+import { onMounted, ref, toRaw } from 'vue';
 import { getEvents } from '@/components/Utils';
 
 const events = ref()
@@ -28,10 +28,11 @@ async function parseEvents(){
 
     return result
 }
+const attrs = ref([])
 
-events.value = await parseEvents()
-
-let attrs = ref([
+onMounted(async () => {
+    events.value = await parseEvents()
+    attrs.value = [
     ...toRaw(events.value),
     {
         key: 'today',
@@ -41,7 +42,10 @@ let attrs = ref([
         label: 'Сегодня',
         }
     }
-])
+    ]
+})
+
+
 
 
 </script>

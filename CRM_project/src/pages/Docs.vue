@@ -9,8 +9,9 @@ import AddDoc from '@/components/forms/AddDoc.vue';
 const docs = ref([])
 const visible = ref(false)
 
-async function updateList() {
-    docs.value = (await axios.get('/api/user/file')).data.data
+async function updateList(params = {}) {
+    let url =  '/api/user/file'
+    docs.value = (await axios.get(url,  { params } )).data.data
 }
 
 onMounted(async () => {updateList()})
@@ -27,7 +28,7 @@ onMounted(async () => {updateList()})
 
         <main class="flex flex-grow h-[80vh]">
             <div class="flex-grow">
-                <DocumentsDropdownNSearch @show-dialog="visible = true"></DocumentsDropdownNSearch>
+                <DocumentsDropdownNSearch @show-dialog="visible = true" @apply-filters="updateList"></DocumentsDropdownNSearch>
                 <AddDoc v-model:visible='visible' @update-list="updateList"></AddDoc>
                 <DocumentsList :docs="docs"/>
             </div>

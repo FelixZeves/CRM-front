@@ -3,11 +3,15 @@ import { ref, computed } from 'vue'
 import { getDepartments, getFormSchema} from '@/components/Utils'
 import axios from 'axios'
 import { successNotify } from '@/components/Notifies'
+import { FileFocusEnum, FileTypeEnum } from '../Enums.vue'
 
 const props = defineProps(['visible'])
 const emit = defineEmits(['update:visible', 'update-list'])
 
 const buffOptions = ref([])
+const typesOptions = Object.values(FileTypeEnum);
+const focusOptions = Object.values(FileFocusEnum)
+
 const form = ref(getFormSchema('file'));
 
 const visible = computed({
@@ -39,11 +43,12 @@ async function lazyLoad() {
         <q-card class="text-black !rounded-[15pt] !flex !w-[90vw] !min-w-[55%]">
             <q-form @submit="send" class="bg-tile p-5 !flex flex-row w-full h-full gap-2">
 
-                <q-card-section class="flex flex-col w-[55%] gap-y-4">
+                <q-card-section class="flex flex-col w-[55%] gap-y-6">
                     <q-input
                         label="Название документа"
                         v-model="form.title"
                         outlined
+                        hide-bottom-space
                         type="text"
                         class="brand-description"
                         :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
@@ -53,7 +58,7 @@ async function lazyLoad() {
                             v-model="form.body"
                             label="Прикрепите файл"
                             outlined
-                            hide-bottom-space=""
+                            hide-bottom-space
                             bg-color="brand-wait"
                             clearable
                             accept=".pdf, .jpg, .png, .docx, .pptx, .xlsx, .txt, .zip"
@@ -72,11 +77,6 @@ async function lazyLoad() {
                             v-model="form.permanent"
                         />
                     </div>
-                    
-                    
-                </q-card-section>
-
-                <q-card-section class="flex flex-col gap-y-4 flex-grow">
                     <q-select
                         label="Отделы"
                         emit-value
@@ -91,14 +91,32 @@ async function lazyLoad() {
                         @focus="lazyLoad"
                         hint="Чтобы файл был доступен всем, оставьте поле пустым"
                     />
+                    
+                </q-card-section>
+
+                <q-card-section class="flex flex-col gap-y-6 flex-grow">
+                    
                     <q-select
+                        class="brand-description"
                         v-model="form.tags"
                         outlined
-                        use-chips
+                        clearable
+                        label="Тип"
+                        :options="typesOptions"
+                        :option-label="'id'"
+                        :option-value="'id'"
+                    />
+                    <q-select
+                        class="brand-description"
+                        v-model="form.tags"
+                        outlined
+                        clearable
                         label="Направленность"
-
-                        />
-                    <q-btn label="Создать" class="brand-description" type="submit" color="brand-velvet"/>
+                        :options="focusOptions"
+                        :option-label="'id'"
+                        :option-value="'id'"
+                    />
+                    <q-btn label="Создать" class="brand-description !h-[56px]" type="submit" color="brand-velvet"/>
                 </q-card-section>
             </q-form>
         </q-card>

@@ -21,9 +21,7 @@ onMounted(() => {checkPass()})
             </div>
 
             <div class="flex flex-col gap-y-8 flex-grow w-[35%] flex-shrink-0">
-                <Suspense>
-                    <CRMCalendar/>
-                </Suspense>
+                <CRMCalendar/>
                 <EventsTile/>
             </div>
         </main>

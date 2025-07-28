@@ -4,7 +4,7 @@ import { DocEnum, StatusEnum_ as St } from '@/components/Enums.vue'
 
 const emit = defineEmits(['show-dialog', 'apply-filters'])
 
-const sortFilters = ref ({status: {key: null, label: "Все статусы"}, deadline: {key: "desc", label:'Сначала новые', icon: 'fa-solid fa-arrow-down'}, is_creator: {key: null, label: "Все создатели"}, type: {key: null, label: "Все типы"}})
+const sortFilters = ref ({status: {key: null, label: "Все статусы"}, sort: {key: "desc", label:'Сначала новые', icon: 'fa-solid fa-arrow-down'}, is_creator: {key: null, label: "Все создатели"}, type: {key: null, label: "Все типы"}})
 
 function filterChanging(filter, val){
   sortFilters.value[filter] = val
@@ -86,18 +86,18 @@ function applyFilters() {
             color="brand-grey"
             text-color="black">
               <template v-slot:label>
-                <span class="text-start">{{ sortFilters.deadline.label }}</span>
-                <q-icon class="flex-grow" :name="sortFilters.deadline.icon" size="14px" />
+                <span class="text-start">{{ sortFilters.sort.label }}</span>
+                <q-icon class="flex-grow" :name="sortFilters.sort.icon" size="14px" />
               </template>
               <q-list>
-                <q-item clickable v-close-popup @click="filterChanging('deadline', {key: 'desc', label:'Сначала новые', icon: 'fa-solid fa-arrow-down'})">
+                <q-item clickable v-close-popup @click="filterChanging('sort', {key: 'desc', label:'Сначала новые', icon: 'fa-solid fa-arrow-down'})">
                   <q-item-section class="!flex !flex-row items-center">
                     <q-item-label class="brand-description pe-4">Сначала новые</q-item-label>
                     <q-icon name="fa-solid fa-arrow-down"/>
                   </q-item-section>
                 </q-item>
 
-                <q-item clickable v-close-popup @click="filterChanging('deadline', {key: 'asc', label:'Сначала старые', icon: 'fa-solid fa-arrow-up'})">
+                <q-item clickable v-close-popup @click="filterChanging('sort', {key: 'asc', label:'Сначала старые', icon: 'fa-solid fa-arrow-up'})">
                   <q-item-section class="!flex !flex-row items-center">
                     <q-item-label class="brand-description pe-4">Сначала старые</q-item-label>
                     <q-icon name="fa-solid fa-arrow-up"/>
