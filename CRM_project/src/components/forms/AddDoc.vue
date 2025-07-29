@@ -9,7 +9,7 @@ const props = defineProps(['visible'])
 const emit = defineEmits(['update:visible', 'update-list'])
 
 const buffOptions = ref([])
-const typesOptions = Object.values(FileTypeEnum);
+const typesOptions = Object.values(FileTypeEnum)
 const focusOptions = Object.values(FileFocusEnum)
 
 const form = ref(getFormSchema('file'));
@@ -103,8 +103,6 @@ async function lazyLoad() {
                         clearable
                         label="Тип"
                         :options="typesOptions"
-                        :option-label="'id'"
-                        :option-value="'id'"
                     />
                     <q-select
                         class="brand-description"
@@ -113,8 +111,6 @@ async function lazyLoad() {
                         clearable
                         label="Направленность"
                         :options="focusOptions"
-                        :option-label="'id'"
-                        :option-value="'id'"
                     />
                     <q-btn label="Создать" class="brand-description !h-[56px]" type="submit" color="brand-velvet"/>
                 </q-card-section>

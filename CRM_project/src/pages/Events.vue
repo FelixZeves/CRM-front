@@ -13,7 +13,6 @@ const filterParams = ref({})
 
 async function updateList(params = {}) {
     filterParams.value = params;
-    console.log(filterParams.value)
     await getEvents(null, filterParams.value).then(response => {
         events.value = response.data.data
     })

@@ -1,15 +1,17 @@
 <script setup>
 import {onMounted, ref} from 'vue'
 import { getMe } from '@/components/Utils';
-import { RoleEnum_ as R} from '@/components/Enums.vue';
+import { RoleEnum_ as R, FileTypeEnum, FileFocusEnum} from '@/components/Enums.vue';
 
 const emit = defineEmits(['show-dialog', 'apply-filters']);
-const focusesFilter = ref("Любая направленность")
 const role = ref(null)
 
 const searchText =ref("")
 
-const sortFilters = ref({type: {key: null, label: "Все документы"}, sort: {key: "desc", label:'Сначала новые', icon: 'fa-solid fa-arrow-down'}, focus: {key: null, label: "Все мероприятия"}, this_year: {key: false}})
+const typesOptions = Object.values(FileTypeEnum)
+const focusOptions = Object.values(FileFocusEnum)
+
+const sortFilters = ref({type: {key: "Все документы"}, sort: {key: "desc", label:'Сначала новые', icon: 'fa-solid fa-arrow-down'}, focus: {key: "Все направления"}, this_year: {key: false}})
 
 function filterChanging(filter, val){
   sortFilters.value[filter] = val
@@ -54,34 +56,17 @@ onMounted(async () => {role.value = (await getMe()).data.role})
                   text-color="black"
                 >
                   <template v-slot:label>
-                    <span class="text-start flex-grow">{{ sortFilters.type.label }}</span>
+                    <span class="text-start flex-grow">{{ sortFilters.type.key }}</span>
                   </template>
                   <q-list class="brand-description">
-                    <q-item clickable v-close-popup @click="filterChanging('type', {key: null, label: 'Все документы'})">
+                    <q-item clickable v-close-popup @click="filterChanging('type', {key: 'Все документы'})">
                       <q-item-section>
                         <q-item-label>Все документы</q-item-label>
                       </q-item-section>
                     </q-item>
-          
-                    <q-item clickable v-close-popup @click="filterChanging('type', {key: 'Приказы', label: 'Приказы'})">
+                    <q-item v-for="type in typesOptions" clickable v-close-popup @click="filterChanging('type', {key: type})">
                       <q-item-section>
-                        <q-item-label>Приказы</q-item-label>
-                      </q-item-section>
-                    </q-item>
-            
-                    <q-item clickable v-close-popup @click="filterChanging('type', {key: 'Нормативные документы', label: 'Нормативные документы'})">
-                      <q-item-section>
-                        <q-item-label>Нормативные документы</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                    <q-item clickable v-close-popup @click="filterChanging('type', {key: 'Сметы', label: 'Сметы'})">
-                      <q-item-section>
-                        <q-item-label>Сметы</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                    <q-item clickable v-close-popup @click="filterChanging('type', {key: 'Заявления', label: 'Заявления'})">
-                      <q-item-section>
-                        <q-item-label>Заявления</q-item-label>
+                        <q-item-label>{{ type }}</q-item-label>
                       </q-item-section>
                     </q-item>
                   </q-list>
@@ -126,48 +111,18 @@ onMounted(async () => {role.value = (await getMe()).data.role})
                   text-color="black"
                 >
                   <template v-slot:label>
-                    <span class="text-start flex-grow">{{ sortFilters.focus.label }}</span>
+                    <span class="text-start flex-grow">{{ sortFilters.focus.key }}</span>
                   </template>
                   <q-list class="brand-description">
-                    <q-item clickable v-close-popup @click="filterChanging('focus', {key: null, label: 'Любая направленность'})">
+                    <q-item clickable v-close-popup @click="filterChanging('focus', {key: 'Все направления'})">
                       <q-item-section>
-                        <q-item-label>Любая направленность</q-item-label>
-                      </q-item-section>
-                    </q-item>
-          
-                    <q-item clickable v-close-popup @click="filterChanging('focus', {key: 'Образование', label: 'Образование'})">
-                      <q-item-section>
-                        <q-item-label>Образование</q-item-label>
-                      </q-item-section>
-                    </q-item>
-            
-                    <q-item clickable v-close-popup @click="filterChanging('focus', {key: 'Отчётность', label: 'Отчётность'})">
-                      <q-item-section>
-                        <q-item-label>Отчётность</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                    
-                    <q-item clickable v-close-popup @click="filterChanging('focus', {key: 'Финансы', label: 'Финансы'})">
-                      <q-item-section>
-                        <q-item-label>Финансы</q-item-label>
+                        <q-item-label>Все направления</q-item-label>
                       </q-item-section>
                     </q-item>
 
-                    <q-item clickable v-close-popup @click="filterChanging('focus', {key: 'Кадровая служба', label: 'Кадровая служба'})">
+                    <q-item v-for="type in focusOptions" clickable v-close-popup @click="filterChanging('focus', {key: type})">
                       <q-item-section>
-                        <q-item-label>Кадровая служба</q-item-label>
-                      </q-item-section>
-                    </q-item>
-
-                    <q-item clickable v-close-popup @click="filterChanging('focus', {key: 'Договоры', label: 'Договоры'})">
-                      <q-item-section>
-                        <q-item-label>Договоры</q-item-label>
-                      </q-item-section>
-                    </q-item>
-
-                    <q-item clickable v-close-popup @click="filterChanging('focus', {key: 'МТ часть', label: 'МТ часть'})">
-                      <q-item-section>
-                        <q-item-label>МТ часть</q-item-label>
+                        <q-item-label>{{ type }}</q-item-label>
                       </q-item-section>
                     </q-item>
                   </q-list>

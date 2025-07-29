@@ -73,19 +73,19 @@ export const PlaceDirectorEnum = Object.freeze({
 })
 
 export const FileTypeEnum = Object.freeze({
-    ORDER: {id: 'Приказы'},
-    REGULATORY: {id: 'Нормативные документы'},
-    ESTIMATES: {id: 'Сметы'},
-    STATEMENTS: {id: 'Заявления'}
+    ORDER: 'Приказы',
+    REGULATORY: 'Нормативные документы',
+    ESTIMATES: 'Сметы',
+    STATEMENTS: 'Заявления'
 })
 
 export const FileFocusEnum = Object.freeze({
-    EDUCATION: {id: 'Образование'},
-    REPORTING: {id: 'Отчётность'},
-    FINANCE: {id: 'Финансы'},
-    PERSONNEL: {id: 'Кадровая часть'},
-    CONTRACTS: {id: 'Договоры'},
-    MT_PART: {id: 'МТ часть'},
+    EDUCATION: 'Образование',
+    REPORTING: 'Отчётность',
+    FINANCE: 'Финансы',
+    PERSONNEL: 'Кадровая часть',
+    CONTRACTS: 'Договоры',
+    MT_PART: 'МТ часть',
 })
 
 export const fileIconsEnum = Object.freeze({
