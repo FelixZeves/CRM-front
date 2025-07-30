@@ -26,7 +26,7 @@ async function lazyLoad(step){
 </script>
 
 <template>
-    <q-card class="flex flex-col flex-grow bg-white mx-2 my-2 pt-3 pb-5 px-5 !min-h-[250px] !max-h-[600px] !flex-nowrap">
+    <q-card class="!flex !flex-col !flex-grow bg-white mx-2 my-2 pt-3 pb-5 px-5 !min-h-[250px] !max-h-[600px] !flex-nowrap">
         <div class="flex flex-row w-[70%] justify-between">
             <span class="lg:text-lg 2xl:text-xl font-bold text-sm lg:text-base 2xl:text-lg mb-2">{{ body.title }}</span>
             <div v-if="user.role != R.TEACHER">

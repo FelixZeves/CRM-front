@@ -53,6 +53,27 @@ export const DocEnum=Object.freeze({
     MEMO: 2
 })
 
+export const TaskDocEnum = Object.freeze({
+    All: {key: null, title: 'Все типы'},
+    ORDER: {key: DocEnum.ORDER, title: 'Задачи'},
+    APPLICATION: {key: DocEnum.APPLICATION, title: 'Заявки'},
+    MEMO: {key: DocEnum.MEMO, title: 'Служебные записки'}
+})
+
+export const TaskStatusEnum  = Object.freeze({
+    ALL: {key: null, title: 'Все статусы'},
+    IN_WORK: {key: StatusEnum_.PROGRESS, title: 'В работе'},
+    EXPIRED: {key: null, title: 'Просрочено'},
+    REJECTED: {key: StatusEnum_.REJECTED, title: 'Отклонено'},
+    COMPLETED: {key: StatusEnum_.APPROVED, title: 'Выполнено'},
+})
+
+export const CreatorEnum = Object.freeze({
+    ALL: {key : null, title: 'Все создатели'},
+    ME: {key: true, title: 'Созданные мной'},
+    NOT_ME: {key: false, title: 'Созданные другими'}
+})
+
 export const PlaceEnum = Object.freeze({
     ASSEMBLY: {id: 1, title: 'Актовый зал (1 этаж)'},
     FORUM: {id: 2, title: 'Форум-зона (1 этаж)'},
@@ -83,7 +104,7 @@ export const FileFocusEnum = Object.freeze({
     EDUCATION: 'Образование',
     REPORTING: 'Отчётность',
     FINANCE: 'Финансы',
-    PERSONNEL: 'Кадровая часть',
+    PERSONNEL: 'Кадровая служба',
     CONTRACTS: 'Договоры',
     MT_PART: 'МТ часть',
 })

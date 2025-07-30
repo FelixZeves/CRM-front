@@ -1,10 +1,14 @@
 <script setup>
 import {ref} from 'vue'
-import { DocEnum, StatusEnum_ as St } from '@/components/Enums.vue'
+import { CreatorEnum, DocEnum, StatusEnum_ as St, TaskDocEnum, TaskStatusEnum } from '@/components/Enums.vue'
 
 const emit = defineEmits(['show-dialog', 'apply-filters'])
 
-const sortFilters = ref ({status: {key: null, label: "Все статусы"}, sort: {key: "desc", label:'Сначала новые', icon: 'fa-solid fa-arrow-down'}, is_creator: {key: null, label: "Все создатели"}, type: {key: null, label: "Все типы"}})
+const taskStatuses = Object.values(TaskStatusEnum)
+const creators = Object.values(CreatorEnum)
+const types = Object.values(TaskDocEnum)
+
+const sortFilters = ref ({status: {key: null, title: "Все статусы"}, sort: {key: "desc", title:'Сначала новые', icon: 'fa-solid fa-arrow-down'}, is_creator: {key: null, title: "Все создатели"}, type: {key: null, title: "Все типы"}})
 
 function filterChanging(filter, val){
   sortFilters.value[filter] = val
@@ -44,36 +48,12 @@ function applyFilters() {
             color="brand-grey"
             text-color="black">
               <template v-slot:label>
-                <span class="text-start flex-grow">{{ sortFilters.status.label }}</span>
+                <span class="text-start flex-grow">{{ sortFilters.status.title }}</span>
               </template>
               <q-list class="brand-description">
-                <q-item clickable v-close-popup @click="filterChanging('status', {key: null, label: 'Все статусы'})">
+                <q-item v-for="status in taskStatuses" clickable v-close-popup @click="filterChanging('status', status)">
                   <q-item-section>
-                    <q-item-label>Все статусы</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item clickable v-close-popup @click="filterChanging('status', {key: St.PROGRESS, label: 'В работе'})">
-                  <q-item-section>
-                    <q-item-label>В работе</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item clickable v-close-popup @click="filterChanging('status', {key: null, label: 'Просрочено'})">
-                  <q-item-section>
-                    <q-item-label>Просрочено</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item clickable v-close-popup @click="filterChanging('status', {key: St.REJECTED, label: 'Отклонено'})">
-                  <q-item-section>
-                    <q-item-label>Отклонено</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item clickable v-close-popup @click="filterChanging('status', {key: St.APPROVED, label: 'Выполнено'})">
-                  <q-item-section>
-                    <q-item-label>Выполнено</q-item-label>
+                    <q-item-label>{{ status.title }}</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -86,19 +66,19 @@ function applyFilters() {
             color="brand-grey"
             text-color="black">
               <template v-slot:label>
-                <span class="text-start">{{ sortFilters.sort.label }}</span>
+                <span class="text-start">{{ sortFilters.sort.title }}</span>
                 <q-icon class="flex-grow" :name="sortFilters.sort.icon" size="14px" />
               </template>
               <q-list>
-                <q-item clickable v-close-popup @click="filterChanging('sort', {key: 'desc', label:'Сначала новые', icon: 'fa-solid fa-arrow-down'})">
-                  <q-item-section class="!flex !flex-row items-center">
-                    <q-item-label class="brand-description pe-4">Сначала новые</q-item-label>
+                <q-item clickable v-close-popup @click="filterChanging('sort', {key: 'desc', title:'Сначала новые', icon: 'fa-solid fa-arrow-down'})">
+                  <q-item-section class="!flex !flex-row items-center !justify-start">
+                    <q-item-label class="brand-description pe-[25px]">Сначала новые</q-item-label>
                     <q-icon name="fa-solid fa-arrow-down"/>
                   </q-item-section>
                 </q-item>
 
-                <q-item clickable v-close-popup @click="filterChanging('sort', {key: 'asc', label:'Сначала старые', icon: 'fa-solid fa-arrow-up'})">
-                  <q-item-section class="!flex !flex-row items-center">
+                <q-item clickable v-close-popup @click="filterChanging('sort', {key: 'asc', title:'Сначала старые', icon: 'fa-solid fa-arrow-up'})">
+                  <q-item-section class="!flex !flex-row items-center !justify-start">
                     <q-item-label class="brand-description pe-4">Сначала старые</q-item-label>
                     <q-icon name="fa-solid fa-arrow-up"/>
                   </q-item-section>
@@ -115,24 +95,12 @@ function applyFilters() {
             color="brand-grey"
             text-color="black">
               <template v-slot:label>
-                <span class="text-start flex-grow">{{ sortFilters.is_creator.label }}</span>
+                <span class="text-start flex-grow">{{ sortFilters.is_creator.title }}</span>
               </template>
               <q-list class="brand-description">
-                <q-item clickable v-close-popup @click="filterChanging('is_creator', {key: null, label: 'Все создатели'})">
+                <q-item v-for="creator in creators" clickable v-close-popup @click="filterChanging('is_creator', creator)">
                   <q-item-section>
-                    <q-item-label>Все создатели</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item clickable v-close-popup @click="filterChanging('is_creator', {key: true, label: 'Поставленные мной'})">
-                  <q-item-section>
-                    <q-item-label>Поставленные мной</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item clickable v-close-popup @click="filterChanging('is_creator', {key: false, label: 'Полученные мной'})">
-                  <q-item-section>
-                    <q-item-label>Полученные мной</q-item-label>
+                    <q-item-label>{{creator.title}}</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -145,10 +113,15 @@ function applyFilters() {
             color="brand-grey"
             text-color="black">
             <template v-slot:label>
-                <span class="text-start flex-grow">{{ sortFilters.type.label }}</span>
+                <span class="text-start flex-grow">{{ sortFilters.type.title }}</span>
               </template>
               <q-list class="brand-description">
-                <q-item clickable v-close-popup @click="filterChanging('type', {key: null, label: 'Все типы'})">
+                <q-item v-for="type in types" clickable v-close-popup @click="filterChanging('type', type)">
+                  <q-item-section>
+                    <q-item-label>{{ type.title }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <!-- <q-item clickable v-close-popup @click="filterChanging('type', {key: null, label: 'Все типы'})">
                   <q-item-section>
                     <q-item-label>Все типы</q-item-label>
                   </q-item-section>
@@ -170,7 +143,7 @@ function applyFilters() {
                   <q-item-section>
                     <q-item-label>Заявки</q-item-label>
                   </q-item-section>
-                </q-item>
+                </q-item> -->
               </q-list>
             </q-btn-dropdown>
           </div>

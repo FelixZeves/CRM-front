@@ -1,9 +1,11 @@
 <script setup>
 import {ref} from 'vue'
+import { CreatorEnum } from '../Enums.vue';
 
 const emit = defineEmits(['show-dialog', 'apply-filters']);
 
-const sortFilters = ref ({sort: {key: "desc", label:'Сначала новые', icon: 'fa-solid fa-arrow-down'}, is_creator: {key: null, label: "Все мероприятия"}})
+const creators = Object.values(CreatorEnum)
+const sortFilters = ref ({sort: {key: "desc", label:'Сначала новые', icon: 'fa-solid fa-arrow-down'}, is_creator: {key: null, title: "Все мероприятия"}})
 
 function filterChanging(filter, val){
   sortFilters.value[filter] = val
@@ -31,24 +33,12 @@ function applyFilters() {
       <div class="flex flex-row items-center gap-x-5">
         <q-btn-dropdown class="brand-description !w-[240px]" color="white" text-color="black" :menu-offset="[0, 5]">
           <template v-slot:label>
-            <span class="text-start flex-grow">{{ sortFilters.is_creator.label }}</span>
+            <span class="text-start flex-grow">{{ sortFilters.is_creator.title }}</span>
           </template>
           <q-list class="brand-description">
-            <q-item clickable v-close-popup @click="filterChanging('is_creator', {key: null, label: 'Все мероприятия'})">
+            <q-item v-for="creator in creators" clickable v-close-popup @click="filterChanging('is_creator', creator)">
               <q-item-section>
-                <q-item-label>Все создатели</q-item-label>
-              </q-item-section>
-            </q-item>
-
-            <q-item clickable v-close-popup @click="filterChanging('is_creator', {key: true, label: 'Созданные мной'})">
-              <q-item-section>
-                <q-item-label>Созданные мной</q-item-label>
-              </q-item-section>
-            </q-item>
-
-            <q-item clickable v-close-popup @click="filterChanging('is_creator', {key: false, label: 'Созданные другими'})">
-              <q-item-section>
-                <q-item-label>Созданные другими</q-item-label>
+                <q-item-label>{{creator.title}}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>

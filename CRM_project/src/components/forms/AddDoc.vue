@@ -25,8 +25,10 @@ async function send() {
     fd.append('title', form.value.title)
     fd.append('body', form.value.body)
     fd.append('permanent', form.value.permanent)
+    fd.append('tags', form.value.type)
+    fd.append('tags', form.value.focus)
     form.value.departments.forEach(dep => fd.append('departments', dep))
-    form.value.tags.forEach(tag => fd.append('tags', tag))
+    
 
     let response = await axios.post('/api/user/file/upload?target=department', fd, {headers: {'Content-Type': 'multipart/form-data'}})
     if (response.status == 200) successNotify()
@@ -46,6 +48,7 @@ async function lazyLoad() {
                 <q-card-section class="flex flex-col w-[55%] gap-y-6">
                     <q-input
                         label="Название документа"
+                        required
                         v-model="form.title"
                         outlined
                         hide-bottom-space
@@ -57,6 +60,7 @@ async function lazyLoad() {
                         <q-file
                             v-model="form.body"
                             label="Прикрепите файл"
+                            required
                             outlined
                             hide-bottom-space
                             bg-color="brand-wait"
@@ -97,16 +101,20 @@ async function lazyLoad() {
                 <q-card-section class="flex flex-col gap-y-6 flex-grow">
                     
                     <q-select
-                        class="brand-description"
-                        v-model="form.tags"
+                        popup-content-class="brand-description"
+                        input-class="brand-description"
+                        required
+                        v-model="form.type"
                         outlined
                         clearable
                         label="Тип"
                         :options="typesOptions"
                     />
                     <q-select
-                        class="brand-description"
-                        v-model="form.tags"
+                        popup-content-class="brand-description"
+                        input-class="brand-description"
+                        required
+                        v-model="form.focus"
                         outlined
                         clearable
                         label="Направленность"

@@ -131,7 +131,8 @@ export function getFormSchema(name) {
             title: '',
             body: [],
             permanent: false,
-            tags: [],
+            type: null,
+            focus: null,
             departments: []
         }
     };

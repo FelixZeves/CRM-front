@@ -19,7 +19,7 @@ const emit = defineEmits(['update-list']);
             :place="event.place"
             :id="event.id">
         </EventOnList>
-        <div v-else class="justify-self-center text-2xl mt-12">
+        <div v-else class="justify-self-center brand-title mt-12">
             Мероприятий нет
         </div>
    
