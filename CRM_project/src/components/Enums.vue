@@ -102,7 +102,7 @@ export const FileTypeEnum = Object.freeze({
 
 export const FileFocusEnum = Object.freeze({
     EDUCATION: 'Образование',
-    REPORTING: 'Отчётность',
+    REPORTING: 'Отчетность',
     FINANCE: 'Финансы',
     PERSONNEL: 'Кадровая служба',
     CONTRACTS: 'Договоры',

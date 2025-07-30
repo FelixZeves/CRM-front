@@ -21,12 +21,12 @@ const buildQueryParams = () => {
   const params = {};
   params['sort'] = sortFilters.value.sort.key
   params['this_year'] = sortFilters.value.this_year.key
-  params['tags'] = []
+  params['tags'] = Array()
   if(sortFilters.value.type.key != null && sortFilters.value.type.key != "Все документы")
     params['tags'].push(sortFilters.value.type.key)
   if(sortFilters.value.focus.key != null && sortFilters.value.focus.key != "Все направления")
     params['tags'].push(sortFilters.value.focus.key)
-  console.log(params)
+  params['tags'] = params['tags'].join(',');
   return params;
 }
 
@@ -125,9 +125,9 @@ onMounted(async () => {role.value = (await getMe()).data.role})
                       </q-item-section>
                     </q-item>
 
-                    <q-item v-for="type in focusOptions" clickable v-close-popup @click="filterChanging('focus', {key: type})">
+                    <q-item v-for="focus in focusOptions" clickable v-close-popup @click="filterChanging('focus', {key: focus})">
                       <q-item-section>
-                        <q-item-label>{{ type }}</q-item-label>
+                        <q-item-label>{{ focus }}</q-item-label>
                       </q-item-section>
                     </q-item>
                   </q-list>
