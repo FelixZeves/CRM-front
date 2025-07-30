@@ -25,7 +25,7 @@ onMounted(async () => {await getUser()})
 <template>
     <div class="!flex !flex-col p-4 bg-[--crm-c-dark-velvet] rounded-[15pt] min-h-[80vh] justify-between">
 
-        <div class="flex flex-col gap-y-4 items-center">
+        <div class="flex flex-col gap-y-3 items-center">
             <q-btn :to="{name: 'Office'}" flat>
             <div class="flex flex-col items-center">
                 <q-img src="@\assets\worker-photo.jpg" class="!rounded-full" width="90%" height="90%"></q-img>
