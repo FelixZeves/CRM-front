@@ -27,8 +27,8 @@ onMounted(async () => {await getUser()})
 
         <div class="flex flex-col gap-y-4 items-center">
             <q-btn :to="{name: 'Office'}" flat>
-            <div class="flex flex-col">
-                <q-img src="@\assets\worker-photo.jpg" class="!rounded-full"></q-img>
+            <div class="flex flex-col items-center">
+                <q-img src="@\assets\worker-photo.jpg" class="!rounded-full" width="90%" height="90%"></q-img>
                 <span class="brand-description !font-bold mt-2" :class="section == 'Office' ? 'text-brand-wait' : 'text-white'">{{ fio }}</span>
             </div>
             </q-btn>
