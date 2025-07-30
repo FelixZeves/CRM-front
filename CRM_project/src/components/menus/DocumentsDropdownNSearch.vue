@@ -21,7 +21,12 @@ const buildQueryParams = () => {
   const params = {};
   params['sort'] = sortFilters.value.sort.key
   params['this_year'] = sortFilters.value.this_year.key
-  params['tags'] = [sortFilters.value.type.key, sortFilters.value.focus.key]
+  params['tags'] = []
+  if(sortFilters.value.type.key != null && sortFilters.value.type.key != "Все документы")
+    params['tags'].push(sortFilters.value.type.key)
+  if(sortFilters.value.focus.key != null && sortFilters.value.focus.key != "Все направления")
+    params['tags'].push(sortFilters.value.focus.key)
+  console.log(params)
   return params;
 }
 

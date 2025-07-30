@@ -16,7 +16,7 @@ const extension = props.body.title.split('.').pop();
                 <div class="flex flex-col px-4 !max-w-[90%] !min-w-[90%]">
                     <div class="brand-title !max-w-full text-ellipsis line-clamp-2 pb-4">{{ body.title }}</div>
                     <div class="flex flex-row justify-end">
-                        <q-chip v-for="tag in body.tags" clickable outline square class="brand-text" :label="tag.title"/>
+                        <q-chip v-for="tag in body.tags" clickable outline square class="brand-text" :label="tag"/>
                         <q-chip outline square class="brand-text" :label="body.create_at"></q-chip>
                     </div>
                 </div>
