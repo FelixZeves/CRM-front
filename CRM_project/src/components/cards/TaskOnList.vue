@@ -23,6 +23,11 @@ async function lazyLoad(step){
     if(!step.files[0].title)
         step.files = (await axios.get(`/api/user/file?id=${step.files}`)).data.data
 }
+
+function applyFilters() {
+  const params = {id: props.body.ref}
+  emit('update-list', params)
+}
 </script>
 
 <template>
@@ -30,6 +35,17 @@ async function lazyLoad(step){
         <div class="flex flex-row w-[70%] justify-between">
             <span class="lg:text-lg 2xl:text-xl font-bold text-sm lg:text-base 2xl:text-lg mb-2">{{ body.title }}</span>
             <div v-if="user.role != R.TEACHER">
+              <q-chip v-if="body.ref != null" dense square clickable @click="applyFilters" size="lg" color="white" text-color="grey-7">
+                <q-icon name="fa-regular fa-file-lines" size="20px"></q-icon>
+                <q-tooltip
+                anchor="top left"
+                self="bottom right"
+                :offset="[-5, 5]"
+                class="!text-sm text-center bg-white !text-stone-700 shadow-xl"
+                >
+                Найти оригинал
+                </q-tooltip>
+              </q-chip>
               <q-chip dense square clickable @click="visibleAdd = true" size="lg" color="white" text-color="grey-7">
                 <q-icon name="fa-regular fa-copy"></q-icon>
                 <q-tooltip

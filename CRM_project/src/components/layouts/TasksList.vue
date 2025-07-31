@@ -1,16 +1,23 @@
 <script setup>
+import { ref } from 'vue'
 import TaskOnList from '@/components/cards/TaskOnList.vue';
 
 const props = defineProps(['tasks', 'user'])
 const emit = defineEmits(['update-list'])
 
+const filterParams = ref({})
+
+async function throwId(params = {}) {
+    filterParams.value = params;
+    emit('update-list', filterParams.value)
+}
 </script>
 
 <template>
     <q-list class="h-[72vh] overflow-y-auto !justify-self-center !w-full">
         <q-item v-if="tasks.length > 0" v-for="task in tasks">
             <TaskOnList
-                @update-list="emit('update-list')"
+                @update-list="throwId"
                 :key="task.id" 
                 :body="task"
                 :user="user"
