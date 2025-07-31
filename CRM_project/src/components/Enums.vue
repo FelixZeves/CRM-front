@@ -14,17 +14,18 @@ export const RoleEnum_ = Object.freeze({
     TEACHER: 3
 })
 
-export const TypesEnum=Object.freeze({
-    'execute': {translation: "Ожидает выполнения"},
-    'agree': {translation: "Ожидает согласования"},
-    'accept': {translation: "Ожидает проверки"},
-    'completed': {translation: "Выполнено"},
-})
-
 export const StatusEnum=Object.freeze({
     0: {description: "Задача ожидает выполнения", color: "!bg-[--crm-c-light-yellow]", textColor: "text-black"},
     1: {description: "Задача отклонена", color: "!bg-[--crm-c-danger]", textColor: "text-white"},
-    2: {description: "Задача выполенена", color: "!bg-[--crm-c-complete]", textColor: "text-white"}
+    2: {description: "Задача выполенена", color: "!bg-[--crm-c-complete]", textColor: "text-white"},
+    3: {description: "Задача просрочена", color: "!bg-[--crm-c-danger]", textColor: "text-white"}
+})
+
+export const StatusEnum_ = Object.freeze({
+    PROGRESS: 0,
+    REJECTED: 1,
+    APPROVED: 2,
+    EXPIRED: 3
 })
 
 export const TaskTypeEnum = Object.freeze({
@@ -41,11 +42,6 @@ export const TaskTypeEnum_ = Object.freeze({
     3: 'CREATOR'
 })
 
-export const StatusEnum_ = Object.freeze({
-    PROGRESS: 0,
-    REJECTED: 1,
-    APPROVED: 2
-})
 
 export const DocEnum=Object.freeze({
     ORDER: 0,

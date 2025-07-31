@@ -1,6 +1,6 @@
 <script setup>
 import {ref} from 'vue'
-import { CreatorEnum, DocEnum, StatusEnum_ as St, TaskDocEnum, TaskStatusEnum } from '@/components/Enums.vue'
+import { CreatorEnum, TaskDocEnum, TaskStatusEnum } from '@/components/Enums.vue'
 
 const emit = defineEmits(['show-dialog', 'apply-filters'])
 
@@ -121,29 +121,6 @@ function applyFilters() {
                     <q-item-label>{{ type.title }}</q-item-label>
                   </q-item-section>
                 </q-item>
-                <!-- <q-item clickable v-close-popup @click="filterChanging('type', {key: null, label: 'Все типы'})">
-                  <q-item-section>
-                    <q-item-label>Все типы</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item clickable v-close-popup @click="filterChanging('type', {key: DocEnum.ORDER, label: 'Задачи'})">
-                  <q-item-section>
-                    <q-item-label>Задачи</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item clickable v-close-popup @click="filterChanging('type', {key: DocEnum.MEMO, label: 'Служебные записки'})">
-                  <q-item-section>
-                    <q-item-label>Служебные записки</q-item-label>
-                  </q-item-section>
-                </q-item>
-
-                <q-item clickable v-close-popup @click="filterChanging('type', {key: DocEnum.APPLICATION, label: 'Заявки'})">
-                  <q-item-section>
-                    <q-item-label>Заявки</q-item-label>
-                  </q-item-section>
-                </q-item> -->
               </q-list>
             </q-btn-dropdown>
           </div>

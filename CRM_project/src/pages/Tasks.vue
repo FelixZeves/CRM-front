@@ -5,7 +5,6 @@ import { ref, onMounted } from 'vue'
 import TasksList from '@/components/layouts/TasksList.vue';
 import TasksDropdown from '@/components/menus/TasksDropdown.vue';
 import AddTask from '@/components/forms/AddTask.vue';
-import { StatusEnum_ } from '@/components/Enums.vue';
 import { getTasks } from '@/components/Utils';
 
 const visible = ref(false)
