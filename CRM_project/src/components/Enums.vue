@@ -59,7 +59,7 @@ export const TaskDocEnum = Object.freeze({
 export const TaskStatusEnum  = Object.freeze({
     ALL: {key: null, title: 'Все статусы'},
     IN_WORK: {key: StatusEnum_.PROGRESS, title: 'В работе'},
-    EXPIRED: {key: null, title: 'Просрочено'},
+    EXPIRED: {key: StatusEnum_.EXPIRED, title: 'Просрочено'},
     REJECTED: {key: StatusEnum_.REJECTED, title: 'Отклонено'},
     COMPLETED: {key: StatusEnum_.APPROVED, title: 'Выполнено'},
 })
