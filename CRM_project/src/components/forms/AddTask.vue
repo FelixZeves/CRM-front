@@ -26,6 +26,7 @@ const task = ref({
     description: '',
     comment:  '',
     deadline: today,
+    ref: null,
     files: [],
     executors: [],
     reviewers: [],
@@ -38,6 +39,7 @@ if (props.body){
     task.value.description = props.body.description
     task.value.deadline = props.body.deadline
     task.value.type = D.ORDER
+    task.value.ref = props.body.id
 }
 
 const event = ref(getFormSchema('event'));
@@ -140,7 +142,7 @@ async function lazyLoad() {
 async function send() {
     const fd = new FormData()
 
-    for (const key of ['title', 'description', 'comment', 'deadline', 'type'])
+    for (const key of ['title', 'description', 'comment', 'deadline', 'type', 'ref'])
         fd.append(key, task.value[key])
 
     for (const key of ['files', 'executors', 'reviewers', 'checkers'])
