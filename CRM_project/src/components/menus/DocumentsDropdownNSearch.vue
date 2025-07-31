@@ -174,7 +174,5 @@ onMounted(async () => {role.value = (await getMe()).data.role})
           @click="$emit('show-dialog')">
           </q-btn>
         </div>
-        
-
     </div>
   </template>

@@ -26,7 +26,7 @@ get()
                             <div class="brand-description overflow-hidden text-ellipsis line-clamp-2"> {{ task.description }} </div>
                         </div>
                         <div class="w-[25%] text-end pe-2">
-                            <div class="brand-text">{{ task.steps[0].user.init_name }}</div>
+                            <div class="brand-text">{{ task.active[0].user.init_name }}</div>
                             <div class="brand-text">{{ task.deadline }}</div>
                         </div>
                     </q-card-section>

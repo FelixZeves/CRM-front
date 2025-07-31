@@ -18,13 +18,13 @@ const body = computed({
     get:  () => props.body
 })
 
-const curStep = ref(body.value.steps.find(step => step.status !== St.APPROVED) ?? body.value.steps[0]);
-const step =  ref(body.value.steps.findIndex(step => step.user.id == props.user.profile.id))
+const curStep = ref(body.value.active.find(step => step.status !== St.APPROVED) ?? body.value.active[0]);
+const step =  ref(body.value.active.findIndex(step => step.user.id == props.user.profile.id))
 const isCreator = (type) => { return type === T.CREATOR }
 
 async function send(status) {
     form.value.status = status
-    form.value.step = body.value.steps[step.value].id
+    form.value.step = body.value.active[step.value].id
 
     const fd = new FormData()
 
@@ -69,21 +69,21 @@ async function lazyLoad(step){
 }
 
 watch(step, (newVal, oldVal) => {
-    if(body.value.steps[newVal].files.length > 0)
-        lazyLoad(body.value.steps[newVal])
+    if(body.value.active[newVal].files.length > 0)
+        lazyLoad(body.value.active[newVal])
 })
 
 watch(() => props.body, (newBody) => {
     body.value = newBody
-    curStep.value = newBody.steps.find(step => step.status !== St.APPROVED) ?? newBody.steps[0];
-    step.value =  newBody.steps.findIndex(step => step.user.id == props.user.profile.id)
-    if(body.value.steps[step.value].files.length > 0)
-        lazyLoad(body.value.steps[step.value])
+    curStep.value = newBody.active.find(step => step.status !== St.APPROVED) ?? newBody.active[0];
+    step.value =  newBody.active.findIndex(step => step.user.id == props.user.profile.id)
+    if(body.value.active[step.value].files.length > 0)
+        lazyLoad(body.value.active[step.value])
 })
 
 onMounted(() => {
-    if(body.value.steps[step.value].files.length > 0)
-        lazyLoad(body.value.steps[step.value])
+    if(body.value.active[step.value].files.length > 0)
+        lazyLoad(body.value.active[step.value])
 })
 
 </script>
@@ -103,7 +103,7 @@ onMounted(() => {
                     animated
                 >
                 <q-step
-                    v-for="(s, index) in body.steps"
+                    v-for="(s, index) in body.active"
                     :name="index"
                     :title="s.user.fio"
                     :caption="s.status !== St.PROGRESS ? s.update_at : body.deadline"
@@ -180,7 +180,7 @@ onMounted(() => {
                             </q-tab-panel>
                             </q-tab-panels>
                             
-                            <div v-if="s.status == St.REJECTED && body.steps[0].user.id  == user.profile.id" class="flex flex-row flex-grow justify-between pt-2">
+                            <div v-if="s.status == St.REJECTED && body.active[0].user.id  == user.profile.id" class="flex flex-row flex-grow justify-between pt-2">
                                 <q-btn v-if="isReset != true" color="brand-danger" @click="" label="В архив" class="navigation-btn opacity-[80%] brand-description" />
                                 <q-btn v-if="isReset != true" color="brand-velvet" @click="isReset = true" label="Сбросить задачу" class="navigation-btn brand-description" />
                                 <q-form @submit.prevent="reset" v-if="isReset == true" class="flex flex-row w-full gap-x-2">

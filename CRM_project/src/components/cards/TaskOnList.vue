@@ -11,7 +11,7 @@ const emit = defineEmits(['update-list'])
 const tab = ref('main')
 const visibleApprove = ref(false)
 const visibleAdd = ref(false)
-const me =  ref(props.body.steps.find(step => step.user.id == props.user.profile.id))
+const me =  ref(props.body.active.find(step => step.user.id == props.user.profile.id))
 const btn = ref({
   [T.EXECUTOR]: 'Отчитаться',
   [T.REVIEWER]: 'Согласовать',
@@ -65,7 +65,7 @@ async function lazyLoad(step){
         >
           <q-tab name="main" class="brand-description" label="Основная" />
           <q-tab name="details" class="brand-description" label="Дополнительная" />
-          <q-tab v-if="Array.isArray(body.steps[0].files) && body.steps[0].files.length > 0" name="files" label="файлы" @click="lazyLoad(body.steps[0])"/>
+          <q-tab v-if="Array.isArray(body.active[0].files) && body.active[0].files.length > 0" name="files" label="файлы" @click="lazyLoad(body.active[0])"/>
         </q-tabs>
 
         <q-tab-panels
@@ -76,18 +76,18 @@ async function lazyLoad(step){
         animated>
           <q-tab-panel name="main">
             
-            <p class="brand-text m-0 justify-self-end text-end pb-4"><span>Получена: {{ body.steps[0].update_at }} <br/> <span>Срок: {{ body.deadline }}</span> </span></p>
+            <p class="brand-text m-0 justify-self-end text-end pb-4"><span>Получена: {{ body.active[0].update_at }} <br/> <span>Срок: {{ body.deadline }}</span> </span></p>
             <div class="brand-description text-pretty text-ellipsis line-clamp-2">{{ body.description }}</div>
           </q-tab-panel>
 
           <q-tab-panel name="details" class="overflow-y-auto">
-            <p class="brand-text m-0 justify-self-end text-end pb-4"><span class="brand-text">Поставил(а) задачу: </span> <br/>{{ body.steps[0].user.fio }}</p>
-            <p class="brand-description">{{ body.steps[0].comment }}</p>
+            <p class="brand-text m-0 justify-self-end text-end pb-4"><span class="brand-text">Поставил(а) задачу: </span> <br/>{{ body.active[0].user.fio }}</p>
+            <p class="brand-description">{{ body.active[0].comment }}</p>
           </q-tab-panel>
 
           <q-tab-panel name="files" class="overflow-y-auto">
             <q-list class="!flex !flex-col !gap-y-2">
-              <q-item v-for="file in body.steps[0].files" class="gap-x-2 !px-0 !items-center">
+              <q-item v-for="file in body.active[0].files" class="gap-x-2 !px-0 !items-center">
                 <q-icon :name="FI[file.title.split('.').pop()] || 'fa-regular fa-file'" size="md"/>
                 <span class="brand-description flex-grow text-ellipsis line-clamp-1">{{ file.title }}</span>
                 <span class="brand-description w-[10%]">{{ `${(file.size / (1024 * 1024)).toFixed(2)}MB` }}</span>

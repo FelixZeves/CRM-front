@@ -17,14 +17,6 @@ export async function getDepartments(id = null){
 export async function getTasks(limit = null, params = {}){
     let url = '/api/user/task'
     let tasks = (await axios.get(url, { params })).data.data
-    for (const task of tasks) {
-        const currentStep = task.steps.find(step => step.status !== StatusEnum_.APPROVED)
-
-        if (currentStep)
-            task.status = currentStep.status
-        else
-            task.status = StatusEnum_.APPROVED
-    }
     return tasks
 }
 
