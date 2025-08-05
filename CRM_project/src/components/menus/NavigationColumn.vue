@@ -58,9 +58,9 @@ onMounted(async () => {await getUser()})
             label="Документы"/>
             <q-btn 
             flat
-            disable
-            class="cursor-not-allowed brand-description"
+            class="brand-description"
             label="Архив"
+            :to="{name : 'Archive'}"
             :class="section == 'Archive' ? 'text-brand-wait' : 'text-white'"/>
             <q-btn
             v-if="role == 0"

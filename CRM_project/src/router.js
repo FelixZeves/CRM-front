@@ -7,6 +7,7 @@ import PasswordChangingPage from './pages/_PasswordChangingPage.vue'
 import TasksPage from './pages/Tasks.vue'
 import EventsPage from './pages/Events.vue'
 import DocumentsPage from './pages/Docs.vue'
+import Archive from './pages/Archive.vue'
 
 const routes = [
   { path: '/', name: 'Authorization', component: AuthorizationPage },
@@ -16,6 +17,7 @@ const routes = [
   { path: '/Office/Tasks', name: 'Tasks', component: TasksPage},
   { path: '/Office/Events', name: 'Events', component: EventsPage},
   { path: '/Office/Documents', name: 'Documents', component: DocumentsPage},
+  { path: '/Office/Archive', name: 'Archive', component: Archive}
 ]
 
 const router = createRouter({
