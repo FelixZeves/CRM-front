@@ -51,7 +51,17 @@ async function reset(){
     let response = await axios.patch('/api/user/task/reset', {tid: body.value.id, deadline: deadline.value})
 
     if (response.status == 200){
-        successNotify()
+        successNotify('Задача перезапущена')
+        emit('update-list')
+    }
+}
+
+async function toArchive(){
+    console.log(props.body)
+    let response = await axios.put(`/api/user/task/archive/${props.body.id}`)
+
+    if (response.status == 200){
+        successNotify('Задача отправлена в архив')
         emit('update-list')
     }
 }
@@ -180,8 +190,8 @@ onMounted(() => {
                             </q-tab-panel>
                             </q-tab-panels>
                             
-                            <div v-if="s.status == St.REJECTED && body.active[0].user.id  == user.profile.id" class="flex flex-row flex-grow justify-between pt-2">
-                                <q-btn v-if="isReset != true" color="brand-danger" @click="" label="В архив" class="navigation-btn opacity-[80%] brand-description" />
+                            <div v-if="s.status == St.REJECTED && body.active[0].user.id  == user.profile.id && body.is_archive != true" class="flex flex-row flex-grow justify-between pt-2">
+                                <q-btn v-if="isReset != true" color="brand-danger" @click="toArchive" label="В архив" class="navigation-btn opacity-[80%] brand-description" />
                                 <q-btn v-if="isReset != true" color="brand-velvet" @click="isReset = true" label="Сбросить задачу" class="navigation-btn brand-description" />
                                 <q-form @submit.prevent="reset" v-if="isReset == true" class="flex flex-row w-full gap-x-2">
                                     <q-btn unelevated icon="fa-solid fa-arrow-left" class="text-brand-danger opacity-[80%] !h-[56px]" @click="isReset=false">
@@ -221,6 +231,11 @@ onMounted(() => {
                                     </q-input>
                                     <q-btn type="submit" class="brand-description !h-[56px]" color="brand-velvet" label="Принять"/>
                                 </q-form>
+                            </div>
+
+                            <div v-if="body.status == St.APPROVED && body.active[0].user.id  == user.profile.id && index == (body.active.length - 1) && body.is_archive != true" class="flex flex-row flex-grow justify-between pt-2">
+                                <q-btn color="brand-danger" v-close-popup  @click="" label="Удалить" class="navigation-btn opacity-[80%] brand-description" />
+                                <q-btn color="brand-velvet" v-close-popup @click="toArchive" label="В архив" class="navigation-btn brand-description" />
                             </div>
                         </template>
                         <template v-else-if="s.type === T.EXECUTOR && s.status !== St.APPROVED">
@@ -284,7 +299,7 @@ onMounted(() => {
                             >
                             <template v-slot:append><q-icon name="attach_file" /></template>
                             </q-file>
-                            <div class="flex flex-row flex-grow justify-between">
+                            <div class="flex flex-row flex-grow justify-between pt-2">
                                 <q-btn color="brand-danger" @click="send(St.REJECTED)" label="Отклонить" class="navigation-btn opacity-[80%] brand-description" />
                                 <q-btn color="brand-velvet" @click="send(St.APPROVED)" :label="s.type == T.REVIEWER ? 'Согласовать' : 'Утвердить'" class="navigation-btn brand-description" />
                             </div>

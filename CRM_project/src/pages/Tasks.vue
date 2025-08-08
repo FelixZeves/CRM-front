@@ -17,7 +17,7 @@ const filterParams = ref({})
 
 async function updateList(params = {}) {
     filterParams.value = params;
-    tasks.value = await getTasks(null, filterParams.value)
+    tasks.value = await getTasks(null, false, filterParams.value)
 }
 </script>
 

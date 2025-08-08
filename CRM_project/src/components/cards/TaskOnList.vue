@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import ApproveTaskForm from '@/components/forms/ApproveTask.vue'
-import { TaskTypeEnum as T, StatusEnum as S, RoleEnum_ as R, fileIconsEnum as FI} from '@/components/Enums.vue'
+import { TaskTypeEnum as T, StatusEnum as S, StatusEnum_ as St, RoleEnum_ as R, fileIconsEnum as FI} from '@/components/Enums.vue'
 import AddTask from '../forms/AddTask.vue'
 import axios from 'axios'
 import { downloadFile } from '../Utils'
@@ -113,7 +113,8 @@ function applyFilters() {
           </q-tab-panel>
         </q-tab-panels>
         <div class="flex flex-row justify-end items-center mt-7">
-          <q-btn :label="btn[me.type]" @click="visibleApprove = true" class="brand-text" color="brand-velvet"/>
+          <q-btn v-if="me.status == St.PROGRESS || body.is_archive == false" :label="btn[me.type]" @click="visibleApprove = true" class="brand-text" color="brand-velvet"/>
+          <q-btn v-else :label="btn[T.CREATOR]" @click="visibleApprove = true" class="brand-text" color="brand-velvet"/>
         </div>
     </q-card>
     <ApproveTaskForm 

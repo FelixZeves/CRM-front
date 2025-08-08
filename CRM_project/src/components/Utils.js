@@ -14,9 +14,10 @@ export async function getDepartments(id = null){
     return (await axios.get(url)).data
 }
 
-export async function getTasks(limit = null, params = {}){
+export async function getTasks(limit = null, is_archive = false, params = {}) {
     let url = '/api/user/task'
-    let tasks = (await axios.get(url, { params })).data.data
+    let query = { ...params, is_archive }
+    let tasks = (await axios.get(url, { params: query })).data.data
     return tasks
 }
 
