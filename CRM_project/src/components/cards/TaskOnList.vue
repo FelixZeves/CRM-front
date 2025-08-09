@@ -113,7 +113,7 @@ function applyFilters() {
           </q-tab-panel>
         </q-tab-panels>
         <div class="flex flex-row justify-end items-center mt-7">
-          <q-btn v-if="me.status == St.PROGRESS || body.is_archive == false" :label="btn[me.type]" @click="visibleApprove = true" class="brand-text" color="brand-velvet"/>
+          <q-btn v-if="me.status in [St.PROGRESS, St.EXPIRED]" :label="btn[me.type]" @click="visibleApprove = true" class="brand-text" color="brand-velvet"/>
           <q-btn v-else :label="btn[T.CREATOR]" @click="visibleApprove = true" class="brand-text" color="brand-velvet"/>
         </div>
     </q-card>
