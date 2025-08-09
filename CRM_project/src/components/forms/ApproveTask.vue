@@ -3,11 +3,12 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { StatusEnum_ as St, TaskTypeEnum as T, fileIconsEnum as FI} from '@/components/Enums.vue'
 import axios from 'axios'
 import { downloadFile } from '@/components/Utils'
-import { successNotify } from '@/components/Notifies'
+import { confirmNotify, successNotify } from '@/components/Notifies'
 
 const emit = defineEmits(['update:visible', 'update-list'])
 const props = defineProps(['visible', 'body', 'user'])
 const tab = ref('comment')
+const url = '/api/user/task'
 
 const visible = computed({
   get: () => props.visible,
@@ -36,7 +37,7 @@ async function send(status) {
     for (const key of ['files'])
         form.value[key].forEach(elem => fd.append(key, elem))
 
-    let response = await axios.put('/api/user/task/approve', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+    let response = await axios.put(`${url}/approve`, fd, {headers: {'Content-Type': 'multipart/form-data'}})
 
     if (response.status == 200){
         successNotify()
@@ -48,7 +49,7 @@ const isReset = ref(false)
 const deadline = ref(body.value.deadline)
 
 async function reset(){
-    let response = await axios.patch('/api/user/task/reset', {tid: body.value.id, deadline: deadline.value})
+    let response = await axios.patch(`${url}/reset`, {tid: body.value.id, deadline: deadline.value})
 
     if (response.status == 200){
         successNotify('Задача перезапущена')
@@ -57,11 +58,21 @@ async function reset(){
 }
 
 async function toArchive(){
-    console.log(props.body)
-    let response = await axios.put(`/api/user/task/archive/${props.body.id}`)
+    let response = await axios.put(`${url}/archive/${props.body.id}`)
 
     if (response.status == 200){
         successNotify('Задача отправлена в архив')
+        visible.value = false
+        emit('update-list')
+    }
+}
+
+async function deleteTask(){
+    let response = await axios.delete(`${url}/${props.body.id}`)
+
+    if (response.status == 200){
+        successNotify('Задача удалена')
+        visible.value = false
         emit('update-list')
     }
 }
@@ -191,7 +202,8 @@ onMounted(() => {
                             </q-tab-panels>
                             
                             <div v-if="s.status == St.REJECTED && body.active[0].user.id  == user.profile.id && body.is_archive != true" class="flex flex-row flex-grow justify-between pt-2">
-                                <q-btn v-if="isReset != true" color="brand-danger" @click="toArchive" label="В архив" class="navigation-btn opacity-[80%] brand-description" />
+                                <q-btn v-if="isReset != true" color="brand-danger" @click="confirmNotify(deleteTask)" label="Удалить" class="navigation-btn opacity-[80%] brand-description" />
+                                <q-btn v-if="isReset != true" color="brand-danger" @click="confirmNotify(toArchive)" label="В архив" class="navigation-btn opacity-[80%] brand-description" />
                                 <q-btn v-if="isReset != true" color="brand-velvet" @click="isReset = true" label="Сбросить задачу" class="navigation-btn brand-description" />
                                 <q-form @submit.prevent="reset" v-if="isReset == true" class="flex flex-row w-full gap-x-2">
                                     <q-btn unelevated icon="fa-solid fa-arrow-left" class="text-brand-danger opacity-[80%] !h-[56px]" @click="isReset=false">
@@ -234,8 +246,8 @@ onMounted(() => {
                             </div>
 
                             <div v-if="body.status == St.APPROVED && body.active[0].user.id  == user.profile.id && index == (body.active.length - 1) && body.is_archive != true" class="flex flex-row flex-grow justify-between pt-2">
-                                <q-btn color="brand-danger" v-close-popup  @click="" label="Удалить" class="navigation-btn opacity-[80%] brand-description" />
-                                <q-btn color="brand-velvet" v-close-popup @click="toArchive" label="В архив" class="navigation-btn brand-description" />
+                                <q-btn color="brand-danger" @click="confirmNotify(deleteTask)" label="Удалить" class="navigation-btn opacity-[80%] brand-description" />
+                                <q-btn color="brand-velvet" @click="confirmNotify(toArchive)" label="В архив" class="navigation-btn brand-description" />
                             </div>
                         </template>
                         <template v-else-if="s.type === T.EXECUTOR && s.status !== St.APPROVED">
