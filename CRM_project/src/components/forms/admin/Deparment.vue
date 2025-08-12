@@ -12,12 +12,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update-list'])
 
-// const localModel = ref(JSON.parse(JSON.stringify(props.model)))
-
-const localModel = computed({
-    get: () => JSON.parse(JSON.stringify(props.model))
-})
-
+const localModel = ref(JSON.parse(JSON.stringify(props.model)))
 
 const buffOptions = ref([])
 const staffOptions = ref([...props.model.staff])
@@ -79,6 +74,7 @@ defineExpose({send, remove})
                 class="w-full brand-description"
                 outlined
                 emit-value
+                clearable
                 map-options
                 :readonly="status"
                 :options="managerOption"

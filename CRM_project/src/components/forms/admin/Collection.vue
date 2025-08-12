@@ -51,12 +51,12 @@ function onSelectionChange(val, targetField) {
   }
 }
 
-function getNameById(id, targetField) {
-  return props.model[targetField].find(opt => opt.id === id)?.init_name || ''
+function getNameById(record, targetField) {
+  return props.model[targetField].find(opt => opt.id === record.id)?.init_name || allOptions.value.find(opt => opt.id === record)?.init_name || ''
 }
 
 function removeUser(id, targetField) {
-  props.model[targetField] = props.model[targetField].filter(sid => sid !== id)
+    if  (!props.status){props.model[targetField] = props.model[targetField].filter(sid => sid !== id)}
 }
 
 async function send() {
@@ -113,9 +113,9 @@ defineExpose({send, remove})
                 @focus="lazyLoad('/api/user')"
                 @filter="filterFn"
                 v-model="model.subs"
-                @update:model-value="val => {onSelectionChange(val, 'subs'); console.log(val)}"
+                @update:model-value="val => onSelectionChange(val, 'subs')"
             >
-                <!-- <template v-slot:selected>
+                <template v-slot:selected>
                     <q-chip
                         v-for="(id, index) in model.subs.slice(0, 5)"
                         :key="id"
@@ -127,7 +127,7 @@ defineExpose({send, remove})
                     <q-chip v-if="model.subs.length > 5" color="brand-velvet" text-color="white">
                         +{{ model.subs.length - 5 }}
                     </q-chip>
-                </template> -->
+                </template>
             </q-select>
         </q-item>
         <q-item>
@@ -137,7 +137,6 @@ defineExpose({send, remove})
                 outlined
                 emit-value
                 map-options
-                :use-chips="!status"
                 multiple
                 use-input
                 input-debounce="200"
@@ -150,8 +149,9 @@ defineExpose({send, remove})
                 v-model="model.pubs"
                 @update:model-value="val => onSelectionChange(val, 'pubs')"
             >
-                <!-- <template v-slot:selected>
+                <template v-slot:selected>
                     <q-chip
+                        :readonly="status"
                         v-for="(id, index) in model.pubs.slice(0, 5)"
                         :key="id"
                         removable
@@ -162,7 +162,7 @@ defineExpose({send, remove})
                     <q-chip v-if="model.pubs.length > 5" color="brand-velvet" text-color="white">
                         +{{ model.pubs.length - 5 }}
                     </q-chip>
-                </template> -->
+                </template>
             </q-select>
 
         </q-item>
