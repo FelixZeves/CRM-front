@@ -19,7 +19,7 @@ const localModel = computed({
 })
 
 
-const buffOptions = ref([{title: 'Пусто', id: null}])
+const buffOptions = ref([])
 const staffOptions = ref([...props.model.staff])
 const managerOption = ref([props.model.manager])
 
@@ -31,10 +31,16 @@ async function send() {
     if (!props.status) {
         localModel.value.manager = localModel.value.manager?.id
         localModel.value.staff = [...localModel.value.staff.map(item => item.id)]
-        if (props.mode == 'create') {await axios.post('/api/user/department', localModel.value)}
-        if (props.mode == 'edit') {await axios.patch('/api/user/department', localModel.value)}
-        successNotify()
-        emit('update-list')
+        if (props.mode == 'create') {
+            let response = await axios.post('/api/user/department', localModel.value)
+            if (response.status == 200) successNotify('Отдел создан')
+        }
+        if (props.mode == 'edit') {
+            let response = await axios.patch('/api/user/department', localModel.value)
+            if (response.status == 200) successNotify('Отдел отредактирован')
+        }
+
+        emit('update-list')    
     }
 }
 
@@ -50,7 +56,13 @@ async function lazyLoad(url) {
 }
 
 async function remove() {
-    if (!props.status && localModel.value?.id) confirmNotify(async () => {await axios.delete(`/api/user/department?id=${localModel.value.id}`); emit('update-list')})
+    if (!props.status && localModel.value?.id) confirmNotify(async () => {
+        let response = await axios.delete(`/api/user/department?id=${localModel.value.id}`)
+        if(response.status == 200){
+            successNotify('Отдел успешно удалён')
+            emit('update-list')
+        }
+    })
 }
 
 defineExpose({send, remove})
@@ -116,6 +128,7 @@ defineExpose({send, remove})
                 class="w-full brand-text"
                 outlined
                 emit-value
+                :use-chips="!status"
                 map-options
                 multiple
                 :readonly="status"
@@ -124,6 +137,9 @@ defineExpose({send, remove})
                 :option-value="'id'"
                 v-model="localModel.staff"
             />
+        </q-item>
+        <q-item>
+            <q-input class="w-full brand-description" borderless readonly label="Создан" v-model="localModel.create_at"/>
         </q-item>
         <q-item>
             <q-input class="w-full brand-description" borderless readonly label="Обновлен" v-model="localModel.update_at"/>

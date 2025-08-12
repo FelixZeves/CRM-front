@@ -34,14 +34,23 @@ async function send() {
             if (response.data?.password) passClipboardNotify(response.data.password)
         }
 
-        if (props.mode == 'edit') {await axios.patch('/api/user', props.model); successNotify()}
+        if (props.mode == 'edit') {
+            await axios.patch('/api/user', props.model)
+            if(response.status == 200) successNotify('Пользователь создан')
+            }
 
         emit('update-list')
     }
 }
 
 async function remove() {
-    if (!props.status &&  props.model?.id) confirmNotify(async () => {await axios.delete('/api/user', { params: { id: props.model.id } }); emit('update-list')})
+    if (!props.status &&  props.model?.id) confirmNotify(async () => {
+        let response = await axios.delete('/api/user', { params: { id: props.model.id } })
+        if(response.status == 200) {
+            successNotify('Пользователь удален')
+            emit('update-list')
+        }
+    })
 }
 
 defineExpose({send, remove})

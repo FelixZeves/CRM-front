@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RoleEnum, StatusEnum_ } from '@/components/Enums.vue';
+import { FileFocusEnum, FileTypeEnum, RoleEnum, StatusEnum_ } from '@/components/Enums.vue';
 
 export async function getMe(){
     const response = await axios.get('/api/user/me')
@@ -127,6 +127,11 @@ export function getFormSchema(name) {
             type: null,
             focus: null,
             departments: []
+        },
+        collection: {
+            title: '',
+            subs: [],
+            pubs: []
         }
     };
 
@@ -166,7 +171,15 @@ export function getTableSchema(name) {
             label: "Уроки",
             columns: [
                 { name: 'title', label: 'Урок', field: row => row.title, align: 'left', sortable: true },
-                { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true }]
+                { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true },]
+        },
+        collections: {
+            label: "Группы",
+            columns: [
+                { name: 'title', label: 'Группа', field: row => row.title, align: 'left', sortable: true },
+                { name: 'subscribers', label: 'Участники', field: row => row.subs.length, align: 'left', sortable: true },
+                { name: 'publishers', label: 'Писатели', field: row => row.pubs.length,  align: 'left', sortable: true },
+                { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true },]
         }
     }
     return TableSchema[name] || null;

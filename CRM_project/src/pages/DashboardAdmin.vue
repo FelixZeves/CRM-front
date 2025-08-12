@@ -4,6 +4,7 @@ import User from '@/components/forms/admin/User.vue'
 import Department from '@/components/forms/admin/Deparment.vue'
 import Class from '@/components/forms/admin/Class.vue'
 import Lesson from '@/components/forms/admin/Lesson.vue'
+import Collection from '@/components/forms/admin/Collection.vue'
 import axios from 'axios'
 import { computed, ref } from 'vue'
 
@@ -19,7 +20,8 @@ const forms = {
     user: User,
     department: Department,
     class: Class,
-    lesson: Lesson
+    lesson: Lesson,
+    collection: Collection
 }
 
 const tables = ref([
@@ -31,7 +33,7 @@ const tables = ref([
 },
   {...getTableSchema('department'), name: 'department', data: [],
     async get() {this.data = (await axios.get('/api/user/department')).data.data},
-    choose(row) {typeForm.value = 'department'; details.value = row},
+    choose(row) {typeForm.value = 'department'; details.value = row; console.log(details.value)},
     add() {typeForm.value = 'department'; details.value = getFormSchema('department'); status.value ='create';},
     info: "1. Чтобы добавить руководителя или сотрудника, необходимо выбрать нужный отдел в форме редактирования/добавления пользователя;\n2. Вышестоящее руководство добавляется путём добавления дочернего отдела у вышестоящего."
 },
@@ -45,8 +47,14 @@ const tables = ref([
   async get() {this.data = (await axios.get('/api/user/lesson')).data.data},
   choose(row) {typeForm.value = 'lesson'; details.value = row},
   add() {typeForm.value = 'lesson'; details.value = getFormSchema('lesson'); status.value ='create';},
-  info: "Вводите уроки в виде: *Название урока* *класс* *кабинет*"
+  info: "Вводите уроки в виде: *Название урока* *класс* *кабинет*",
 },
+ {...getTableSchema('collections'), name: 'collection', data: [],
+ async get() {this.data = (await axios.get('/api/user/collection')).data.data},
+ choose(row) {typeForm.value =  'collection'; details.value = row},
+ add() {typeForm.value = 'collection'; details.value = getFormSchema('collection'); status.value = 'create';},
+ info: "Участники - те кто будут принадлежать к группе.\nПисатели - те кто сможет обращаться (писать) в данную группу."
+}
 ])
 
 async function save() {
