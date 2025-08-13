@@ -71,15 +71,15 @@ export const CreatorEnum = Object.freeze({
 })
 
 export const PlaceEnum = Object.freeze({
-    ASSEMBLY: {id: 1, title: 'Актовый зал (1 этаж)'},
-    FORUM: {id: 2, title: 'Форум-зона (1 этаж)'},
-    COWORKING: {id: 3, title: 'Коворкинг (1 этаж)'},
-    ELEMENT_LIBRARY: {id: 4, title: 'Информационно-библиотечный центр (начальная школа)'},
-    HIGH_LIBRARY: {id: 5, title: 'Информационно-библиотечный центр (старшая школа)'},
-    CONFERENCE: {id: 6, title: 'Конференц-зал (каб. 1.10)'},
-    SUPPORT_SERVICE: {id: 7, title: 'Служба соц.-педагог. и психолог. поддержки (каб. 1.45)'},
-    SHOOTING_GALLERY: {id: 8, title: 'Тир (1 этаж)'},
-    MUSEUM_OF_WEAPONS: {id: 9, title: 'Музей славы боевого оружия (3 этаж)'},
+    ASSEMBLY: {title: 'Актовый зал (1 этаж)'},
+    FORUM: {title: 'Форум-зона (1 этаж)'},
+    COWORKING: {title: 'Коворкинг (1 этаж)'},
+    ELEMENT_LIBRARY: {title: 'Информационно-библиотечный центр (начальная школа)'},
+    HIGH_LIBRARY: {title: 'Информационно-библиотечный центр (старшая школа)'},
+    CONFERENCE: {title: 'Конференц-зал (каб. 1.10)'},
+    SUPPORT_SERVICE: { title: 'Служба соц.-педагог. и психолог. поддержки (каб. 1.45)'},
+    SHOOTING_GALLERY: {title: 'Тир (1 этаж)'},
+    MUSEUM_OF_WEAPONS: {title: 'Музей славы боевого оружия (3 этаж)'},
 })
 
 export const PlaceDirectorEnum = Object.freeze({

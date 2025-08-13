@@ -33,7 +33,7 @@ const tables = ref([
 },
   {...getTableSchema('department'), name: 'department', data: [],
     async get() {this.data = (await axios.get('/api/user/department')).data.data},
-    choose(row) {typeForm.value = 'department'; details.value = row; console.log(details.value)},
+    choose(row) {typeForm.value = 'department'; details.value = row},
     add() {typeForm.value = 'department'; details.value = getFormSchema('department'); status.value ='create';},
     info: "1. Чтобы добавить руководителя или сотрудника, необходимо выбрать нужный отдел в форме редактирования/добавления пользователя;\n2. Вышестоящее руководство добавляется путём добавления дочернего отдела у вышестоящего."
 },

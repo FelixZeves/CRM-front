@@ -1,9 +1,9 @@
 <script setup>
 import axios from 'axios'
 import { computed, ref } from 'vue'
-import { DocEnum as D, PlaceDirectorEnum, PlaceEnum, RoleEnum_ as R} from '@/components/Enums.vue'
+import { DocEnum as D, PlaceEnum, RoleEnum_ as R} from '@/components/Enums.vue'
 import { getFormSchema, getToday } from '@/components/Utils.js'
-import { successNotify } from '@/components/Notifies'
+import { errorNotify, successNotify } from '@/components/Notifies'
 
 const props = defineProps(['visible', 'body', 'me'])
 const emit = defineEmits(['update:visible', 'update-list'])
@@ -13,13 +13,16 @@ const activeEvent = ref(false)
 const eventForMe =  ref(false)
 const peopleOptions = ref([])
 const departmentOptions = ref([])
+const collectionOptions = ref([])
 const evtUsers = ref(new Set())
 
-const today = getToday();
-const date = ref({ from: today, to: today });
+const today = getToday()
+const date = ref({ from: today, to: today })
 
-const placeOptions = Object.values(PlaceEnum);
-const directorOptions = Object.values(PlaceDirectorEnum)
+const placeOptions = Object.values(PlaceEnum)
+
+const taskForm = ref(null)
+const receiversTab = ref('concrete')
 
 const task = ref({
     title: '',
@@ -31,7 +34,8 @@ const task = ref({
     executors: [],
     reviewers: [],
     checkers: [],
-    type: D.MEMO,    
+    type: D.MEMO,
+    place: null
 })
 
 if (props.body){
@@ -109,10 +113,6 @@ const visible = computed({
   set: val => emit('update:visible', val)
 })
 
-function checkDock(){
-    console.log(taskFiles)
-}
-
 function labelChanges(){
     if (task.value.type == D.ORDER){
         return 'ЗАДАЧИ'
@@ -137,28 +137,102 @@ async function lazyLoad() {
         department = (await axios.get(`/api/user/department?id=${props.me.profile.department.id}`)).data.data[0]
         peopleOptions.value = [{id: department.manager.id, fio: `${department.manager.fio} (${department.title})`}]
     }
+    let collections = (await axios.get(`/api/user/collection`)).data.data
+    collectionOptions.value = [...collections.map(collection => ({
+                                    id: collection.subs.map(sub => sub.id),
+                                    title: collection.title}))]
 }
 
 async function send() {
-    const fd = new FormData()
-
-    for (const key of ['title', 'description', 'comment', 'deadline', 'type', 'ref'])
-        fd.append(key, task.value[key])
-
-    for (const key of ['files', 'executors', 'reviewers', 'checkers'])
-        task.value[key].forEach(elem => fd.append(key, elem))
-
-    let response = await axios.post('/api/user/task', fd, {headers: {'Content-Type': 'multipart/form-data'}})
-
-    if (activeEvent.value && response.status == 200) {
-        event.value.user = [...evtUsers.value]
-        response = await axios.post('/api/user/event', event.value)
+    const taskValid = await taskForm.value.validate()
+    if (!taskValid) {
+        errorNotify('Задача. Не все поля заполнены')
+        return
     }
 
-    if (response.status == 200){
-        successNotify('Задача поставлена')
-        emit('update-list')
+    if([...task.value.executors, ...task.value.reviewers, ...task.value.executors].length == 0){
+        errorNotify('Поля получателей пусты')
+        return
     }
+
+    if (receiversTab.value == 'concrete' || task.value.type == D.APPLICATION) {
+        if (task.value.type == D.APPLICATION){
+            task.value.title = `${task.value.title} (${task.value.place})`
+        }
+
+        const fd = new FormData()
+
+        for (const key of ['title', 'description', 'comment', 'deadline', 'type', 'ref'])
+            fd.append(key, task.value[key])
+
+        for (const key of ['files', 'executors', 'reviewers', 'checkers'])
+            task.value[key].forEach(elem => fd.append(key, elem))
+
+        let response = await axios.post('/api/user/task', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+
+        if (activeEvent.value && response.status == 200) {
+            event.value.user = [...evtUsers.value]
+            response = await axios.post('/api/user/event', event.value)
+        }
+
+        if (response.status == 200){
+            successNotify('Задача поставлена')
+            emit('update-list')
+        }
+    }
+
+    else {
+        const fd = new FormData()
+        for (const key of ['title', 'description', 'comment', 'deadline', 'type', 'ref'])
+            fd.append(key, task.value[key])
+
+        task.value.files.forEach(elem => fd.append('files', elem))
+
+        if (task.value.type == D.ORDER){
+            let badIds = []
+            for (let id of task.value.executors){
+                fd.append('executors', id)
+                let response = await axios.post('/api/user/task', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+                fd.delete('executors')
+                if (response.status != 200){
+                    badIds.push(id)
+                }
+            }
+            if (badIds.length == 0){
+                if (activeEvent.value) {
+                    event.value.user = [...evtUsers.value]
+                    let response = await axios.post('/api/user/event', event.value)
+                }
+                successNotify('Задача поставлена')
+                emit('update-list')
+            }
+            else {
+                errorNotify(`Задача не была поставлена ${badIds.length} ${badIds.length > 1 ? 'людям' : 'человеку'}`)
+                emit('update-list')
+            }
+        }
+        else {
+            let badIds = []
+            for (let id of task.value.reviewers){
+                fd.append('reviewers', id)
+                let response = await axios.post('/api/user/task', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+                fd.delete('reviewers')
+                if (response.status != 200){
+                    badIds.push(id)
+                }
+            }
+            if (badIds.length == 0){
+                successNotify('Задача поставлена')
+                emit('update-list')
+            }
+            else {
+                errorNotify(`Задача не была поставлена ${badIds.length} ${badIds.length > 1 ? 'людям' : 'человеку'}`)
+                emit('update-list')
+            }
+        }
+    }
+
+    
 }
 </script>
 
@@ -177,11 +251,11 @@ async function send() {
                 animated
                 >
                 <q-step
-                    :name="D.APPLICATION"
+                    :name="1"
                     :title="`СОЗДАНИЕ ${labelChanges()}`"
                     icon="fa-regular fa-file-lines"
                     class="row-grow"
-                    :done="step > D.APPLICATION"
+                    :done="step > 1"
                 >
                 <q-tabs
                     v-model="task.type"
@@ -194,8 +268,8 @@ async function send() {
                     <q-tab :name="D.MEMO" label="Служебная записка" />
                     <q-tab :name="D.APPLICATION" label="Заявка" />
                 </q-tabs>
-                <div class="!flex !flex-col">
-                    <q-form class=" p-5 !flex flex-row h-full gap-x-12">
+                <div class="!flex !flex-col min-h-[575px]">
+                    <q-form ref="taskForm" class=" p-5 !flex flex-row h-full gap-x-12">
                         <div class="flex flex-col gap-y-8 w-1/2">
                             <div class="flex flex-row gap-x-2">
                                 <q-btn unelevated icon="refresh " class="text-brand-danger opacity-[80%] !h-[56px]" @click="clearForm()">
@@ -213,10 +287,11 @@ async function send() {
                                     v-model="task.title"
                                     outlined
                                     hide-bottom-space
-                                    required
                                     type="text"
                                     label="Название"
-                                    :rules="[val => !val || val.length <= 1000 || 'Максимальная длина 1000 символов',
+                                    :rules="[
+                                        val => !!val || 'Обязательное поле',
+                                        val => !val || val.length <= 1000 || 'Максимальная длина 1000 символов',
                                         val => !val || val.length>=4 || 'Минимальная длина 4 символа']"
                                     class="!flex-grow brand-description"
                                 />
@@ -224,10 +299,11 @@ async function send() {
                                 <q-input
                                     v-model="task.description"
                                     outlined
-                                    required
                                     type="textarea"
                                     label="Описание"
-                                    :rules="[val => !val || val.length <= 1000 || 'Максимальная длина 1000 символов',
+                                    :rules="[
+                                        val => !!val || 'Обязательное поле',
+                                        val => !val || val.length <= 1000 || 'Максимальная длина 1000 символов',
                                         val => !val || val.length>=4 || 'Минимальная длина 4 символа']"
                                     class="brand-description"
                                 />
@@ -242,22 +318,6 @@ async function send() {
                                 />
                         </div>
                         <div class="flex flex-col gap-y-8 w-1/2">
-                            <q-input label="Дата выполнения" v-model="task.deadline" readonly outlined>
-                                <template v-slot:append>
-                                    <q-icon name="event" color="brand-velvet">
-                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                                            <q-date
-                                                v-model="task.deadline"
-                                                minimal
-                                                mask="DD.MM.YYYY"
-                                                class="brand-description"
-                                                >
-                                                <q-btn class="flex flex-row brand-description" v-close-popup label="Закрыть" flat/>
-                                            </q-date>
-                                        </q-popup-proxy>
-                                    </q-icon>
-                                </template>
-                            </q-input>
                             <q-file
                                 v-model="task.files"
                                 label="Прикрепить файлы"
@@ -279,65 +339,133 @@ async function send() {
                                 class="brand-description">
                                 <template v-slot:append><q-icon name="attach_file" /></template>
                             </q-file>
-                            
-                            <q-select
-                                v-if="task.type == D.ORDER"
-                                label="Исполнитель (-и)"
-                                class="w-full pb-5"
-                                outlined
-                                emit-value
-                                map-options
-                                use-chips
-                                multiple
-                                :options="peopleOptions"
-                                :option-label="'fio'"
-                                :option-value="'id'"
-                                @focus="lazyLoad"
-                                v-model="task.executors"
-                            />
-                            <q-select
+
+                            <q-input label="Дата выполнения" v-model="task.deadline" readonly outlined>
+                                <template v-slot:append>
+                                    <q-icon name="event" color="brand-velvet">
+                                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                                            <q-date
+                                                v-model="task.deadline"
+                                                minimal
+                                                mask="DD.MM.YYYY"
+                                                class="brand-description"
+                                                >
+                                                <q-btn class="flex flex-row brand-description" v-close-popup label="Закрыть" flat/>
+                                            </q-date>
+                                        </q-popup-proxy>
+                                    </q-icon>
+                                </template>
+                            </q-input>
+
+                            <q-tabs
                                 v-if="task.type != D.APPLICATION"
-                                label="Согласующий (-ие)"
-                                class="w-full"
-                                outlined
-                                emit-value
-                                map-options
-                                use-chips
-                                multiple
-                                :options="peopleOptions"
-                                :option-label="'fio'"
-                                :option-value="'id'"
-                                @focus="lazyLoad"
-                                v-model="task.reviewers"
-                            />
-                            <q-select
-                                v-if="task.type == D.ORDER"
-                                label="Проверяющий (-ие)"
-                                class="w-full"
-                                outlined
-                                emit-value
-                                map-options
-                                use-chips
-                                multiple
-                                :options="peopleOptions"
-                                :option-label="'fio'"
-                                :option-value="'id'"
-                                @focus="lazyLoad"
-                                v-model="task.checkers"
-                            />
+                                class="!h-[56px] !mb-5"
+                                v-model="receiversTab"
+                                active-color="brand-velvet"
+                                indicator-color="brand-velvet"
+                                align="justify"
+                                narrow-indicator
+                            >
+                                <q-tab :name="'concrete'" label="Определённые люди"></q-tab>
+                                <q-tab :name="'massive'" label="Групповая рассылка"></q-tab>
+                            </q-tabs>
+
+                            <div v-if="receiversTab == 'concrete' && task.type != D.APPLICATION" class="flex flex-col gap-y-8">
+                                <q-select
+                                    v-if="task.type == D.ORDER"
+                                    label="Исполнитель (-и)"
+                                    class="w-full"
+                                    outlined
+                                    emit-value
+                                    map-options
+                                    use-chips
+                                    multiple
+                                    :options="peopleOptions"
+                                    :option-label="'fio'"
+                                    :option-value="'id'"
+                                    @focus="lazyLoad"
+                                    v-model="task.executors"
+                                />
+                                <q-select
+                                    v-if="task.type != D.APPLICATION"
+                                    label="Согласующий (-ие)"
+                                    class="w-full"
+                                    outlined
+                                    emit-value
+                                    map-options
+                                    use-chips
+                                    multiple
+                                    :options="peopleOptions"
+                                    :option-label="'fio'"
+                                    :option-value="'id'"
+                                    @focus="lazyLoad"
+                                    v-model="task.reviewers"
+                                />
+                                <q-select
+                                    v-if="task.type == D.ORDER"
+                                    label="Проверяющий (-ие)"
+                                    class="w-full"
+                                    outlined
+                                    emit-value
+                                    map-options
+                                    use-chips
+                                    multiple
+                                    :options="peopleOptions"
+                                    :option-label="'fio'"
+                                    :option-value="'id'"
+                                    @focus="lazyLoad"
+                                    v-model="task.checkers"
+                                />
+                            </div>
+                            <div v-else-if="receiversTab == 'massive' && task.type != D.APPLICATION" class="flex flex-col gap-y-4">
+                                <q-select
+                                    v-if="task.type == D.ORDER"
+                                    label="Получатели"
+                                    class="w-full"
+                                    outlined
+                                    emit-value
+                                    map-options
+                                    :rules="[val => !!val || 'Обязательное поле']"
+                                    clearable
+                                    :options="collectionOptions"
+                                    :option-label="'title'"
+                                    :option-value="'id'"
+                                    @focus="lazyLoad"
+                                    v-model="task.executors"
+                                />
+                                <q-select
+                                    v-if="task.type == D.MEMO"
+                                    label="Получатели"
+                                    class="w-full"
+                                    outlined
+                                    emit-value
+                                    map-options
+                                    :rules="[val => !!val || 'Обязательное поле']"
+                                    clearable
+                                    :options="collectionOptions"
+                                    :option-label="'title'"
+                                    :option-value="'id'"
+                                    @focus="lazyLoad"
+                                    v-model="task.reviewers"
+                                />
+                            </div>
+
                             <q-select
                                 v-if="task.type == D.APPLICATION"
                                 label="Образовательное пространство"
                                 class="w-full pb-5"
+                                hide-bottom-space
                                 outlined
                                 emit-value
                                 map-options
+                                :rules="[val => !!val || 'Обязательное поле']"
                                 clearable
                                 :options="placeOptions"
                                 :option-label="'title'"
-                                :option-value="'id'"
-                                v-model="task.executors"
+                                :option-value="'title'"
+                                v-model="task.place"
                             />
+
                             <q-select
                                 v-if="task.type == D.APPLICATION"
                                 label="Получатель"
@@ -345,17 +473,19 @@ async function send() {
                                 outlined
                                 emit-value
                                 map-options
+                                :rules="[val => !!val || 'Обязательное поле']"
                                 clearable
-                                :options="directorOptions"
+                                :options="collectionOptions"
                                 :option-label="'title'"
                                 :option-value="'id'"
-                                v-model="task.executors"
+                                @focus="lazyLoad"
+                                v-model="task.reviewers"
                             />
                         </div>
                     </q-form>
                 </div>
                 </q-step>
-
+                
                 <q-step
                     v-if="task.type == D.ORDER"
                     :name="2"
@@ -364,7 +494,7 @@ async function send() {
                     icon="add"
                     :done="step > 2"
                 >
-                    <q-form @submit="checkDock" class=" p-5 !flex flex-row h-full gap-x-12">
+                    <q-form ref="taskForm" class=" p-5 !flex flex-row h-full gap-x-12">
                         <div class="flex flex-col gap-y-8 w-1/2">
                             <q-toggle
                                 v-model="activeEvent"
@@ -389,7 +519,7 @@ async function send() {
                                         Сбросить поля
                                     </q-tooltip>
                                 </q-btn>
-                                <q-input :disable="!activeEvent" label="Дата выполнения" v-model="formatDate" readonly outlined  class="flex-grow">
+                                <q-input :disable="!activeEvent" label="Дата выполнения" v-model="formatDate" readonly outlined class="flex-grow">
                                     <template v-slot:append>
                                         <q-icon name="event" color="brand-velvet">
                                             <q-popup-proxy cover transition-show="scale" transition-hide="scale">
@@ -414,13 +544,14 @@ async function send() {
                             :disable="!activeEvent"
                             outlined
                             v-model="event.title"
-                            :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
+                            :rules="[val => !!val || 'Обязательное поле' ,val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 80 || 'Максимальная длина 80 символов']"
                             label="Название мероприятия"
                             class="brand-description"
                         />
                         <q-input
                             :disable="!activeEvent"
                             outlined
+                            :rules="[val => !!val || 'Обязательное поле']"
                             v-model="event.place"
                             label="Место проведения"
                             class="brand-description"
@@ -429,7 +560,7 @@ async function send() {
                         :disable="!activeEvent"
                         outlined
                         v-model="event.description"
-                        :rules="[val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 255 || 'Максимальная длина 255 символов']"
+                        :rules="[val => !!val || 'Обязательное поле', val => val.length >= 4 || 'Минимальная длина 4 символа', val => val.length <= 255 || 'Максимальная длина 255 символов']"
                         label="Описание мероприятия"
                         type="textarea" input-style="min-height: 150px; resize: vertical;"
                         class="brand-description"
@@ -442,8 +573,8 @@ async function send() {
                 
             </q-card-section>
             <q-card-section class="flex flex-row justify-between mx-12">
-                <q-btn :disable="step == 1 ? true : false" @click="step = 1" color="brand-velvet" label="Назад" class="navigation-btn brand-description" />
-                <q-btn v-if="step == 1 & task.type == D.ORDER" @click="step++; throwData()" color="brand-velvet" label="Далее" class="navigation-btn brand-description" />
+                <q-btn :disable="step == 1 ? true : false" @click="step = step - 1" color="brand-velvet" label="Назад" class="navigation-btn brand-description" />
+                <q-btn v-if="(step == 1 && task.type == D.ORDER)" @click="step++; throwData()" color="brand-velvet" label="Далее" class="navigation-btn brand-description" />
                 <q-btn v-if="step == 2 || task.type != D.ORDER" @click="send" color="brand-velvet" label="Создать" class="navigation-btn brand-description" />
             </q-card-section>
         </q-card>

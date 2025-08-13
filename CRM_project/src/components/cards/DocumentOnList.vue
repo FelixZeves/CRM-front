@@ -14,11 +14,14 @@ const extension = props.body.title.split('.').pop();
             <q-card-section class="flex flex-row items-center">
                 <q-icon :name="fileIcons[extension] || 'fa-regular fa-file'" size="xl" class="!max-w-[5%]"/>
                 <div class="flex flex-col px-4 !max-w-[90%] !min-w-[90%]">
-                    <div class="brand-title !max-w-full text-ellipsis line-clamp-2 pb-4">{{ body.title }}</div>
-                    <div class="flex flex-row justify-end">
-                        <q-chip v-for="tag in body.tags" clickable outline square class="brand-text" :label="tag"/>
-                        <q-chip outline square class="brand-text" :label="body.create_at"/>
-                        <q-chip v-if="body.permanent == true" outline square class="brand-text" label="Бессрочный"/>
+                    <div class="brand-title !max-w-full text-ellipsis line-clamp-2 pb-2">{{ body.title }}</div>
+                    <div class="flex flex-row justify-between">
+                        <div class="brand-text content-center">Опубликовано: {{ body.creator }}</div>
+                        <div>
+                            <q-chip v-for="tag in body.tags" clickable outline square class="brand-text" :label="tag"/>
+                            <q-chip outline square class="brand-text" :label="body.create_at"/>
+                            <q-chip v-if="body.permanent == true" outline square class="brand-text" label="Бессрочный"/>
+                        </div>
                     </div>
                 </div>
                 <q-btn flat class="!max-w-[5%] !px-1" @click="downloadFile(body.id)">
