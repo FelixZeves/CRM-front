@@ -5,7 +5,7 @@ import axios from 'axios'
 import { successNotify } from '@/components/Notifies'
 import { FileFocusEnum, FileTypeEnum } from '../Enums.vue'
 
-const props = defineProps(['visible'])
+const props = defineProps(['visible', 'body'])
 const emit = defineEmits(['update:visible', 'update-list'])
 
 const buffOptions = ref([])
@@ -13,6 +13,14 @@ const typesOptions = Object.values(FileTypeEnum)
 const focusOptions = Object.values(FileFocusEnum)
 
 const form = ref(getFormSchema('file'));
+
+if (props.body){
+    form.value.id = props.body.id
+    form.value.title = props.body.title
+    form.value.permanent = props.body.permanent
+    form.value.focus = props.body.tags[0]
+    form.value.type = props.body.tags[1]
+}
 
 const visible = computed({
   get: () => props.visible,
@@ -31,8 +39,28 @@ async function send() {
     
 
     let response = await axios.post('/api/user/file/upload?target=department', fd, {headers: {'Content-Type': 'multipart/form-data'}})
-    if (response.status == 200) successNotify()
-    emit('update-list')
+    if (response.status == 200) {
+        successNotify()
+        emit('update-list')
+    }
+}
+
+async function edit() {
+    const fd = new FormData()
+
+    fd/append('id', form.value.id)
+    fd.append('title', form.value.title)
+    fd.append('permanent', form.value.permanent)
+    fd.append('tags', form.value.type)
+    fd.append('tags', form.value.focus)
+    form.value.departments.forEach(dep => fd.append('departments', dep))
+    
+
+    let response = await axios.patch('/api/user/file/?target=department', fd)
+    if (response.status == 200) {
+        successNotify()
+        emit('update-list')
+    }
 }
 
 async function lazyLoad() {
@@ -43,7 +71,7 @@ async function lazyLoad() {
 <template>
     <q-dialog v-model="visible" backdrop-filter="blur(4px)">
         <q-card class="text-black !rounded-[15pt] !flex !w-[90vw] !min-w-[55%]">
-            <q-form @submit="send" class="bg-tile p-5 !flex flex-row w-full h-full gap-2">
+            <q-form @submit="body != null ? edit() : send()" class="bg-tile p-5 !flex flex-row w-full h-full gap-2">
 
                 <q-card-section class="flex flex-col w-[55%] gap-y-6">
                     <q-input
@@ -61,13 +89,14 @@ async function lazyLoad() {
                             v-model="form.body"
                             label="Прикрепите файл"
                             required
+                            :disable="body != null"
                             outlined
                             hide-bottom-space
                             bg-color="brand-wait"
                             clearable
                             accept=".pdf, .jpg, .png, .docx, .pptx, .xlsx, .txt, .zip"
                             class="!w-[60%]"
-                            :rules="[val => val != null|| 'Обязательно прикрепите файл']">
+                            :rules="[val => (body == null && val != null)|| 'Обязательно прикрепите файл']">
                                 <template v-slot:append><q-icon name="attach_file" /></template>
                         </q-file>
                         <q-checkbox
@@ -120,14 +149,9 @@ async function lazyLoad() {
                         label="Направленность"
                         :options="focusOptions"
                     />
-                    <q-btn label="Создать" class="brand-description !h-[56px]" type="submit" color="brand-velvet"/>
+                    <q-btn :label="body != null ? 'Редактировать' : 'Создать'" class="brand-description !h-[56px]" type="submit" color="brand-velvet"/>
                 </q-card-section>
             </q-form>
         </q-card>
     </q-dialog>
-    <!--:rules="[val => val.length  > 0|| 'Обязательно выберите направленность']" -->
 </template>
-
-<style scoped>
-
-</style>

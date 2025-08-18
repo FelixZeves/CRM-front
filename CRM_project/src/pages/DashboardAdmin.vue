@@ -3,7 +3,6 @@ import { getTableSchema, getFormSchema} from '@/components/Utils.js'
 import User from '@/components/forms/admin/User.vue'
 import Department from '@/components/forms/admin/Deparment.vue'
 import Class from '@/components/forms/admin/Class.vue'
-import Lesson from '@/components/forms/admin/Lesson.vue'
 import Collection from '@/components/forms/admin/Collection.vue'
 import axios from 'axios'
 import { computed, ref } from 'vue'
@@ -20,7 +19,6 @@ const forms = {
     user: User,
     department: Department,
     class: Class,
-    lesson: Lesson,
     collection: Collection
 }
 
@@ -43,12 +41,12 @@ const tables = ref([
   add() {typeForm.value = 'class'; details.value = getFormSchema('class'); status.value ='create';},
   info: "Вводите класс и параллель отдельно"
 },
-  {...getTableSchema('lessons'), name: 'lesson', data: [],
-  async get() {this.data = (await axios.get('/api/user/lesson')).data.data},
-  choose(row) {typeForm.value = 'lesson'; details.value = row},
-  add() {typeForm.value = 'lesson'; details.value = getFormSchema('lesson'); status.value ='create';},
-  info: "Вводите уроки в виде: *Название урока* *класс* *кабинет*",
-},
+//   {...getTableSchema('lessons'), name: 'lesson', data: [],
+//   async get() {this.data = (await axios.get('/api/user/lesson')).data.data},
+//   choose(row) {typeForm.value = 'lesson'; details.value = row},
+//   add() {typeForm.value = 'lesson'; details.value = getFormSchema('lesson'); status.value ='create';},
+//   info: "Вводите уроки в виде: *Название урока* *класс* *кабинет*",
+// },
  {...getTableSchema('collections'), name: 'collection', data: [],
  async get() {this.data = (await axios.get('/api/user/collection')).data.data},
  choose(row) {typeForm.value =  'collection'; details.value = row},
