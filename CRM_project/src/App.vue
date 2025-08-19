@@ -40,6 +40,10 @@
   background: #F2F2F2 !important
 }
 
+.q-item.q-item--active {
+  @apply text-[#825AFF]
+}
+
 .q-table thead tr th {
   @apply !text-lg text-stone-800 !font-semibold !z-10 !sticky top-0 !bg-white
 }

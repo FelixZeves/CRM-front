@@ -1,11 +1,10 @@
-import axios from 'axios';
 import router from '@/router';
-import { Notify, copyToClipboard } from 'quasar'
+import { Notify, SessionStorage, copyToClipboard } from 'quasar'
 
 export async function checkPass(){
-    const response = (await axios.get('/api/user/me')).data;
+    const user = SessionStorage.getItem('user')
 
-    if (response.default_pass){
+    if (user.default_pass){
         Notify.create({
             type: 'negative',
             position: 'top',

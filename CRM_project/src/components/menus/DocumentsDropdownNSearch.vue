@@ -1,10 +1,10 @@
 <script setup>
-import {onMounted, ref} from 'vue'
-import { getMe } from '@/components/Utils';
+import {ref} from 'vue'
 import { RoleEnum_ as R, FileTypeEnum, FileFocusEnum} from '@/components/Enums.vue';
+import { SessionStorage } from 'quasar';
 
 const emit = defineEmits(['show-dialog', 'apply-filters']);
-const role = ref(null)
+const role = (SessionStorage.getItem('user')).role
 
 const searchText =ref("")
 
@@ -34,8 +34,6 @@ function applyFilters() {
   const params = buildQueryParams();
   emit('apply-filters', params);
 }
-
-onMounted(async () => {role.value = (await getMe()).data.role})
 
 </script>
 

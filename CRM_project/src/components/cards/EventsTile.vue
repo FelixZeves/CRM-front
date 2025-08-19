@@ -1,10 +1,8 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import axios from 'axios';
 import { getEvents } from '@/components/Utils';
 
 const events = ref([])
-const visible = ref(false)
 
 async function updateList() {
     let response = await getEvents(5)

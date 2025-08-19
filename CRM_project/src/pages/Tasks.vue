@@ -1,17 +1,17 @@
 <script setup>
-import NavigationColumn from '@/components/menus/NavigationColumn.vue';
-import axios from 'axios';
+import NavigationColumn from '@/components/menus/NavigationColumn.vue'
 import { ref, onMounted } from 'vue'
-import TasksList from '@/components/layouts/TasksList.vue';
-import TasksDropdown from '@/components/menus/TasksDropdown.vue';
-import AddTask from '@/components/forms/AddTask.vue';
-import { getTasks } from '@/components/Utils';
+import TasksList from '@/components/layouts/TasksList.vue'
+import TasksDropdown from '@/components/menus/TasksDropdown.vue'
+import AddTask from '@/components/forms/AddTask.vue'
+import { getTasks } from '@/components/Utils'
+import { SessionStorage } from 'quasar'
 
 const visible = ref(false)
 const tasks = ref([])
-const user = ref()
+const user = SessionStorage.getItem('user')
 
-onMounted(async () => {user.value = (await axios.get('/api/user/me')).data; await updateList()})
+onMounted(async () => {await updateList()})
 
 const filterParams = ref({})
 

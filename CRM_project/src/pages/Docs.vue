@@ -5,19 +5,18 @@ import NavigationColumn from '@/components/menus/NavigationColumn.vue';
 import DocumentsList from '@/components/layouts/DocumentsList.vue';
 import DocumentsDropdownNSearch from '@/components/menus/DocumentsDropdownNSearch.vue';
 import AddDoc from '@/components/forms/AddDoc.vue';
+import { SessionStorage } from 'quasar';
 
 const docs = ref([])
 const visible = ref(false)
-const user = ref()
+const user = SessionStorage.getItem('user')
 
-onMounted(async () => {user.value = (await axios.get('/api/user/me')).data; await updateList()})
+onMounted(async () => {await updateList()})
 
 async function updateList(params = {}) {
     let url =  '/api/user/file'
     docs.value = (await axios.get(url,  { params } )).data.data
 }
-
-onMounted(async () => {updateList()})
 </script>
 
 

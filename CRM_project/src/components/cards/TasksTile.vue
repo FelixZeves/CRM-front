@@ -1,5 +1,4 @@
 <script setup>
-import axios from 'axios'
 import { StatusEnum } from '@/components/Enums.vue'
 import { ref } from 'vue';
 import { getTasks } from '../Utils';

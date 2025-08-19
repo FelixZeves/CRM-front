@@ -1,8 +1,7 @@
 <script setup>
-import axios from 'axios'
 import { onMounted, ref } from 'vue'
-import ModalError from '@/components/forms/BugReport.vue';
-import { getMe } from '../Utils';
+import ModalError from '@/components/forms/BugReport.vue'
+import { SessionStorage } from 'quasar'
 
 const props = defineProps(['name', 'section'])
 const fio = ref("");
@@ -11,10 +10,10 @@ const defaultPass =  ref(false)
 const visibleBugReport = ref(false);
 
 async function getUser(){
-    const me = (await getMe()).data
+    const me = SessionStorage.getItem('user')
 
-    fio.value = me.profile.initials_name;
-    role.value = me.role;
+    fio.value = me.profile.initials_name
+    role.value = me.role
     defaultPass.value = me.default_pass
 
 }

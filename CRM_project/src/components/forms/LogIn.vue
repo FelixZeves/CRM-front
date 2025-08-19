@@ -2,6 +2,8 @@
 import router from '@/router';
 import { ref } from 'vue'
 import axios from 'axios';
+import { getMe } from '../Utils';
+import { SessionStorage } from 'quasar'
 
 const email = ref("")
 const password = ref("")
@@ -15,6 +17,10 @@ async function loginUser(){
 
         const token = response.data.jwt;
         localStorage.setItem('jwtToken', token);
+
+        const me = (await getMe()).data
+
+        SessionStorage.set('user', me)
 
         router.push('/Office')
         

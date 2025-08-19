@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FileFocusEnum, FileTypeEnum, RoleEnum, StatusEnum_ } from '@/components/Enums.vue';
+import { RoleEnum } from '@/components/Enums.vue';
 
 export async function getMe(){
     const response = await axios.get('/api/user/me')
@@ -17,6 +17,9 @@ export async function getDepartments(id = null){
 export async function getTasks(limit = null, is_archive = false, params = {}) {
     let url = '/api/user/task'
     let query = { ...params, is_archive }
+    if (limit != null){
+        query.limit = limit
+    }
     let tasks = (await axios.get(url, { params: query })).data.data
     return tasks
 }
