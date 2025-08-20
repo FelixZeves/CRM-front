@@ -5,7 +5,7 @@ import { CreatorEnum } from '../Enums.vue';
 const emit = defineEmits(['show-dialog', 'apply-filters']);
 
 const creators = Object.values(CreatorEnum)
-const sortFilters = ref ({sort: {key: "desc", label:'Сначала новые', icon: 'fa-solid fa-arrow-down'}, is_creator: {key: null, title: "Все мероприятия"}})
+const sortFilters = ref ({sort: {key: "desc", label:'Сначала новые', icon: 'fa-solid fa-arrow-down'}, is_creator: {key: null, title: "Все создатели"}})
 
 function filterChanging(filter, val){
   sortFilters.value[filter] = val
