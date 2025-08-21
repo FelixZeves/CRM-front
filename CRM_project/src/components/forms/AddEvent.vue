@@ -76,9 +76,10 @@ async function createEvent() {
                                         range
                                         mask="DD.MM.YYYY"
                                         @update:model-value="selectDate"
-                                        class="brand-description"
+                                        color="brand-velvet"
+                                        class="brand-description !min-w-[20vw]"
                                         >
-                                        <q-btn class="flex flex-row" v-close-popup label="Закрыть" flat/>
+                                        <q-btn class="flex flex-row" v-close-popup label="Закрыть" color="brand-velvet"/>
                                     </q-date>
                                 </q-popup-proxy>
                             </q-icon>
