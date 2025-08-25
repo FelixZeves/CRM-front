@@ -32,12 +32,16 @@
   background: #825AFF !important;
 }
 
+.outline-brand-velvet {
+  outline-color: #825AFF !important;
+}
+
 .text-brand-grey {
   color: #F2F2F2 !important;
 }
 
 .bg-brand-grey {
-  background: #F2F2F2 !important
+  background: #F2F2F2 !important;
 }
 
 .q-item.q-item--active {

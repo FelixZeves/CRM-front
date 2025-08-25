@@ -5,6 +5,7 @@ import { TaskTypeEnum as T, StatusEnum as S, StatusEnum_ as St, RoleEnum_ as R, 
 import AddTask from '../forms/AddTask.vue'
 import axios from 'axios'
 import { downloadFile } from '../Utils'
+import ApproveGroupTask from '../forms/ApproveGroupTask.vue'
 
 const props = defineProps(['body', 'user'])
 const emit = defineEmits(['update-list'])
@@ -33,7 +34,14 @@ function applyFilters() {
 <template>
     <q-card class="!flex !flex-col !flex-grow bg-white mx-2 my-2 pt-3 pb-5 px-5 !min-h-[250px] !max-h-[600px] !flex-nowrap">
         <div class="flex flex-row w-[70%] justify-between">
-            <span class="lg:text-lg 2xl:text-xl font-bold text-sm lg:text-base 2xl:text-lg mb-2">{{ body.title }}</span>
+            <div class="flex flex-row gap-x-8">
+              <span class="lg:text-lg 2xl:text-xl font-bold text-sm lg:text-base 2xl:text-lg mb-2">{{ body.title }}</span>
+              <div v-if="body.multiple == true" class="flex flex-row gap-x-2">
+                <q-chip outline dense square color="brand-complete" class="!text-base !font-semibold">{{ `${body.approved.length}/${body.all}` }}</q-chip>
+                <q-chip outline dense square color="brand-danger" class="!text-base !font-semibold">{{ `${body.rejected.length}/${body.all}` }}</q-chip>
+                <q-chip outline dense square color="brand-velvet"  class="!text-base !font-semibold">{{ `${body.progress.length}/${body.all}` }}</q-chip>
+              </div>
+            </div>
             <div v-if="user.role != R.TEACHER">
               <q-chip v-if="body.ref != null" dense square clickable @click="applyFilters" size="lg" color="white" text-color="grey-7">
                 <q-icon name="fa-regular fa-file-lines" size="20px"></q-icon>
@@ -117,12 +125,18 @@ function applyFilters() {
           <q-btn v-else :label="btn[T.CREATOR]" @click="visibleApprove = true" class="brand-text" color="brand-velvet"/>
         </div>
     </q-card>
-    <ApproveTaskForm 
+    <ApproveTaskForm v-if="body.multiple == null"
       @update-list="emit('update-list')"
       v-model:visible="visibleApprove"
       :user="user"
       :body="body">
     </ApproveTaskForm>
+    <ApproveGroupTask v-else
+    @update-list="emit('update-list')"
+    v-model:visible="visibleApprove"
+    :user="user"
+    :body="body">
+    </ApproveGroupTask>
     <AddTask
       @update-list="emit('update-list')"
       v-model:visible="visibleAdd"

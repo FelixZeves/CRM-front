@@ -2,7 +2,7 @@
 import router from '@/router';
 import { ref } from 'vue'
 import axios from 'axios';
-import { getMe } from '../Utils';
+import { getMe, scheduleTokenRefresh } from '../Utils';
 import { SessionStorage } from 'quasar'
 
 const email = ref("")
@@ -22,6 +22,8 @@ async function loginUser(){
 
         SessionStorage.set('user', me)
 
+        scheduleTokenRefresh()
+        
         router.push('/Office')
         
     } catch (error) {

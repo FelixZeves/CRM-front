@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import ModalError from '@/components/forms/BugReport.vue'
-import { SessionStorage } from 'quasar'
+import { LocalStorage, SessionStorage } from 'quasar'
 
 const props = defineProps(['name', 'section'])
 const fio = ref("");
@@ -74,7 +74,7 @@ onMounted(async () => {await getUser()})
             <q-btn @click="visibleBugReport = true" label="Нашли ошибку?" color="brand-white brand-description" unelevated>
             <ModalError v-model:visible="visibleBugReport" />
             </q-btn>
-            <q-btn flat class="text-white brand-description" to="/" label="Выйти"></q-btn>
+            <q-btn flat class="text-white brand-description" @click="localStorage.removeItem('jwtToken')" to="/" label="Выйти"></q-btn>
         </div>
     </div>
 </template>

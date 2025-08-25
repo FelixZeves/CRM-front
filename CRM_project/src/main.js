@@ -20,6 +20,12 @@ import 'quasar/src/css/index.sass'
 import { errorNotify } from './components/Notifies.js'
 
 import axios from 'axios'
+import { scheduleTokenRefresh } from './components/Utils.js'
+
+const token = localStorage.getItem('jwtToken');
+if (token) {
+  scheduleTokenRefresh();
+}
 
 // handler for jwt token
 axios.interceptors.request.use((config) => {

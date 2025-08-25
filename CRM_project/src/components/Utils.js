@@ -6,6 +6,34 @@ export async function getMe(){
     return response
 }
 
+export function scheduleTokenRefresh() {
+    console.log('Scheduler запущен')
+    try {
+        const token = localStorage.getItem('jwtToken')
+        const payload = JSON.parse(atob(token.split('.')[1]))
+        const exp = payload.exp * 1000
+        const ttl = exp - Date.now()
+        if (ttl > 60000) { 
+            console.log(`Токен обновится через ${Math.round((ttl - 60000)/1000)} сек`)
+            setTimeout(refreshToken, ttl - 60000)
+        } else {
+            refreshToken()
+            console.log('Токен обновлён')
+        }
+    } catch (e) {
+        console.error('Ошибка при разборе JWT:', e)
+        refreshToken()
+    }
+  }
+
+export async function refreshToken(){
+    const response = await axios.get('/api/refresh')
+    localStorage.removeItem('jwtToken')
+
+    const token = response.data.jwt;
+    localStorage.setItem('jwtToken', token);
+}
+
 export async function getDepartments(id = null){
     let url = '/api/user/department'
     if (id)
@@ -72,7 +100,7 @@ export async function sendFile(files, title = null) {
 }
 
 export async function downloadFile(id){
-    const response = await axios.get(`/api/user/file/download/${id}`, {responseType: 'blob'});
+    const response = await axios.get(`/api/user/document/download/${id}`, {responseType: 'blob'});
     const disposition = response.headers['content-disposition'] || '';
     const fileNameMatch = disposition.match(/filename="?([^"]+)"?/);
     const fileName = fileNameMatch ? decodeURIComponent(fileNameMatch[1]) : 'file.bin';

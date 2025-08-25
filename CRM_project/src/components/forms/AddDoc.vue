@@ -18,8 +18,9 @@ if (props.body){
     form.value.id = props.body.id
     form.value.title = props.body.title
     form.value.permanent = props.body.permanent
-    form.value.focus = props.body.tags[0]
-    form.value.type = props.body.tags[1]
+    form.value.focus = props.body.tags[0].title
+    form.value.type = props.body.tags[1].title
+    form.value.departments = [...props.body.accesses, props.body.owner]
 }
 
 const visible = computed({
@@ -38,7 +39,7 @@ async function send() {
     form.value.departments.forEach(dep => fd.append('departments', dep))
     
 
-    let response = await axios.post('/api/user/file/upload?target=department', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+    let response = await axios.post('/api/user/document/upload', fd, {headers: {'Content-Type': 'multipart/form-data'}})
     if (response.status == 200) {
         successNotify()
         emit('update-list')
@@ -48,15 +49,15 @@ async function send() {
 async function edit() {
     const fd = new FormData()
 
-    fd/append('id', form.value.id)
+    fd.append('id', form.value.id)
     fd.append('title', form.value.title)
     fd.append('permanent', form.value.permanent)
     fd.append('tags', form.value.type)
     fd.append('tags', form.value.focus)
-    form.value.departments.forEach(dep => fd.append('departments', dep))
+    form.value.departments.forEach(dep => fd.append('departments', dep.id))
     
 
-    let response = await axios.patch('/api/user/file/?target=department', fd)
+    let response = await axios.patch('/api/user/document', fd)
     if (response.status == 200) {
         successNotify()
         emit('update-list')
@@ -122,7 +123,6 @@ async function lazyLoad() {
                         :option-value="'id'"
                         v-model="form.departments"
                         @focus="lazyLoad"
-                        hint="Чтобы файл был доступен всем, оставьте поле пустым"
                     />
                     
                 </q-card-section>

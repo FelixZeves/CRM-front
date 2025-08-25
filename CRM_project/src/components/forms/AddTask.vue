@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { DocEnum as D, PlaceEnum, RoleEnum_ as R} from '@/components/Enums.vue'
 import { getFormSchema, getToday } from '@/components/Utils.js'
 import { errorNotify, successNotify } from '@/components/Notifies'
@@ -23,6 +23,7 @@ const placeOptions = Object.values(PlaceEnum)
 
 const taskForm = ref(null)
 const receiversTab = ref('concrete')
+const subsIntoCollection = ref([])
 
 const task = ref({
     title: '',
@@ -45,6 +46,25 @@ if (props.body){
     task.value.type = D.ORDER
     task.value.ref = props.body.id
 }
+
+watch(subsIntoCollection, (newVal) => {
+    if(newVal){
+        if (task.value.type == D.ORDER){
+            task.value.executors = [...newVal]
+            task.value.reviewers = []
+            task.value.checkers = []
+        }
+        else{
+            task.value.executors = []
+            task.value.reviewers = [...newVal]
+            task.value.checkers = []
+        }
+    }
+    else{
+        task.value.executors = []
+        task.value.reviewers = []
+    }
+})
 
 const event = ref(getFormSchema('event'));
 
@@ -93,7 +113,7 @@ function clearForm() {
 
 function throwData(){
     evtUsers.value.clear()
-    if (eventForMe.value) evtUsers.value.add(props.me.profile.id)
+    if (eventForMe.value) evtUsers.value.add(props.me.id)
     let tmp = [...task.value.executors, ...task.value.reviewers, ...task.value.checkers].forEach(id => evtUsers.value.add(id))
 
     event.value.title = task.value.title
@@ -417,6 +437,7 @@ async function send() {
                                     v-model="task.checkers"
                                 />
                             </div>
+
                             <div v-else-if="receiversTab == 'massive' && task.type != D.APPLICATION" class="flex flex-col gap-y-4">
                                 <q-select
                                     v-if="task.type == D.ORDER"
@@ -431,8 +452,23 @@ async function send() {
                                     :option-label="'title'"
                                     :option-value="'id'"
                                     @focus="lazyLoad"
+                                    v-model="subsIntoCollection"
+                                />
+                                <q-select
+                                    v-if="task.type == D.ORDER"
+                                    label="Уточнение выбора"
+                                    class="w-full"
+                                    outlined
+                                    emit-value
+                                    map-options
+                                    use-chips
+                                    multiple
+                                    :options="subsIntoCollection"
+                                    :option-label="'title'"
+                                    :option-value="'id'"
                                     v-model="task.executors"
                                 />
+
                                 <q-select
                                     v-if="task.type == D.MEMO"
                                     label="Получатели"
@@ -446,8 +482,23 @@ async function send() {
                                     :option-label="'title'"
                                     :option-value="'id'"
                                     @focus="lazyLoad"
+                                    v-model="subsIntoCollection"
+                                />
+                                <q-select
+                                    v-if="task.type == D.MEMO"
+                                    label="Уточнение выбора"
+                                    class="w-full"
+                                    outlined
+                                    emit-value
+                                    map-options
+                                    use-chips
+                                    multiple
+                                    :options="subsIntoCollection"
+                                    :option-value="'id'"
+                                    @focus="lazyLoad"
                                     v-model="task.reviewers"
                                 />
+
                             </div>
 
                             <q-select

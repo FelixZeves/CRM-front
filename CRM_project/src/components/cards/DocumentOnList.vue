@@ -14,7 +14,7 @@ const extension = props.body.title.split('.').pop();
 const visible = ref(false)
 
 function parseTag(tag) {
-    return tag
+    return tag.title
         .split(' ')
         .map(p => {
             if (p.length <= 3) return p
@@ -50,12 +50,12 @@ function parseTag(tag) {
                                 </q-chip>
                             </div>
                         </div>
-                        <span class="brand-text">Опубликовано: {{ body.creator }}</span>
+                        <span class="brand-text">{{ body.owner.title }} | {{ body.owner.manager.init_name }}</span>
                     </div>
                     <div class="content-center !w-[50%]">
                         <div class="flex flex-row justify-end">
                             <q-chip v-if="body.permanent == true" outline dense square class="brand-text !p-2" label="Бессрочный"/>
-                            <q-chip v-for="tag in body.tags" outline dense square class="brand-text !p-2" :label="tag.length < 12  ? tag : parseTag(tag)"/>
+                            <q-chip v-for="tag in body.tags" outline dense square class="brand-text !p-2" :label="tag.title.length < 12  ? tag.title : parseTag(tag)"/>
                             <q-chip outline dense square class="brand-text !p-2" :label="body.create_at"/>
                         </div>
                     </div>

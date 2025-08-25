@@ -14,7 +14,7 @@ const user = SessionStorage.getItem('user')
 onMounted(async () => {await updateList()})
 
 async function updateList(params = {}) {
-    let url =  '/api/user/file'
+    let url =  '/api/user/document'
     docs.value = (await axios.get(url,  { params } )).data.data
 }
 </script>

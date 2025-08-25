@@ -111,7 +111,7 @@ onMounted(() => {
 
 <template>
     <q-dialog v-model="visible" backdrop-filter="blur(4px)">
-        <q-card style="max-width: 50%; min-width: 50%;" class="py-4 px-3 min-w-[50%] max-w-[50%] !flex-nowrap">
+        <q-card class="py-4 px-3 min-w-[50%] max-w-[50%] !flex-nowrap">
             
             <q-card-section>
                 <div class="brand-title text-center">{{ body.title }}</div>
