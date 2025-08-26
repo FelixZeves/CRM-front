@@ -19,21 +19,26 @@ const body = computed({
     get:  () => props.body
 })
 
-const curStep = ref(body.value.active.find(step => step.status !== St.APPROVED) ?? body.value.active[0]);
-const step =  ref(body.value.active.findIndex(step => step.user.id == props.user.profile.id))
+const step = ref(body.value.active.findIndex(step => step.user.id == props.user.profile.id))
 const isCreator = (type) => { return type === T.CREATOR }
+
+const form = ref({
+    id: null,
+    status: St.PROGRESS,
+    comment: null,
+    files: []
+})
 
 async function send(status) {
     form.value.status = status
-    form.value.step = body.value.active[step.value].id
+    form.value.id = body.value.active[step.value].id
 
     const fd = new FormData()
 
-    for (const key of ['step', 'status', 'comment']){
+    for (const key of ['id', 'status', 'comment']){
         fd.append(key, form.value[key])
     }
         
-
     for (const key of ['files'])
         form.value[key].forEach(elem => fd.append(key, elem))
 
@@ -49,7 +54,7 @@ const isReset = ref(false)
 const deadline = ref(body.value.deadline)
 
 async function reset(){
-    let response = await axios.patch(`${url}/reset`, {tid: body.value.id, deadline: deadline.value})
+    let response = await axios.patch(`${url}/rollback/${body.value.id}`, { deadline: deadline.value})
 
     if (response.status == 200){
         successNotify('Задача перезапущена')
@@ -77,13 +82,6 @@ async function deleteTask(){
     }
 }
 
-const form = ref({
-    step: null,
-    status: St.PROGRESS,
-    comment: null,
-    files: []
-})
-
 async function lazyLoad(step){
     if(!step.files[0].title)
         step.files = (await axios.get(`/api/user/file?id=${step.files}`)).data.data
@@ -96,13 +94,13 @@ watch(step, (newVal, oldVal) => {
 
 watch(() => props.body, (newBody) => {
     body.value = newBody
-    curStep.value = newBody.active.find(step => step.status !== St.APPROVED) ?? newBody.active[0];
     step.value =  newBody.active.findIndex(step => step.user.id == props.user.profile.id)
     if(body.value.active[step.value].files.length > 0)
         lazyLoad(body.value.active[step.value])
 })
 
 onMounted(() => {
+    console.log(body.value)
     if(body.value.active[step.value].files.length > 0)
         lazyLoad(body.value.active[step.value])
 })
@@ -150,7 +148,7 @@ onMounted(() => {
                                 <q-tab name="details" class="brand-description" label="Описание" v-if="isCreator(s.type)"/>
                                 <q-tab name="comment" class="brand-description" label="Комментарий" />
                                 <q-tab name="files" class="brand-description" label="Файлы" v-if="s.files.length > 0"/>
-                                <q-tab name="history" class="brand-description" label="История" v-if="isCreator(s.type)  && body.history.length > 0"/>
+                                <q-tab name="history" class="brand-description" label="История" v-if="isCreator(s.type)  && body.archive.length > 0"/>
                             </q-tabs>
 
                             <q-tab-panels
@@ -172,10 +170,10 @@ onMounted(() => {
                                     </q-item>
                                 </q-list>
                             </q-tab-panel>
-                            <q-tab-panel name="history" v-if="isCreator(s.type) && body.history.length > 0">
+                            <q-tab-panel name="history" v-if="isCreator(s.type) && body.archive.length > 0">
                                 <q-list>
                                     <q-expansion-item
-                                        v-for="hs in body.history"
+                                        v-for="hs in body.archive"
                                         group="history steps"
                                         :icon="hs.status == St.APPROVED ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark'"
                                         :label="hs.user.init_name"

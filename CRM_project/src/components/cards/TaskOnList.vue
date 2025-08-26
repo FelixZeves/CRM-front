@@ -12,7 +12,7 @@ const emit = defineEmits(['update-list'])
 const tab = ref('main')
 const visibleApprove = ref(false)
 const visibleAdd = ref(false)
-const me =  ref(props.body.active.find(step => step.user.id == props.user.profile.id))
+const me = ref(props.body.active.find(step => step.user.id == props.user.profile.id))
 const btn = ref({
   [T.EXECUTOR]: 'Отчитаться',
   [T.REVIEWER]: 'Согласовать',

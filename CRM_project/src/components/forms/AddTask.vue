@@ -31,6 +31,7 @@ const task = ref({
     comment:  '',
     deadline: today,
     ref: null,
+    gid: null,
     files: [],
     executors: [],
     reviewers: [],
@@ -182,11 +183,10 @@ async function send() {
 
         const fd = new FormData()
 
-        for (const key of ['title', 'description', 'comment', 'deadline', 'type', 'ref'])
-            fd.append(key, task.value[key])
+        const { files, ...rest } = task.value
+        fd.append('data', JSON.stringify(rest))
 
-        for (const key of ['files', 'executors', 'reviewers', 'checkers'])
-            task.value[key].forEach(elem => fd.append(key, elem))
+        files.forEach(file => fd.append('files', file))
 
         let response = await axios.post('/api/user/task', fd, {headers: {'Content-Type': 'multipart/form-data'}})
 
