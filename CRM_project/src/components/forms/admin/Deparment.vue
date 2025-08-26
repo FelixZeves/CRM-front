@@ -19,7 +19,7 @@ const staffOptions = ref([...props.model.staff])
 const managerOption = ref([props.model.manager])
 
 watch(() => props.model, (val) => {
-  Object.assign(localModel, JSON.parse(JSON.stringify(val)))
+  Object.assign(localModel.value, JSON.parse(JSON.stringify(val)))
 }, { deep: true })
 
 async function send() {
