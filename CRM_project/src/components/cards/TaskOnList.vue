@@ -12,7 +12,16 @@ const emit = defineEmits(['update-list'])
 const tab = ref('main')
 const visibleApprove = ref(false)
 const visibleAdd = ref(false)
-const me = ref(props.body.active.find(step => step.user.id == props.user.profile.id))
+const me = ref(null)
+if(props.body.total == null){
+  me.value=props.body.active.find(step => step.user.id == props.user.profile.id)
+}
+else{
+  me.value = {
+    type: T.CREATOR,
+    status: St.APPROVED
+  }
+}
 const btn = ref({
   [T.EXECUTOR]: 'Отчитаться',
   [T.REVIEWER]: 'Согласовать',
@@ -36,10 +45,10 @@ function applyFilters() {
         <div class="flex flex-row w-[70%] justify-between">
             <div class="flex flex-row gap-x-8">
               <span class="lg:text-lg 2xl:text-xl font-bold text-sm lg:text-base 2xl:text-lg mb-2">{{ body.title }}</span>
-              <div v-if="body.multiple == true" class="flex flex-row gap-x-2">
-                <q-chip outline dense square color="brand-complete" class="!text-base !font-semibold">{{ `${body.approved.length}/${body.all}` }}</q-chip>
-                <q-chip outline dense square color="brand-danger" class="!text-base !font-semibold">{{ `${body.rejected.length}/${body.all}` }}</q-chip>
-                <q-chip outline dense square color="brand-velvet"  class="!text-base !font-semibold">{{ `${body.progress.length}/${body.all}` }}</q-chip>
+              <div v-if="body.total != null" class="flex flex-row gap-x-2">
+                <q-chip outline dense square color="brand-complete" class="!text-base !font-semibold">{{ `${body.approved}/${body.total}` }}</q-chip>
+                <q-chip outline dense square color="brand-danger" class="!text-base !font-semibold">{{ `${body.rejected}/${body.total}` }}</q-chip>
+                <q-chip outline dense square color="brand-velvet"  class="!text-base !font-semibold">{{ `${body.progress}/${body.total}` }}</q-chip>
               </div>
             </div>
             <div v-if="user.role != R.TEACHER">
@@ -88,8 +97,8 @@ function applyFilters() {
           narrow-indicator
         >
           <q-tab name="main" class="brand-description" label="Основная" />
-          <q-tab name="details" class="brand-description" label="Дополнительная" />
-          <q-tab v-if="Array.isArray(body.active[0].files) && body.active[0].files.length > 0" name="files" label="файлы" @click="lazyLoad(body.active[0])"/>
+          <q-tab v-if="body.total == null" name="details" class="brand-description" label="Дополнительная" />
+          <q-tab v-if="body.total == null && Array.isArray(body.active[0].files) && body.active[0].files.length > 0" name="files" label="файлы" @click="lazyLoad(body.active[0])"/>
         </q-tabs>
 
         <q-tab-panels
@@ -100,11 +109,11 @@ function applyFilters() {
         animated>
           <q-tab-panel name="main">
             
-            <p class="brand-text m-0 justify-self-end text-end pb-4"><span>Получена: {{ body.active[0].update_at }} <br/> <span>Срок: {{ body.deadline }}</span> </span></p>
+            <p class="brand-text m-0 justify-self-end text-end pb-4"><span>Получена: {{ body.update_at }} <br/> <span>Срок: {{ body.deadline }}</span> </span></p>
             <div class="brand-description text-pretty text-ellipsis line-clamp-2">{{ body.description }}</div>
           </q-tab-panel>
 
-          <q-tab-panel name="details" class="overflow-y-auto">
+          <q-tab-panel v-if="body.total == null" name="details" class="overflow-y-auto">
             <p class="brand-text m-0 justify-self-end text-end pb-4"><span class="brand-text">Поставил(а) задачу: </span> <br/>{{ body.active[0].user.fio }}</p>
             <p class="brand-description">{{ body.active[0].comment }}</p>
           </q-tab-panel>
@@ -115,7 +124,7 @@ function applyFilters() {
                 <q-icon :name="FI[file.title.split('.').pop()] || 'fa-regular fa-file'" size="md"/>
                 <span class="brand-description flex-grow text-ellipsis line-clamp-1">{{ file.title }}</span>
                 <span class="brand-description w-[10%]">{{ `${(file.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
-                <q-btn color="brand-wait" class="!w-[225px]" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile(file.id)"/>
+                <q-btn color="brand-wait" class="!w-[225px]" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile('/api/user/task/download',file.id)"/>
               </q-item>
             </q-list>
           </q-tab-panel>
@@ -125,7 +134,7 @@ function applyFilters() {
           <q-btn v-else :label="btn[T.CREATOR]" @click="visibleApprove = true" class="brand-text" color="brand-velvet"/>
         </div>
     </q-card>
-    <ApproveTaskForm v-if="body.multiple == null"
+    <ApproveTaskForm v-if="body.total == null"
       @update-list="emit('update-list')"
       v-model:visible="visibleApprove"
       :user="user"
@@ -135,7 +144,7 @@ function applyFilters() {
     @update-list="emit('update-list')"
     v-model:visible="visibleApprove"
     :user="user"
-    :body="body">
+    :id="body.id">
     </ApproveGroupTask>
     <AddTask
       @update-list="emit('update-list')"

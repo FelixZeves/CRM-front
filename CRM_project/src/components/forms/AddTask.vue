@@ -25,6 +25,15 @@ const taskForm = ref(null)
 const receiversTab = ref('concrete')
 const subsIntoCollection = ref([])
 
+watch(receiversTab, (newVal) => {
+    if(newVal){
+        subsIntoCollection.value = []
+        task.value.executors = []
+        task.value.reviewers = []
+        task.value.checkers = []
+    }
+})
+
 const task = ref({
     title: '',
     description: '',
@@ -46,24 +55,29 @@ if (props.body){
     task.value.deadline = props.body.deadline
     task.value.type = D.ORDER
     task.value.ref = props.body.id
+    if(props.body.gid && props.body.owner == props.me.profile.id){
+        task.value.type = D.MEMO
+        task.value.reviewers = props.body.active[1].user.id
+        lazyLoad()
+    }
 }
 
 watch(subsIntoCollection, (newVal) => {
-    if(newVal){
-        if (task.value.type == D.ORDER){
-            task.value.executors = [...newVal]
+    if (Array.isArray(newVal) && newVal.length > 0) {
+        if (task.value.type === D.ORDER) {
+            task.value.executors = newVal.map(item => item.id)
             task.value.reviewers = []
             task.value.checkers = []
-        }
-        else{
+        } else {
             task.value.executors = []
-            task.value.reviewers = [...newVal]
+            task.value.reviewers = newVal.map(item => item.id)
             task.value.checkers = []
         }
     }
     else{
         task.value.executors = []
         task.value.reviewers = []
+        task.value.checkers = []
     }
 })
 
@@ -127,6 +141,8 @@ function clearDialog(){
     clearForm()
     step.value = 1
     clearForm()
+    subsIntoCollection.value = []
+    receiversTab.value = 'concrete'
 }
 
 const visible = computed({
@@ -150,18 +166,27 @@ async function lazyLoad() {
     let department = null
     if (props.me.role == R.LEADER){
         department = (await axios.get(`/api/user/department?id=${props.me.profile.manager.id}`)).data.data[0]
-        peopleOptions.value = [...department.staff.map(staff => ({id: staff.id, fio: `${staff.fio} (Сотрудник)`})),
-                               ...department.childrens.filter(child => child.manager !== null)
-                                                      .map(child => ({id: child.manager.id, fio: `${child.manager.fio} (${child.title})`}))]
-        departmentOptions.value = [...department.parents.map(p => ({id: p.id, title: `${p.title} (${p.manager?.fio})`}))]
+        if(peopleOptions.value.length == 0){
+            peopleOptions.value = [...department.staff.map(staff => ({id: staff.id, fio: `${staff.fio} (Сотрудник)`})),
+                                    ...department.childrens.filter(child => child.manager !== null)
+                                                                    .map(child => ({id: child.manager.id, fio: `${child.manager.fio} (${child.title})`}))]
+        }
+        if(departmentOptions.value.length == 0)
+            departmentOptions.value = [...department.parents.map(p => ({id: p.id, title: `${p.title} (${p.manager?.fio})`}))]
     } else {
         department = (await axios.get(`/api/user/department?id=${props.me.profile.department.id}`)).data.data[0]
-        peopleOptions.value = [{id: department.manager.id, fio: `${department.manager.fio} (${department.title})`}]
+        if(peopleOptions.value.length == 0)
+            peopleOptions.value = [{id: department.manager.id, fio: `${department.manager.fio} (${department.title})`}]
     }
-    let collections = (await axios.get(`/api/user/collection`)).data.data
-    collectionOptions.value = [...collections.map(collection => ({
-                                    id: collection.subs.map(sub => sub.id),
+    if(collectionOptions.value.length == 0){
+        let collections = (await axios.get(`/api/user/collection`)).data.data
+        collectionOptions.value = [...collections.map(collection => ({
+                                    subs: collection.subs,
                                     title: collection.title}))]
+        if (props.me.role == R.LEADER && props.me.profile.manager.id){
+            collectionOptions.value = [...collectionOptions.value, {title: props.me.profile.manager.title, subs: peopleOptions.value}]
+        }
+    }
 }
 
 async function send() {
@@ -170,15 +195,17 @@ async function send() {
         errorNotify('Задача. Не все поля заполнены')
         return
     }
-
     if([...task.value.executors, ...task.value.reviewers, ...task.value.executors].length == 0){
         errorNotify('Поля получателей пусты')
         return
     }
 
-    if (receiversTab.value == 'concrete' || task.value.type == D.APPLICATION) {
+    if (receiversTab.value == 'concrete' ||
+        task.value.type == D.APPLICATION ||
+        (receiversTab.value == 'massive' && [...task.value.executors, ...task.value.reviewers].length == 1)) {
         if (task.value.type == D.APPLICATION){
             task.value.title = `${task.value.title} (${task.value.place})`
+            task.value.reviewers = [...task.value.reviewers.map(staff => (staff.id))]
         }
 
         const fd = new FormData()
@@ -203,56 +230,24 @@ async function send() {
 
     else {
         const fd = new FormData()
-        for (const key of ['title', 'description', 'comment', 'deadline', 'type', 'ref'])
-            fd.append(key, task.value[key])
 
-        task.value.files.forEach(elem => fd.append('files', elem))
+        const { files, ...rest } = task.value
+        fd.append('data', JSON.stringify(rest))
 
-        if (task.value.type == D.ORDER){
-            let badIds = []
-            for (let id of task.value.executors){
-                fd.append('executors', id)
-                let response = await axios.post('/api/user/task', fd, {headers: {'Content-Type': 'multipart/form-data'}})
-                fd.delete('executors')
-                if (response.status != 200){
-                    badIds.push(id)
-                }
-            }
-            if (badIds.length == 0){
-                if (activeEvent.value) {
-                    event.value.user = [...evtUsers.value]
-                    let response = await axios.post('/api/user/event', event.value)
-                }
-                successNotify('Задача поставлена')
-                emit('update-list')
-            }
-            else {
-                errorNotify(`Задача не была поставлена ${badIds.length} ${badIds.length > 1 ? 'людям' : 'человеку'}`)
-                emit('update-list')
-            }
+        files.forEach(file => fd.append('files', file))
+
+        let response = await axios.post('/api/user/task?group=true', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+
+        if (activeEvent.value && response.status == 200) {
+            event.value.user = [...evtUsers.value]
+            response = await axios.post('/api/user/event', event.value)
         }
-        else {
-            let badIds = []
-            for (let id of task.value.reviewers){
-                fd.append('reviewers', id)
-                let response = await axios.post('/api/user/task', fd, {headers: {'Content-Type': 'multipart/form-data'}})
-                fd.delete('reviewers')
-                if (response.status != 200){
-                    badIds.push(id)
-                }
-            }
-            if (badIds.length == 0){
-                successNotify('Задача поставлена')
-                emit('update-list')
-            }
-            else {
-                errorNotify(`Задача не была поставлена ${badIds.length} ${badIds.length > 1 ? 'людям' : 'человеку'}`)
-                emit('update-list')
-            }
+
+        if (response.status == 200){
+            successNotify('Групповая задача поставлена')
+            emit('update-list')
         }
     }
-
-    
 }
 </script>
 
@@ -450,7 +445,7 @@ async function send() {
                                     clearable
                                     :options="collectionOptions"
                                     :option-label="'title'"
-                                    :option-value="'id'"
+                                    :option-value="'subs'"
                                     @focus="lazyLoad"
                                     v-model="subsIntoCollection"
                                 />
@@ -464,7 +459,7 @@ async function send() {
                                     use-chips
                                     multiple
                                     :options="subsIntoCollection"
-                                    :option-label="'title'"
+                                    :option-label="'fio'"
                                     :option-value="'id'"
                                     v-model="task.executors"
                                 />
@@ -480,7 +475,7 @@ async function send() {
                                     clearable
                                     :options="collectionOptions"
                                     :option-label="'title'"
-                                    :option-value="'id'"
+                                    :option-value="'subs'"
                                     @focus="lazyLoad"
                                     v-model="subsIntoCollection"
                                 />
@@ -494,8 +489,8 @@ async function send() {
                                     use-chips
                                     multiple
                                     :options="subsIntoCollection"
+                                    :option-label="'fio'"
                                     :option-value="'id'"
-                                    @focus="lazyLoad"
                                     v-model="task.reviewers"
                                 />
 
@@ -528,7 +523,7 @@ async function send() {
                                 clearable
                                 :options="collectionOptions"
                                 :option-label="'title'"
-                                :option-value="'id'"
+                                :option-value="'subs'"
                                 @focus="lazyLoad"
                                 v-model="task.reviewers"
                             />
@@ -550,7 +545,7 @@ async function send() {
                             <q-toggle
                                 v-model="activeEvent"
                                 class="brand-description"
-                                label="для исполнителей"
+                                label="для получателей"
                             />
                             <q-toggle 
                                 :disable="!activeEvent"

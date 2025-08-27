@@ -2,8 +2,11 @@
 import { StatusEnum } from '@/components/Enums.vue'
 import { ref } from 'vue';
 import { getTasks } from '../Utils';
+import { SessionStorage } from 'quasar';
 
 const tasks = ref([])
+
+const user = SessionStorage.getItem('user')
 
 async function get() {
     tasks.value = await getTasks()
@@ -25,7 +28,7 @@ get()
                             <div class="brand-description overflow-hidden text-ellipsis line-clamp-2"> {{ task.description }} </div>
                         </div>
                         <div class="w-[25%] text-end pe-2">
-                            <div class="brand-text">{{ task.active[0].user.init_name }}</div>
+                            <div class="brand-text">{{ task.total == null ? task.active[0].user.init_name : user.profile.initials_name }}</div>
                             <div class="brand-text">{{ task.deadline }}</div>
                         </div>
                     </q-card-section>

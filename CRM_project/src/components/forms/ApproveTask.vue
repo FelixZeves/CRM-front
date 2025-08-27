@@ -100,7 +100,6 @@ watch(() => props.body, (newBody) => {
 })
 
 onMounted(() => {
-    console.log(body.value)
     if(body.value.active[step.value].files.length > 0)
         lazyLoad(body.value.active[step.value])
 })
@@ -166,7 +165,7 @@ onMounted(() => {
                                         <q-icon :name="file.title ? FI[file.title.split('.').pop()] : 'fa-regular fa-file'" size="md"/>
                                         <span class="brand-text flex-grow text-ellipsis line-clamp-1">{{ file.title }}</span>
                                         <span class="brand-text w-[15%]">{{ `${(file.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
-                                        <q-btn color="brand-wait" class="!w-[185px] brand-text" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile(file.id)"/>
+                                        <q-btn color="brand-wait" class="!w-[185px] brand-text" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile('/api/user/task/download',file.id)"/>
                                     </q-item>
                                 </q-list>
                             </q-tab-panel>
@@ -189,7 +188,7 @@ onMounted(() => {
                                                             <q-icon :name="hf.title ? FI[hf.title.split('.').pop()] : 'fa-regular fa-file'" size="md"/>
                                                             <span class="brand-text flex-grow text-ellipsis line-clamp-1">{{ hf.title }}</span>
                                                             <span class="brand-text w-[15%]">{{ `${(hf.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
-                                                            <q-btn color="brand-wait" class="!w-[185px] brand-text" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile(hf.id)"/>
+                                                            <q-btn color="brand-wait" class="!w-[185px] brand-text" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile('/api/user/task/download', hf.id)"/>
                                                 </q-item>
                                             </q-list>
                                         </q-card-section>
@@ -199,7 +198,7 @@ onMounted(() => {
                             </q-tab-panel>
                             </q-tab-panels>
                             
-                            <div v-if="s.status == St.REJECTED && body.active[0].user.id  == user.profile.id && body.is_archive != true" class="flex flex-row flex-grow justify-between pt-2">
+                            <div v-if="s.status == St.REJECTED && body.active[0].user.id  == user.profile.id && body.is_archive != true && body.gid === null" class="flex flex-row flex-grow justify-between pt-2">
                                 <q-btn v-if="isReset != true" color="brand-danger" @click="confirmNotify(deleteTask)" label="Удалить" class="navigation-btn opacity-[80%] brand-description" />
                                 <q-btn v-if="isReset != true" color="brand-danger" @click="confirmNotify(toArchive)" label="В архив" class="navigation-btn opacity-[80%] brand-description" />
                                 <q-btn v-if="isReset != true" color="brand-velvet" @click="isReset = true" label="Сбросить задачу" class="navigation-btn brand-description" />
@@ -243,7 +242,7 @@ onMounted(() => {
                                 </q-form>
                             </div>
 
-                            <div v-if="body.status == St.APPROVED && body.active[0].user.id  == user.profile.id && index == (body.active.length - 1) && body.is_archive != true" class="flex flex-row flex-grow justify-between pt-2">
+                            <div v-if="body.status == St.APPROVED && body.active[0].user.id  == user.profile.id && index == (body.active.length - 1) && body.is_archive != true && body.gid === null" class="flex flex-row flex-grow justify-between pt-2">
                                 <q-btn color="brand-danger" @click="confirmNotify(deleteTask)" label="Удалить" class="navigation-btn opacity-[80%] brand-description" />
                                 <q-btn color="brand-velvet" @click="confirmNotify(toArchive)" label="В архив" class="navigation-btn brand-description" />
                             </div>

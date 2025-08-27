@@ -61,7 +61,7 @@ function parseTag(tag) {
                     </div>
                     <span class="brand-description !w-[6%] content-center text-end">{{ `${(body.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
                 </div>
-                <q-btn flat class="!w-[5%] !px-1" @click="downloadFile(body.id)">
+                <q-btn flat class="!w-[5%] !px-1" @click="downloadFile('/api/user/document/download',body.id)">
                     <q-icon name="download" size="lg"></q-icon>
                 </q-btn>
             </q-card-section>

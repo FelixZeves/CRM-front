@@ -99,20 +99,20 @@ export async function sendFile(files, title = null) {
     await axios.post('/api/user/file/upload', fd, {headers: {'Content-Type': 'multipart/form-data'}})
 }
 
-export async function downloadFile(id){
-    const response = await axios.get(`/api/user/document/download/${id}`, {responseType: 'blob'});
+export async function downloadFile(url, id){
+    const response = await axios.get(`${url}/${id}`, {responseType: 'blob'});
     const disposition = response.headers['content-disposition'] || '';
     const fileNameMatch = disposition.match(/filename="?([^"]+)"?/);
     const fileName = fileNameMatch ? decodeURIComponent(fileNameMatch[1]) : 'file.bin';
 
-    const url = window.URL.createObjectURL(response.data);
+    const tmpUrl = window.URL.createObjectURL(response.data);
     const link = document.createElement('a');
-    link.href = url;
+    link.href = tmpUrl;
     link.download = fileName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    window.URL.revokeObjectURL(tmpUrl);
 }
 
 export function getFormSchema(name) {

@@ -1,5 +1,14 @@
 <script setup>
+import { ref } from 'vue'
+import AddTask from '../forms/AddTask.vue'
+import ApproveTask from '../forms/ApproveTask.vue'
+import { SessionStorage } from 'quasar'
 const props = defineProps(['task', 'section'])
+
+const visibleApprove = ref(false)
+const visibleAdd = ref(false)
+
+const user = SessionStorage.getItem('user')
 
 function pluralizeFiles(count) {
   if (count === 1) return 'файл'
@@ -12,9 +21,9 @@ function pluralizeFiles(count) {
 <template>
     <q-item>
         <q-item-section class="min-w-0">
-            <q-item-label overline class="!text-sm !font-semibold text-">{{ task.fio }}</q-item-label>
+            <q-item-label overline class="!text-sm !font-semibold text-">{{ task.active[1].user.init_name }}</q-item-label>
             <q-item-label v-if="section.key !== 'progress'" class="!text-xs text-stone-600 !font-semibold text-">
-            {{ `${task.update_at}` }} : {{ `${task.files.length} ${pluralizeFiles(task.files.length)}` }}
+            {{ `${task.update_at}` }} : {{ `${task.active[1].files.length} ${pluralizeFiles(task.active[1].files.length)}` }}
             </q-item-label>
             <q-item-label v-else class="!text-xs text-stone-600 !font-semibold text-ellipsis">
             {{ task.update_at }}
@@ -22,7 +31,12 @@ function pluralizeFiles(count) {
         </q-item-section>
 
         <q-item-section side shrink>
-            <q-btn flat color="brand-velvet" class="!h-[32px] !w-[42px]">
+            <q-btn
+                flat
+                color="brand-velvet"
+                class="!h-[32px] !w-[42px]"
+                @click="section.key === 'progress' ? visibleAdd = true : visibleApprove = true"
+            >
                 <q-icon :name="section.icon" size="sm">
 
                 </q-icon>
@@ -38,4 +52,14 @@ function pluralizeFiles(count) {
             </q-btn>
         </q-item-section>
     </q-item>
+    <ApproveTask
+      v-model:visible="visibleApprove"
+      :user="user"
+      :body="task">
+    </ApproveTask>
+    <AddTask
+      v-model:visible="visibleAdd"
+      :body="task"
+      :me="user"
+    />
 </template>
