@@ -1,11 +1,12 @@
 <script setup>
-import axios from 'axios';
+import api from '@/main';
+import { EVENT } from '../Utils';
 const props = defineProps(['id','name', 'description', 'deadline', 'creator', 'place'])
 const emit = defineEmits(['delete-event']);
 
 async function deleteEvent(){
     try{
-        const response = await axios.delete(`/api/user/event?id=${props.id}`)
+        const response = await api.delete(`${EVENT}?id=${props.id}`)
         emit('delete-event')
         return response
     } catch (error) {

@@ -3,8 +3,8 @@ import { ref } from 'vue'
 import ApproveTaskForm from '@/components/forms/ApproveTask.vue'
 import { TaskTypeEnum as T, StatusEnum as S, StatusEnum_ as St, RoleEnum_ as R, fileIconsEnum as FI} from '@/components/Enums.vue'
 import AddTask from '../forms/AddTask.vue'
-import axios from 'axios'
-import { downloadFile } from '../Utils'
+import api from '@/main'
+import { downloadFile, FILE, TASK } from '../Utils'
 import ApproveGroupTask from '../forms/ApproveGroupTask.vue'
 
 const props = defineProps(['body', 'user'])
@@ -31,7 +31,7 @@ const btn = ref({
 
 async function lazyLoad(step){
     if(!step.files[0].title)
-        step.files = (await axios.get(`/api/user/file?id=${step.files}`)).data.data
+        step.files = (await api.get(`${FILE}?id=${step.files}`)).data.data
 }
 
 function applyFilters() {
@@ -124,7 +124,7 @@ function applyFilters() {
                 <q-icon :name="FI[file.title.split('.').pop()] || 'fa-regular fa-file'" size="md"/>
                 <span class="brand-description flex-grow text-ellipsis line-clamp-1">{{ file.title }}</span>
                 <span class="brand-description w-[10%]">{{ `${(file.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
-                <q-btn color="brand-wait" class="!w-[225px]" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile('/api/user/task/download',file.id)"/>
+                <q-btn color="brand-wait" class="!w-[225px]" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile(`${TASK}`,file.id)"/>
               </q-item>
             </q-list>
           </q-tab-panel>

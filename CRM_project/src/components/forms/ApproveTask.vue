@@ -1,14 +1,13 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { StatusEnum_ as St, TaskTypeEnum as T, fileIconsEnum as FI} from '@/components/Enums.vue'
-import axios from 'axios'
-import { downloadFile } from '@/components/Utils'
+import api from '@/main'
+import { FILE, TASK, downloadFile } from '@/components/Utils'
 import { confirmNotify, successNotify } from '@/components/Notifies'
 
 const emit = defineEmits(['update:visible', 'update-list'])
 const props = defineProps(['visible', 'body', 'user'])
 const tab = ref('comment')
-const url = '/api/user/task'
 
 const visible = computed({
   get: () => props.visible,
@@ -42,7 +41,7 @@ async function send(status) {
     for (const key of ['files'])
         form.value[key].forEach(elem => fd.append(key, elem))
 
-    let response = await axios.put(`${url}/approve`, fd, {headers: {'Content-Type': 'multipart/form-data'}})
+    let response = await api.put(`${TASK}/approve`, fd, {headers: {'Content-Type': 'multipart/form-data'}})
 
     if (response.status == 200){
         successNotify()
@@ -54,7 +53,7 @@ const isReset = ref(false)
 const deadline = ref(body.value.deadline)
 
 async function reset(){
-    let response = await axios.patch(`${url}/rollback/${body.value.id}`, { deadline: deadline.value})
+    let response = await api.patch(`${TASK}/rollback/${body.value.id}`, { deadline: deadline.value})
 
     if (response.status == 200){
         successNotify('Задача перезапущена')
@@ -63,7 +62,7 @@ async function reset(){
 }
 
 async function toArchive(){
-    let response = await axios.put(`${url}/archive/${props.body.id}`)
+    let response = await api.put(`${TASK}/archive/${props.body.id}`)
 
     if (response.status == 200){
         successNotify('Задача отправлена в архив')
@@ -73,7 +72,7 @@ async function toArchive(){
 }
 
 async function deleteTask(){
-    let response = await axios.delete(`${url}/${props.body.id}`)
+    let response = await api.delete(`${TASK}/${props.body.id}`)
 
     if (response.status == 200){
         successNotify('Задача удалена')
@@ -84,7 +83,7 @@ async function deleteTask(){
 
 async function lazyLoad(step){
     if(!step.files[0].title)
-        step.files = (await axios.get(`/api/user/file?id=${step.files}`)).data.data
+        step.files = (await api.get(`${FILE}?id=${step.files}`)).data.data
 }
 
 watch(step, (newVal, oldVal) => {
@@ -165,7 +164,13 @@ onMounted(() => {
                                         <q-icon :name="file.title ? FI[file.title.split('.').pop()] : 'fa-regular fa-file'" size="md"/>
                                         <span class="brand-text flex-grow text-ellipsis line-clamp-1">{{ file.title }}</span>
                                         <span class="brand-text w-[15%]">{{ `${(file.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
-                                        <q-btn color="brand-wait" class="!w-[185px] brand-text" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile('/api/user/task/download',file.id)"/>
+                                        <q-btn
+                                            color="brand-wait"
+                                            class="!w-[185px] brand-text"
+                                            text-color="black"
+                                            label="Скачать"
+                                            icon-right="bi-download ps-5"
+                                            @click="downloadFile(`${TASK}`,file.id)"/>
                                     </q-item>
                                 </q-list>
                             </q-tab-panel>
@@ -188,7 +193,12 @@ onMounted(() => {
                                                             <q-icon :name="hf.title ? FI[hf.title.split('.').pop()] : 'fa-regular fa-file'" size="md"/>
                                                             <span class="brand-text flex-grow text-ellipsis line-clamp-1">{{ hf.title }}</span>
                                                             <span class="brand-text w-[15%]">{{ `${(hf.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
-                                                            <q-btn color="brand-wait" class="!w-[185px] brand-text" text-color="black" label="Скачать" icon-right="bi-download ps-5" @click="downloadFile('/api/user/task/download', hf.id)"/>
+                                                            <q-btn
+                                                                color="brand-wait"
+                                                                class="!w-[185px] brand-text"
+                                                                text-color="black" label="Скачать"
+                                                                icon-right="bi-download ps-5"
+                                                                @click="downloadFile(`${TASK}`, hf.id)"/>
                                                 </q-item>
                                             </q-list>
                                         </q-card-section>

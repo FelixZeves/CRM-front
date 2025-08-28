@@ -1,8 +1,8 @@
 <script setup>
-import { reactive, ref, watch, computed } from 'vue';
-import { useQuasar } from 'quasar'
-import axios from 'axios'
+import { ref, watch } from 'vue';
+import api from '@/main';
 import { successNotify, confirmNotify } from '@/components/Notifies';
+import { DEPARTMENT, getDepartments } from '@/components/Utils';
 
 const props = defineProps({
     model: {type: Object, required: true, default: {}},
@@ -27,11 +27,11 @@ async function send() {
         localModel.value.manager = localModel.value.manager?.id
         localModel.value.staff = [...localModel.value.staff.map(item => item.id)]
         if (props.mode == 'create') {
-            let response = await axios.post('/api/user/department', localModel.value)
+            let response = await api.post(DEPARTMENT, localModel.value)
             if (response.status == 200) successNotify('Отдел создан')
         }
         if (props.mode == 'edit') {
-            let response = await axios.patch('/api/user/department', localModel.value)
+            let response = await api.patch(DEPARTMENT, localModel.value)
             if (response.status == 200) successNotify('Отдел отредактирован')
         }
 
@@ -39,20 +39,15 @@ async function send() {
     }
 }
 
-async function getDepartments() {
-    const data = (await axios.get('/api/user/department?limit=100')).data.data
+async function getDeps() {
+    const data = (await getDepartments()).data
     buffOptions.value = [...data.filter(item => item.id !== localModel.id)
                                 .map(item => ({id: item.id, title: item.title}))]
 }
 
-async function lazyLoad(url) {
-    const data = (await axios.get(url)).data.data
-    buffOptions.value = [{title: 'Пусто', id: null}, ...data]
-}
-
 async function remove() {
     if (!props.status && localModel.value?.id) confirmNotify(async () => {
-        let response = await axios.delete(`/api/user/department?id=${localModel.value.id}`)
+        let response = await api.delete(`${DEPARTMENT}?id=${localModel.value.id}`)
         if(response.status == 200){
             successNotify('Отдел успешно удалён')
             emit('update-list')
@@ -80,7 +75,6 @@ defineExpose({send, remove})
                 :options="managerOption"
                 :option-label="'fio'"
                 :option-value="'id'"
-                @focus="lazyLoad('/api/user/department')"
                 v-model="localModel.manager"
             />
         </q-item>
@@ -97,7 +91,7 @@ defineExpose({send, remove})
                 :options="buffOptions.manager"
                 :option-label="'title'"
                 :option-value="'id'"
-                @focus="getDepartments"
+                @focus="getDeps"
                 v-model="localModel.parents"
             />
         </q-item>
@@ -114,7 +108,7 @@ defineExpose({send, remove})
                 :options="buffOptions"
                 :option-label="'title'"
                 :option-value="'id'"
-                @focus="getDepartments"
+                @focus="getDeps"
                 v-model="localModel.childrens"
             />
         </q-item>

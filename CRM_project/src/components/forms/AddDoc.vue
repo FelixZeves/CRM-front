@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { getDepartments, getFormSchema} from '@/components/Utils'
-import axios from 'axios'
+import { FILE, getDepartments, getFormSchema} from '@/components/Utils'
+import api from '@/main'
 import { successNotify } from '@/components/Notifies'
 import { FileFocusEnum, FileTypeEnum } from '../Enums.vue'
 
@@ -43,7 +43,7 @@ async function send() {
     form.value.departments.forEach(dep => fd.append('departments', dep))
     
 
-    let response = await axios.post('/api/user/document/upload', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+    let response = await api.post(`${FILE}/upload`, fd, {headers: {'Content-Type': 'multipart/form-data'}})
     if (response.status == 200) {
         successNotify()
         emit('update-list')
@@ -61,7 +61,7 @@ async function edit() {
     form.value.departments.forEach(dep => fd.append('departments', dep.id))
     
 
-    let response = await axios.patch('/api/user/document', fd)
+    let response = await api.patch(FILE, fd)
     if (response.status == 200) {
         successNotify()
         emit('update-list')

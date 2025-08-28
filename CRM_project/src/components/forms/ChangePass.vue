@@ -1,18 +1,16 @@
 <script setup>
-import axios from 'axios'
+import api from '@/main';
 import router from '@/router';
-import { useQuasar } from 'quasar';
 import { ref } from 'vue'
 import { successNotify } from '@/components/Notifies';
 
 const passwordVerification = ref("")
 const password = ref("")
 
-const q = useQuasar()
 
 
 async function passwordCheck(){
-    await axios.put('/api/user/change-pass', {password: password.value})
+    await api.put(`${USER}/change-pass`, {password: password.value})
 
     successNotify()
     router.push('/')

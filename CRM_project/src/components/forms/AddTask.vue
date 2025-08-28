@@ -1,8 +1,8 @@
 <script setup>
-import axios from 'axios'
+import api from '@/main'
 import { computed, ref, watch } from 'vue'
 import { DocEnum as D, PlaceEnum, RoleEnum_ as R} from '@/components/Enums.vue'
-import { getFormSchema, getToday } from '@/components/Utils.js'
+import { EVENT, TASK, DEPARTMENT, getFormSchema, getToday, COLLECTION, getDepartments } from '@/components/Utils.js'
 import { errorNotify, successNotify } from '@/components/Notifies'
 
 const props = defineProps(['visible', 'body', 'me'])
@@ -174,7 +174,7 @@ function labelChanges(){
 async function lazyLoad() {
     let department = null
     if (props.me.role == R.LEADER){
-        department = (await axios.get(`/api/user/department?id=${props.me.profile.manager.id}`)).data.data[0]
+        department = (await getDepartments(props.me.profile.manager.id)).data[0]
         if(peopleOptions.value.length == 0){
             peopleOptions.value = [...department.staff.map(staff => ({id: staff.id, fio: `${staff.fio} (Сотрудник)`})),
                                     ...department.childrens.filter(child => child.manager !== null)
@@ -183,12 +183,12 @@ async function lazyLoad() {
         if(departmentOptions.value.length == 0)
             departmentOptions.value = [...department.parents.map(p => ({id: p.id, title: `${p.title} (${p.manager?.fio})`}))]
     } else {
-        department = (await axios.get(`/api/user/department?id=${props.me.profile.department.id}`)).data.data[0]
+        department = (await getDepartments(props.me.profile.manager.id)).data[0]
         if(peopleOptions.value.length == 0)
             peopleOptions.value = [{id: department.manager.id, fio: `${department.manager.fio} (${department.title})`}]
     }
     if(collectionOptions.value.length == 0){
-        let collections = (await axios.get(`/api/user/collection`)).data.data
+        let collections = (await api.get(COLLECTION)).data.data
         collectionOptions.value = [...collections.map(collection => ({
                                     subs: collection.subs,
                                     title: collection.title}))]
@@ -224,11 +224,11 @@ async function send() {
 
         files.forEach(file => fd.append('files', file))
 
-        let response = await axios.post('/api/user/task', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+        let response = await api.post(`${TASK}`, fd, {headers: {'Content-Type': 'multipart/form-data'}})
 
         if (activeEvent.value && response.status == 200) {
             event.value.user = [...evtUsers.value]
-            response = await axios.post('/api/user/event', event.value)
+            response = await api.post(EVENT, event.value)
         }
 
         if (response.status == 200){
@@ -245,11 +245,11 @@ async function send() {
 
         files.forEach(file => fd.append('files', file))
 
-        let response = await axios.post('/api/user/task?group=true', fd, {headers: {'Content-Type': 'multipart/form-data'}})
+        let response = await api.post(`${TASK}?group=true`, fd, {headers: {'Content-Type': 'multipart/form-data'}})
 
         if (activeEvent.value && response.status == 200) {
             event.value.user = [...evtUsers.value]
-            response = await axios.post('/api/user/event', event.value)
+            response = await api.post(EVENT, event.value)
         }
 
         if (response.status == 200){

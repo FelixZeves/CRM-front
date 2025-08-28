@@ -1,11 +1,12 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import axios from 'axios';
+import api from '@/main';
 import NavigationColumn from '@/components/menus/NavigationColumn.vue';
 import DocumentsList from '@/components/layouts/DocumentsList.vue';
 import DocumentsDropdownNSearch from '@/components/menus/DocumentsDropdownNSearch.vue';
 import AddDoc from '@/components/forms/AddDoc.vue';
 import { SessionStorage } from 'quasar';
+import { FILE } from '@/components/Utils';
 
 const docs = ref([])
 const visible = ref(false)
@@ -14,8 +15,7 @@ const user = SessionStorage.getItem('user')
 onMounted(async () => {await updateList()})
 
 async function updateList(params = {}) {
-    let url =  '/api/user/document'
-    docs.value = (await axios.get(url,  { params } )).data.data
+    docs.value = (await api.get(FILE,  { params } )).data.data
 }
 </script>
 

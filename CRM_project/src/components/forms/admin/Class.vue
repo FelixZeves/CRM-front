@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from 'vue';
-import axios from 'axios';
+import api from '@/main';
 import { successNotify, confirmNotify } from '@/components/Notifies';
+import { CLASS, DEPARTMENT } from '@/components/Utils';
 
 const props = defineProps({
     model: {type: Object, required: true, default: {}},
@@ -19,22 +20,22 @@ async function send() {
     let response = null
 
     if (props.mode == 'create')
-        response = await axios.post('/api/user/class', localModel.value)
+        response = await api.post(CLASS, localModel.value)
 
     if (props.mode == 'edit')
-        response = await axios.patch('/api/user/class', localModel.value)
+        response = await api.patch(CLASS, localModel.value)
 
     if (response?.status == 200) successNotify()
     emit('update-list')
 }
 
 async function lazyLoad(url) {
-    const data = (await axios.get(url)).data.data
+    const data = (await api.get(url)).data.data
     buffOptions.value = [...data]
 }
 
 async function remove() {
-    if (props.mode != 'read') confirmNotify(async () => {await axios.delete(`/api/user/class?id=${localModel.value.id}`); emit('update-list')})
+    if (props.mode != 'read') confirmNotify(async () => {await api.delete(`${CLASS}?id=${localModel.value.id}`); emit('update-list')})
 }
 
 defineExpose({ send, remove })
@@ -49,6 +50,9 @@ defineExpose({ send, remove })
             <q-input class="w-full brand-description" outlined label="Параллель" :readonly="status" v-model="localModel.parallel"/>
         </q-item>
         <q-item>
+            <q-input class="w-full brand-description" outlined label="Уклон" :readonly="status" v-model="localModel.spec"/>
+        </q-item>
+        <!-- <q-item>
             <q-select
                 label="Уклон"
                 class="w-full brand-description"
@@ -60,10 +64,10 @@ defineExpose({ send, remove })
                 :options="buffOptions"
                 :option-label="'title'"
                 :option-value="'id'"
-                @focus="lazyLoad('/api/user/department/short')"
+                @focus="lazyLoad(DEPARTMENT)"
                 v-model="localModel.spec"
             />
-        </q-item>
+        </q-item> -->
         <q-item>
             <q-input class="w-full brand-description" borderless readonly label="Обновлен" v-model="localModel.update_at"/>
         </q-item>

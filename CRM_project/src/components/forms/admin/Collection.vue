@@ -1,8 +1,8 @@
 <script setup>
-import {ref, watch } from 'vue';
-import { successNotify, passClipboardNotify, confirmNotify } from '@/components/Notifies';
-import axios from 'axios';
-import { getFormSchema } from '@/components/Utils';
+import {ref } from 'vue';
+import { successNotify, confirmNotify } from '@/components/Notifies';
+import api from '@/main';
+import { COLLECTION, USER } from '@/components/Utils';
 
 const props = defineProps({
     model: {type: Object, required: true, default: {}},
@@ -16,7 +16,7 @@ const buffOptions = ref([])
 const allOptions = ref([])
 
 async function lazyLoad(url) {
-  const data = (await axios.get(url)).data.data
+  const data = (await api.get(url)).data.data
   buffOptions.value = [
   { init_name: 'Выбрать всех', id: '__all__' },
     ...data.map(item => ({
@@ -62,14 +62,14 @@ function removeUser(id, targetField) {
 async function send() {
     if (!props.status) {
         if (props.mode == 'create') {
-            let response = await axios.post('/api/user/collection', props.model)
+            let response = await api.post(COLLECTION, props.model)
             if (response.status == 200) successNotify('Коллекция создана')
         }
 
         if (props.mode == 'edit') {
             props.model.subs = [...props.model.subs.map(item => item.id || item)]
             props.model.pubs = [...props.model.pubs.map(item => item.id || item)]
-            let response = await axios.patch('/api/user/collection', props.model)
+            let response = await api.patch(COLLECTION, props.model)
             if (response.status == 200) successNotify('Коллекция изменена')
         }
 
@@ -79,7 +79,7 @@ async function send() {
 
 async function remove() {
     if (!props.status &&  props.model?.id) confirmNotify(async () => {
-        let response = await axios.delete(`/api/user/collection/${props.model.id}`)
+        let response = await api.delete(`${COLLECTION}/${props.model.id}`)
         if(response.status == 200) {
             successNotify('Группа удалена')
             emit('update-list')
@@ -110,7 +110,7 @@ defineExpose({send, remove})
                 :options="buffOptions"
                 option-label="init_name"
                 option-value="id"
-                @focus="lazyLoad('/api/user')"
+                @focus="lazyLoad(USER)"
                 @filter="filterFn"
                 v-model="model.subs"
                 @update:model-value="val => onSelectionChange(val, 'subs')"
@@ -144,7 +144,7 @@ defineExpose({send, remove})
                 :options="buffOptions"
                 option-label="init_name"
                 option-value="id"
-                @focus="lazyLoad('/api/user')"
+                @focus="lazyLoad(USER)"
                 @filter="filterFn"
                 v-model="model.pubs"
                 @update:model-value="val => onSelectionChange(val, 'pubs')"

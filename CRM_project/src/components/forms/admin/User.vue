@@ -2,7 +2,8 @@
 import { RoleEnum } from '@/components/Enums.vue';
 import { ref } from 'vue';
 import { successNotify, passClipboardNotify, confirmNotify } from '@/components/Notifies';
-import axios from 'axios';
+import api from '@/main';
+import { DEPARTMENT, USER } from '@/components/Utils';
 
 const props = defineProps({
     model: {type: Object, required: true, default: {}},
@@ -17,25 +18,25 @@ const roleOptions = Object.entries(RoleEnum).map(([key, value]) => ({label: valu
 const buffOptions = ref([{title: 'Пусто', id: null}])
 
 async function lazyLoad(url) {
-    const data = (await axios.get(url)).data.data
+    const data = (await api.get(url)).data.data
     buffOptions.value = [{title: 'Пусто', id: null}, ...data]
 }
 
 async function send() {
     if (!props.status) {
         if (isPassReset.value) {
-            let response = await axios.put('/api/user/pass-reset', {id: props.model.id})
+            let response = await api.put(`${USER}/pass-reset`, {id: props.model.id})
             if (response.data?.password) passClipboardNotify(response.data.password)
         }
         if (props.model.profile.department?.id) {props.model.profile.department = props.model.profile.department.id}
 
         if (props.mode == 'create') {
-            let response = await axios.post('/api/user', props.model);
+            let response = await api.post(USER, props.model);
             if (response.data?.password) passClipboardNotify(response.data.password)
         }
 
         if (props.mode == 'edit') {
-            let response = await axios.patch('/api/user', props.model)
+            let response = await api.patch(USER, props.model)
             if(response.status == 200) successNotify('Пользователь создан')
             }
 
@@ -45,7 +46,7 @@ async function send() {
 
 async function remove() {
     if (!props.status &&  props.model?.id) confirmNotify(async () => {
-        let response = await axios.delete('/api/user', { params: { id: props.model.id } })
+        let response = await api.delete(USER, { params: { id: props.model.id } })
         if(response.status == 200) {
             successNotify('Пользователь удален')
             emit('update-list')
@@ -138,7 +139,7 @@ defineExpose({send, remove})
                     :options="buffOptions"
                     :option-label="'title'"
                     :option-value="'id'"
-                    @focus="lazyLoad('/api/user/department')"
+                    @focus="lazyLoad(DEPARTMENT)"
                     v-model="model.profile.manager"
                 />
             </q-item>
@@ -153,7 +154,7 @@ defineExpose({send, remove})
                     :options="buffOptions"
                     :option-label="'title'"
                     :option-value="'id'"
-                    @focus="lazyLoad('/api/user/department')"
+                    @focus="lazyLoad(DEPARTMENT)"
                     v-model="model.profile.department"
                 />
             </q-item>

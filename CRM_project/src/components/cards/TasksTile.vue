@@ -9,7 +9,7 @@ const tasks = ref([])
 const user = SessionStorage.getItem('user')
 
 async function get() {
-    tasks.value = await getTasks()
+    tasks.value = (await getTasks()).slice(0,6)
 }
 
 get()

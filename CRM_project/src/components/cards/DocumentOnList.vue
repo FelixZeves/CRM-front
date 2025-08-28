@@ -2,9 +2,7 @@
 import { ref } from 'vue'
 import { fileIconsEnum as fileIcons } from '@/components/Enums.vue'
 import AddDoc from '@/components/forms/AddDoc.vue';
-import { downloadFile } from '@/components/Utils'
-import axios from 'axios';
-import { confirmNotify, successNotify } from '../Notifies';
+import { downloadFile, FILE } from '@/components/Utils'
 
 const props = defineProps(['body', 'user'])
 const emit = defineEmits(['update-list'])
@@ -61,7 +59,7 @@ function parseTag(tag) {
                     </div>
                     <span class="brand-description !w-[6%] content-center text-end">{{ `${(body.size / (1024 * 1024)).toFixed(2)}MB` }}</span>
                 </div>
-                <q-btn flat class="!w-[5%] !px-1" @click="downloadFile('/api/user/document/download',body.id)">
+                <q-btn flat class="!w-[5%] !px-1" @click="downloadFile(FILE, body.id)">
                     <q-icon name="download" size="lg"></q-icon>
                 </q-btn>
             </q-card-section>

@@ -1,8 +1,17 @@
-import axios from 'axios';
+import api from '@/main';
 import { RoleEnum } from '@/components/Enums.vue';
 
+export const USER = '/user'
+export const TASK = `${USER}/task`
+export const DEPARTMENT = `${USER}/department`
+export const EVENT = `${USER}/event`
+export const COLLECTION = `${USER}/collection`
+export const FILE = `${USER}/document`
+export const CLASS = `${USER}/class`
+export const LESSON = `${USER}/lesson`
+
 export async function getMe(){
-    const response = await axios.get('/api/user/me')
+    const response = await api.get(`${USER}/me`)
     return response
 }
 
@@ -23,10 +32,10 @@ export function scheduleTokenRefresh() {
         console.error('Ошибка при разборе JWT:', e)
         refreshToken()
     }
-  }
+}
 
 export async function refreshToken(){
-    const response = await axios.get('/api/refresh')
+    const response = await api.get('/refresh')
     localStorage.removeItem('jwtToken')
 
     const token = response.data.jwt;
@@ -34,32 +43,35 @@ export async function refreshToken(){
 }
 
 export async function getDepartments(id = null){
-    let url = '/api/user/department'
+    let url = DEPARTMENT
     if (id)
         url = `${url}?id=${id}`
 
-    return (await axios.get(url)).data
+    return (await api.get(url)).data
 }
 
 export async function getTasks(limit = null, is_archive = false, params = {}) {
-    let url = '/api/user/task'
     let query = { ...params, is_archive }
     if (limit != null){
         query.limit = limit
     }
-    let tasks = (await axios.get(url, { params: query })).data.data
+    let tasks = []
+    if (params.id)
+        tasks = [(await api.get(`${TASK}/${params.id}`)).data.data]
+    else
+        tasks = (await api.get(`${TASK}`, { params: query })).data.data
+    console.log(tasks)
     return tasks
 }
 
 export async function getEvents(limit = null, params = {}){
-    let url = '/api/user/event'
     try{
         let response
         if(limit != null){
-            response = (await axios.get(`${url}?limit=${limit}`))
+            response = (await api.get(`${EVENT}?limit=${limit}`))
         }
         else {
-            response = await axios.get(url, { params })
+            response = await api.get(EVENT, { params })
         }
         return response
     } catch (error) {
@@ -70,9 +82,7 @@ export async function getEvents(limit = null, params = {}){
 
 export async function getSupervisors(){
     try{
-        const user = await axios.get('/api/user/me')
-        console.log(user.data.profile.departments)
-
+        const user = await api.get(`${USER}/me`)
         return user
     } catch (error) {
         console.error('Ошибка загрузки информации о вас:', error);
@@ -84,22 +94,8 @@ export function getToday() {
     return new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-export async function sendFile(files, title = null) {
-    const fd = new FormData()
-
-    if (title)
-        fd.append('title', title)
-
-    if (Array.isArray(files))
-        files.forEach(file => fd.append('body', file))
-    else
-        fd.append('body', files)
-
-    await axios.post('/api/user/file/upload', fd, {headers: {'Content-Type': 'multipart/form-data'}})
-}
-
 export async function downloadFile(url, id){
-    const response = await axios.get(`${url}/${id}`, {responseType: 'blob'});
+    const response = await api.get(`${url}/download/${id}`, {responseType: 'blob'});
     const disposition = response.headers['content-disposition'] || '';
     const fileNameMatch = disposition.match(/filename="?([^"]+)"?/);
     const fileName = fileNameMatch ? decodeURIComponent(fileNameMatch[1]) : 'file.bin';

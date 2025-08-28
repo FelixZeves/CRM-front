@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
-import axios from 'axios'
-import { getFormSchema } from '@/components/Utils'
+import api from '@/main'
+import { EVENT , getFormSchema } from '@/components/Utils'
 import { successNotify } from '@/components/Notifies'
 
 const props = defineProps(['visible'])
@@ -40,7 +40,7 @@ function clearDialog(){
 }
 
 async function createEvent() {
-    let response = await axios.post('/api/user/event', form.value)
+    let response = await api.post(EVENT, form.value)
     
     if (response.status == 200) successNotify()
     emit('update-list')

@@ -1,13 +1,12 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
-import axios from 'axios'
+import api from '@/main'
 import { confirmNotify, successNotify } from '@/components/Notifies'
 import TaskItem from '../layouts/TaskItem.vue'
-import { StatusEnum_ as St } from '../Enums.vue'
+import { getTasks, TASK } from '../Utils'
 
 const emit = defineEmits(['update:visible', 'update-list'])
 const props = defineProps(['visible', 'id', 'user'])
-const url = '/api/user/task'
 
 const visible = computed({
   get: () => props.visible,
@@ -23,8 +22,7 @@ watch(visible, async (val) => {
         loading.value = true
         try {
         if(body.value == null){
-            const response = await axios.get(`${url}/${props.id}`)
-            body.value = response.data.data
+            body.value = (await getTasks(null, false, {id: props.id}))[0]
         }
         } finally {
          loading.value = false
@@ -57,7 +55,7 @@ const sections = [
 ]
 
 async function toArchive(){
-    let response = await axios.put(`${url}/archive/${props.id}`)
+    let response = await api.put(`${TASK}/archive/${props.id}`)
 
     if (response.status == 200){
         successNotify('Задача отправлена в архив')
@@ -67,7 +65,7 @@ async function toArchive(){
 }
 
 async function deleteTask(){
-    let response = await axios.delete(`${url}/${props.id}`)
+    let response = await api.delete(`${TASK}/${props.id}`)
 
     if (response.status == 200){
         successNotify('Задача удалена')

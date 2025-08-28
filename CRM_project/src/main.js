@@ -27,8 +27,14 @@ if (token) {
   scheduleTokenRefresh();
 }
 
+const api = axios.create({
+    baseURL: import.meta.env.DEV ? '/api' : '' // на dev через proxy, на prod — без
+})
+  
+export default api
+
 // handler for jwt token
-axios.interceptors.request.use((config) => {
+api.interceptors.request.use((config) => {
     const token = localStorage.getItem('jwtToken');
 
     if (token) {
@@ -37,7 +43,7 @@ axios.interceptors.request.use((config) => {
     return config;
 })
 
-axios.interceptors.response.use((response) => response, (error) => {
+api.interceptors.response.use((response) => response, (error) => {
     let message = ''
     if (!error.response) {
         message = 'Сервер недоступен. Попробуйте позже.'

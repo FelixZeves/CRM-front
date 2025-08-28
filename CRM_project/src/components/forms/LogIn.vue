@@ -1,7 +1,7 @@
 <script setup>
 import router from '@/router';
 import { ref } from 'vue'
-import axios from 'axios';
+import api from '@/main';
 import { getMe, scheduleTokenRefresh } from '../Utils';
 import { SessionStorage } from 'quasar'
 
@@ -10,7 +10,7 @@ const password = ref("")
 
 async function loginUser(){
     try {
-        const response = await axios.post('/api/login', {
+        const response = await api.post('/login', {
           email: email.value,
           password: password.value,
         });
