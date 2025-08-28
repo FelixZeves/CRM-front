@@ -12,7 +12,6 @@ const visible = computed({
   set: val => emit('update:visible', val)
 })
 
-const isDelegate = ref(false)
 const today = new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
 const date = ref({ from: today, to: today });
 
@@ -36,6 +35,10 @@ newDate = { from: val, to: val };
 
 const form = ref(getFormSchema('event'));
 
+function clearDialog(){
+    form.value = getFormSchema('event')
+}
+
 async function createEvent() {
     let response = await axios.post('/api/user/event', form.value)
     
@@ -45,7 +48,7 @@ async function createEvent() {
 </script>
 
 <template>
-    <q-dialog v-model="visible" backdrop-filter="blur(4px)">
+    <q-dialog v-model="visible" backdrop-filter="blur(4px)" @hide="clearDialog">
         <q-card class="text-black !rounded-[15pt] !flex !w-[90vw] !min-w-[50%]">
             <q-form @submit="createEvent" class="bg-tile p-5 !flex flex-row w-full h-full gap-2">
 

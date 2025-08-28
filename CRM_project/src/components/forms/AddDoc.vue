@@ -28,6 +28,10 @@ const visible = computed({
   set: val => emit('update:visible', val)
 })
 
+function clearDialog(){
+    form.value = getFormSchema('file')
+}
+
 async function send() {
     const fd = new FormData()
 
@@ -70,7 +74,7 @@ async function lazyLoad() {
 </script>
 
 <template>
-    <q-dialog v-model="visible" backdrop-filter="blur(4px)">
+    <q-dialog v-model="visible" backdrop-filter="blur(4px)" @hide="clearDialog">
         <q-card class="text-black !rounded-[15pt] !flex !w-[90vw] !min-w-[55%]">
             <q-form @submit="body != null ? edit() : send()" class="bg-tile p-5 !flex flex-row w-full h-full gap-2">
 
@@ -109,7 +113,17 @@ async function lazyLoad() {
                             checked-icon="fa-solid fa-circle"
                             unchecked-icon="fa-solid fa-circle-notch"
                             v-model="form.permanent"
-                        />
+                        >
+                        <q-tooltip
+                            anchor="top right"
+                            outline
+                            self="bottom right"
+                            :offset="[-5, 5]"
+                            class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                        >
+                            Без бессрочного статуса файл будет удалён через месяц
+                        </q-tooltip>
+                        </q-checkbox>
                     </div>
                     <q-select
                         label="Отделы"

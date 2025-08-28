@@ -35,7 +35,7 @@ async function send() {
         }
 
         if (props.mode == 'edit') {
-            await axios.patch('/api/user', props.model)
+            let response = await axios.patch('/api/user', props.model)
             if(response.status == 200) successNotify('Пользователь создан')
             }
 

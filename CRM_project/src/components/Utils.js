@@ -7,7 +7,6 @@ export async function getMe(){
 }
 
 export function scheduleTokenRefresh() {
-    console.log('Scheduler запущен')
     try {
         const token = localStorage.getItem('jwtToken')
         const payload = JSON.parse(atob(token.split('.')[1]))
