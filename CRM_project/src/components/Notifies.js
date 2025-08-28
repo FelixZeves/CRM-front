@@ -33,7 +33,7 @@ export function passClipboardNotify(newPass){
         message: newPass,
         caption: 'Это ваш временный пароль',
         actions: [
-            {label: 'Копировать', color: 'white', handler: copyToClipboard(newPass)}
+            {label: 'Копировать', color: 'white', handler: () => copyToClipboard(newPass)}
     ]})
 }
 
