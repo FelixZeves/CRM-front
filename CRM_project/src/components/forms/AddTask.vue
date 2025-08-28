@@ -25,6 +25,13 @@ const taskForm = ref(null)
 const receiversTab = ref('concrete')
 const subsIntoCollection = ref([])
 
+
+const visible = computed({
+  get: () => props.visible,
+  set: val => emit('update:visible', val)
+})
+
+
 watch(receiversTab, (newVal) => {
     if(newVal){
         subsIntoCollection.value = []
@@ -49,18 +56,25 @@ const task = ref({
     place: null
 })
 
-if (props.body){
-    task.value.title = props.body.title
-    task.value.description = props.body.description
-    task.value.deadline = props.body.deadline
-    task.value.type = D.ORDER
-    task.value.ref = props.body.id
-    if(props.body.gid && props.body.owner == props.me.profile.id){
-        task.value.type = D.MEMO
-        task.value.reviewers = props.body.active[1].user.id
-        lazyLoad()
+watch(visible, async (val) => {
+    if (val) {
+        if (props.body){
+            task.value.title = props.body.title
+            task.value.description = props.body.description
+            task.value.deadline = props.body.deadline
+            task.value.type = D.ORDER
+            task.value.ref = props.body.id
+            if(props.body.gid && props.body.owner == props.me.profile.id){
+                task.value.type = D.MEMO
+                task.value.reviewers = [props.body.active[1].user.id]
+                task.value.ref = []
+                lazyLoad()
+            }
+        }
     }
-}
+})
+
+
 
 watch(subsIntoCollection, (newVal) => {
     if (Array.isArray(newVal) && newVal.length > 0) {
@@ -144,11 +158,6 @@ function clearDialog(){
     subsIntoCollection.value = []
     receiversTab.value = 'concrete'
 }
-
-const visible = computed({
-  get: () => props.visible,
-  set: val => emit('update:visible', val)
-})
 
 function labelChanges(){
     if (task.value.type == D.ORDER){

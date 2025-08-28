@@ -149,7 +149,7 @@ function applyFilters() {
           </q-btn-dropdown>
         </div>
         <div class="flex flex-row gap-x-2">
-          <div class="flex flex-row items-center border-2">
+          <!-- <div class="flex flex-row items-center border-2">
             <q-input v-model="searchText" borderless label-color="black" class="ps-2 pe-1 brand-description" label="Поиск документа">
 
                 <template v-slot:append>
@@ -162,13 +162,14 @@ function applyFilters() {
                     </button>
                 </template>
             </q-input>
-          </div>
+          </div> -->
           <q-btn
           v-if="role == R.LEADER"
           icon-right="add"
           unelevated
           color="brand-wait"
           text-color="black"
+          label="Создать"
           @click="$emit('show-dialog')">
           </q-btn>
         </div>

@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import AddTask from '../forms/AddTask.vue'
 import ApproveTask from '../forms/ApproveTask.vue'
 import { SessionStorage } from 'quasar'
+import { StatusEnum_ as St } from '../Enums.vue'
 const props = defineProps(['task', 'section'])
 
 const visibleApprove = ref(false)
@@ -58,8 +59,9 @@ function pluralizeFiles(count) {
       :body="task">
     </ApproveTask>
     <AddTask
-      v-model:visible="visibleAdd"
-      :body="task"
-      :me="user"
+        v-if="task.status == St.PROGRESS"
+        v-model:visible="visibleAdd"
+        :body="task"
+        :me="user"
     />
 </template>
