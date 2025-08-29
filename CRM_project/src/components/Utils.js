@@ -2,13 +2,13 @@ import api from '@/main';
 import { RoleEnum } from '@/components/Enums.vue';
 
 export const USER = '/user'
-export const TASK = `${USER}/task`
-export const DEPARTMENT = `${USER}/department`
-export const EVENT = `${USER}/event`
-export const COLLECTION = `${USER}/collection`
-export const FILE = `${USER}/document`
-export const CLASS = `${USER}/class`
-export const LESSON = `${USER}/lesson`
+export const TASK = `/task`
+export const DEPARTMENT = `/department`
+export const EVENT = `/event`
+export const COLLECTION = `/collection`
+export const FILE = `/document`
+export const CLASS = `/class`
+export const LESSON = `/lesson`
 
 export async function getMe(){
     const response = await api.get(`${USER}/me`)
