@@ -28,10 +28,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
+      '/dev': {
         target: 'http://localhost:5000', // Ваш Flask-сервер
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''), // Удаляет префикс "/api"
+        rewrite: (path) => path.replace(/^\/dev/, ''), // Удаляет префикс "/dev"
       },
     },
   },

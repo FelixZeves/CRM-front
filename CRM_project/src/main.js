@@ -23,7 +23,7 @@ import axios from 'axios'
 import { scheduleTokenRefresh } from './components/Utils.js'
 
 const api = axios.create({
-    baseURL: import.meta.env.DEV ? '/api' : '' // на dev через proxy, на prod — без
+    baseURL: import.meta.env.DEV ? '/dev' : '/api' // на dev через proxy, на prod — без
 })
 
 const token = localStorage.getItem('jwtToken');
