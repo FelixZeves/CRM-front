@@ -60,7 +60,6 @@ export async function getTasks(limit = null, is_archive = false, params = {}) {
         tasks = [(await api.get(`${TASK}/${params.id}`)).data.data]
     else
         tasks = (await api.get(`${TASK}`, { params: query })).data.data
-    console.log(tasks)
     return tasks
 }
 

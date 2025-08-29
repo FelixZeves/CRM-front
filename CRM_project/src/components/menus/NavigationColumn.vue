@@ -1,7 +1,8 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import ModalError from '@/components/forms/BugReport.vue'
-import { LocalStorage, SessionStorage } from 'quasar'
+import { SessionStorage } from 'quasar'
+import router from '@/router';
 
 const props = defineProps(['name', 'section'])
 const fio = ref("");
@@ -16,6 +17,12 @@ async function getUser(){
     role.value = me.role
     defaultPass.value = me.default_pass
 
+}
+
+function exit(){
+    localStorage.removeItem('jwtToken')
+
+    router.push('/')
 }
 
 onMounted(async () => {await getUser()})
@@ -74,7 +81,7 @@ onMounted(async () => {await getUser()})
             <q-btn @click="visibleBugReport = true" label="Нашли ошибку?" color="brand-white brand-description" unelevated>
             <ModalError v-model:visible="visibleBugReport" />
             </q-btn>
-            <q-btn flat class="text-white brand-description" @click="localStorage.removeItem('jwtToken')" to="/" label="Выйти"></q-btn>
+            <q-btn flat class="text-white brand-description" @click="exit" label="Выйти"></q-btn>
         </div>
     </div>
 </template>

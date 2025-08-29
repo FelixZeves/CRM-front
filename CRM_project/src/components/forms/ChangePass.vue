@@ -3,6 +3,7 @@ import api from '@/main';
 import router from '@/router';
 import { ref } from 'vue'
 import { successNotify } from '@/components/Notifies';
+import { USER } from '../Utils';
 
 const passwordVerification = ref("")
 const password = ref("")

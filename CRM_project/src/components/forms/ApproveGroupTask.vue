@@ -128,7 +128,7 @@ async function deleteTask(){
             <q-skeleton type="QBtn" class="navigation-btn brand-description" />
         </div>
 
-        <div v-else-if="body.approved.length == body.total || body.rejected.length > 0"
+        <div v-else-if="body.is_history == false && body.approved.length == body.total || body.rejected.length > 0"
             class="flex flex-row flex-grow justify-between pt-2">
             <q-btn
             color="brand-danger"

@@ -22,15 +22,15 @@ import { errorNotify } from './components/Notifies.js'
 import axios from 'axios'
 import { scheduleTokenRefresh } from './components/Utils.js'
 
+const api = axios.create({
+    baseURL: import.meta.env.DEV ? '/api' : '' // на dev через proxy, на prod — без
+})
+
 const token = localStorage.getItem('jwtToken');
 if (token) {
   scheduleTokenRefresh();
 }
 
-const api = axios.create({
-    baseURL: import.meta.env.DEV ? '/api' : '' // на dev через proxy, на prod — без
-})
-  
 export default api
 
 // handler for jwt token
