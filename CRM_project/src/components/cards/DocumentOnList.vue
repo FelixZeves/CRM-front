@@ -34,7 +34,7 @@ function parseTag(tag) {
                     <div class="flex flex-col content-start flex-grow w-[40%]">
                         <div class="flex flex-row w-full !flex-nowrap">
                             <span class="brand-title text-ellipsis line-clamp-1 pb-1 max-w-[80%]">{{ body.title }}</span>
-                            <div class="flex flex-row justify-end ps-2">
+                            <div v-if="body.owner.manager.id == user.profile.id" class="flex flex-row justify-end ps-2">
                                 <q-chip dense square clickable @click="visible = true" size="md" color="white" text-color="grey-7">
                                     <q-icon name="fa-regular fa-edit"></q-icon>
                                     <q-tooltip
