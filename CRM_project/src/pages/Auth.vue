@@ -3,7 +3,7 @@ import LogIn from '@/components/forms/LogIn.vue';
 </script>
 
 <template>
-  <div class="w-full h-full justify-between flex flex-row">
+  <div class="w-full h-full justify-between flex flex-row !flex-nowrap">
     <div class="w-[45%] h-full content-center min-w-[800px]">
       <div class="ps-20 flex flex-col gap-y-5">
         <div class="flex flex-row w-full border-b border-black pb-4">
