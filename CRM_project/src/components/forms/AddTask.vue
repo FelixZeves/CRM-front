@@ -183,7 +183,7 @@ async function lazyLoad() {
         if(departmentOptions.value.length == 0)
             departmentOptions.value = [...department.parents.map(p => ({id: p.id, title: `${p.title} (${p.manager?.fio})`}))]
     } else {
-        department = (await getDepartments(props.me.profile.manager.id)).data[0]
+        department = (await getDepartments(props.me.profile.department.id)).data[0]
         if(peopleOptions.value.length == 0)
             peopleOptions.value = [{id: department.manager.id, fio: `${department.manager.fio} (${department.title})`}]
     }
