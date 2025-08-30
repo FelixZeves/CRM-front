@@ -1,5 +1,7 @@
 <script setup>
+import api from '@/main'
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { successNotify } from '../Notifies'
 
 const props = defineProps(['visible'])
 const emit = defineEmits(['update:visible'])
@@ -18,6 +20,12 @@ async function sendBugReport() {
 
     if (comment.value.length > 0)
         form.append('comment', comment.value)
+
+    let response = await api.post('/report', form)
+
+    if (response.status == 200){
+        successNotify()
+    }
 }
 
 function handlePaste(e) {
@@ -81,7 +89,7 @@ onBeforeUnmount(() => {
                     </q-file>
                 </q-card-section>
                 <q-card-actions align="center">
-                    <q-btn @click="visible = false" label="Отправить" type="submit" class="brand-description" color="brand-velvet"/>
+                    <q-btn label="Отправить" type="submit" class="brand-description" color="brand-velvet"/>
                 </q-card-actions>
             </q-form>
         </q-card>
