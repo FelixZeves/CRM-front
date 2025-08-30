@@ -12,6 +12,11 @@ const visible = computed({
     set: val => emit('update:visible', val)
 })
 
+function clearDialog(){
+    attachFiles.value=[]
+    comment.value=''
+}
+
 async function sendBugReport() {
     let form = new FormData()
     
@@ -50,7 +55,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <q-dialog v-model="visible" backdrop-filter="blur(4px)">
+    <q-dialog v-model="visible" backdrop-filter="blur(4px)" @hide="clearDialog">
         <q-card class="text-black !rounded-[15pt]">
             <q-form @submit="sendBugReport" class="bg-tile p-5 flex flex-col gap-y-2 w-full">
                 <q-card-section class="brand-title text-left pb-5"> Отчёт об ошибке </q-card-section>
