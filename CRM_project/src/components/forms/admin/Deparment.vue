@@ -26,6 +26,8 @@ async function send() {
     if (!props.status) {
         localModel.value.manager = localModel.value.manager?.id
         localModel.value.staff = [...localModel.value.staff.map(item => item.id)]
+        localModel.value.childrens = [...localModel.value.childrens.map(item => item.id ? item.id : item)]
+        localModel.value.parents = [...localModel.value.parents.map(item => item.id ? item.id : item)]
         if (props.mode == 'create') {
             let response = await api.post(DEPARTMENT, localModel.value)
             if (response.status == 200) successNotify('Отдел создан')

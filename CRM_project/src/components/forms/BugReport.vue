@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps(['visible'])
 const emit = defineEmits(['update:visible'])
@@ -19,6 +19,26 @@ async function sendBugReport() {
     if (comment.value.length > 0)
         form.append('comment', comment.value)
 }
+
+function handlePaste(e) {
+  if (!e.clipboardData || !e.clipboardData.items) return
+  for (const item of e.clipboardData.items) {
+    if (item.type.startsWith('image/')) {
+      const file = item.getAsFile()
+      if (file) {
+        attachFiles.value = [...attachFiles.value, file]
+      }
+    }
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('paste', handlePaste)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('paste', handlePaste)
+})
+
 </script>
 
 <template>
@@ -53,6 +73,7 @@ async function sendBugReport() {
                         v-model="attachFiles"
                         label="Прикрепить файлы"
                         outlined counter
+                        use-chips
                         :counter-label="({filesNumber, maxFiles, totalSize}) => `${filesNumber} из ${maxFiles} (общий размер ${totalSize})`"
                         max-files="5"
                         multiple>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import api from '@/main';
 import { successNotify, confirmNotify } from '@/components/Notifies';
 import { CLASS, DEPARTMENT } from '@/components/Utils';
@@ -15,6 +15,9 @@ const emit = defineEmits(['update-list'])
 const localModel = ref(JSON.parse(JSON.stringify(props.model)))
 const buffOptions = ref([])
 
+watch(() => props.model, (val) => {
+  Object.assign(localModel.value, JSON.parse(JSON.stringify(val)))
+}, { deep: true })
 
 async function send() {
     let response = null
@@ -50,7 +53,7 @@ defineExpose({ send, remove })
             <q-input class="w-full brand-description" outlined label="Параллель" :readonly="status" v-model="localModel.parallel"/>
         </q-item>
         <q-item>
-            <q-input class="w-full brand-description" outlined label="Уклон" :readonly="status" v-model="localModel.spec"/>
+            <q-input class="w-full brand-description" outlined disable label="Уклон" :readonly="status" v-model="localModel.spec"/>
         </q-item>
         <!-- <q-item>
             <q-select
