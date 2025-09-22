@@ -219,6 +219,7 @@ export function getTableSchema(name) {
                 { name: 'achievementsInter', label: 'Информация об участии детей в Международных конкурсах детского творчества', field: row => row.achievementsInter, align: 'left', sortable: true },
                 { name: 'schoolEvents', label: 'Участие в мероприятиях школы', field: row => row.schoolEvents, align: 'left', sortable: true },
                 { name: 'specAttention', label: 'Требует особого внимания', field: row => row.specAttention, align: 'left', sortable: true },
+                { name: 'edit', label: 'Действия', align: 'center'}
             ]
         },
     }

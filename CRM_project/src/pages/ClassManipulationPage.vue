@@ -6,15 +6,15 @@ import { getTableSchema } from '@/components/Utils';
 import TES from '@/components/layouts/TES.vue';
 
 const body = ref(SessionStorage.getItem('selectedClass'))
-
 const user = SessionStorage.getItem('user')
 
 const cols = getTableSchema('students')
 const pagination = ref({rowsPerPage: 0})
 const selected = ref([])
+const edit = ref(null)
 
 const availableCols = ref([
-    { value: 'name', label: 'Ф.И.О.'},
+    { value: 'fio', label: 'Ф.И.О.'},
     { value: 'parents', label: 'Родители'},
     { value: 'mainPhone', label: 'Основной телефон'},
     { value: 'subPhone', label: 'Доп. телефон'},
@@ -24,6 +24,7 @@ const availableCols = ref([
     { value: 'achievementsInter', label: 'Информация об участии детей в Международных конкурсах детского творчества'},
     { value: 'schoolEvents', label: 'Участие в мероприятиях школы'},
     { value: 'specAttention', label: 'Требует особого внимания'},
+    { value: 'edit', label: 'Действия'}
 ])
 
 const savedCols = LocalStorage.getItem('visibleCols')
@@ -33,21 +34,21 @@ const visibleCols = ref(
 )
 
 const students = ref([
-    {id: 1, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Анатолий Анатольевич', 'Сидорова Нина Николаевна'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}, {id: 3, title: 'Английский язык'}], achievementsRus: ['Олимпиада "Кенгуру"', 'Олимпиада "Олимпик"', 'Областная олимпиада Урфо', 'Областная олимпиада Урфо', 'Областная олимпиада Урфо'], achievementsInter: [''], schoolEvents: ['Конкурс поделок', 'Конкурс сценического искусства'], specAttention: ['Да']},
-    {id: 2, name: 'Сидоров Сергей Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 3, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 4, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 5, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 6, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 7, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 8, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 9, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 10, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 11, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Да'},
-    {id: 12, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Да'},
-    {id: 13, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 14, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 15, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Анатолий Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: '3', tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: null},
+    {id: 1, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Анатолий Анатольевич', 'Сидорова Нина Николаевна'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}, {id: 3, title: 'Английский язык'}], achievementsRus: ['Олимпиада "Кенгуру"', 'Олимпиада "Олимпик"', 'Областная олимпиада Урфо', 'Третья Государственная олимпиада для учеников средних классов', 'Областная олимпиада Урфо'], achievementsInter: [''], schoolEvents: ['Конкурс поделок', 'Конкурс сценического искусства'], specAttention: ['Да']},
+    {id: 2, name: 'Сидоров Сергей Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
+    {id: 3, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
+    {id: 4, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
+    {id: 5, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
+    {id: 6, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
+    {id: 7, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
+    {id: 8, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
+    {id: 9, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
+    {id: 10, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
+    {id: 11, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Да'},
+    {id: 12, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Да'},
+    {id: 13, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
+    {id: 14, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
+    {id: 15, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Анатолий Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: null},
 ])
 
 watch(
@@ -107,21 +108,48 @@ watch(
 
             <template v-slot:header="props">
                 <q-tr :props="props">
-                    <q-th auto-width />
+                    <q-th auto-width>
+                        <q-checkbox
+                            keep-color
+                            color="brand-velvet"
+                            checked-icon="fa-solid fa-circle"
+                            unchecked-icon="fa-solid fa-circle-notch"
+                            v-model="props.selected" />
+                    </q-th>
+                    <q-th auto-width></q-th>
                     <q-th
                         v-for="col in props.cols"
                         :key="col.name"
                         :props="props"
                     >
-                        {{ col.label }}
+                    {{ col.label }}
                     </q-th>
                 </q-tr>
+            </template>
+            <template v-slot:body-selection="props">
+                
             </template>
 
             <template v-slot:body="props">
                 <q-tr :props="props">
                     <q-td auto-width>
-                        <q-btn size="sm" color="brand-velvet" round flat @click="props.expand = !props.expand" :icon="props.expand ? 'fa-solid fa-circle' : 'fa-solid fa-circle-notch'" />
+                        <q-checkbox
+                            keep-color
+                            color="brand-velvet"
+                            checked-icon="fa-solid fa-circle"
+                            unchecked-icon="fa-solid fa-circle-notch"
+                            v-model="props.selected"
+                        />
+                    </q-td>
+                    <q-td auto-width>
+                        <q-btn
+                            fab-mini
+                            round
+                            flat
+                            color="brand-velvet"
+                            @click="props.expand = !props.expand"
+                            :icon="props.expand ? 'fa-solid fa-angle-up' : 'fa-solid fa-angle-down'"
+                        />
                     </q-td>
                     <q-td
                         v-for="col in props.cols"
@@ -129,16 +157,22 @@ watch(
                         :props="props"
                     >
                     <span v-if="!['parents','tutors', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)">{{ col.value }}</span>
-                    <div class="flex flex-col" v-else>
+                    <div class="flex flex-col" v-if="['parents','tutors', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)">
                         <q-chip v-for="elem in col.value">
                             {{ elem }}
                         </q-chip>
+                    </div>
+                    <div v-if="col.name == 'edit'"  class="flex flex-row justify-center flex-grow">
+                        <q-btn v-if="edit !== props.row.id" flat text-color="brand-velvet" icon="edit" dense @click="props.expand = true; edit = props.row.id"></q-btn>
+                        <q-btn v-if="edit === props.row.id" flat text-color="brand-complete" icon="fa-solid fa-check" dense ></q-btn>
+                        <q-btn v-if="edit === props.row.id" flat text-color="brand-danger" icon="refresh" dense @click="props.expand = false; edit = null"></q-btn>
+                        <q-btn flat text-color="brand-danger" icon="delete" dense></q-btn>
                     </div>
                     </q-td>
                 </q-tr>
                 <q-tr v-show="props.expand" :props="props">
                     <q-td colspan="100%">
-                        <TES :body="props.row"/>
+                        <TES :body="props.row" :edit="edit === props.row.id"/>
                     </q-td>
                 </q-tr>
             </template>
