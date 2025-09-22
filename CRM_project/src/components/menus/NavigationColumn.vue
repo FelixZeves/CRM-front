@@ -40,8 +40,8 @@ onMounted(async () => {await getUser()})
             </q-btn>
             <q-btn 
             flat
-            disable
-            class="cursor-not-allowed brand-description"
+            :to="{name : 'Education'}"
+            class="brand-description"
             label="Учебная деятельность"
             :class="section == 'Education' ? 'text-brand-wait' : 'text-white'"/>
             <q-btn

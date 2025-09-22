@@ -205,7 +205,22 @@ export function getTableSchema(name) {
                 { name: 'subscribers', label: 'Участники', field: row => row.subs.length, align: 'left', sortable: true },
                 { name: 'publishers', label: 'Писатели', field: row => row.pubs.length,  align: 'left', sortable: true },
                 { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true },]
-        }
+        },
+        students: {
+            label: "Ученики",
+            columns: [
+                { name: 'fio', label: 'Ф.И.О.', field: row => row.name, align: 'left', sortable: true },
+                { name: 'parents', label: 'Родители', field: row => row.parents, align: 'left', sortable: true },
+                { name: 'mainPhone', label: 'Основной телефон', field: row => row.mainPhone, align: 'left', sortable: true },
+                { name: 'subPhone', label: 'Доп. телефон', field: row => row.subPhone, align: 'left', sortable: true },
+                { name: 'health', label: 'Группа здоровья', field: row => row.health, align: 'left', sortable: true },
+                { name: 'tutors', label: 'Репетиторы', field: row => row.tutors.map(item => `${item.title} `), align: 'left', sortable: true },
+                { name: 'achievementsRus', label: 'Информация об участии во Всероссийских конкурсах детского творчества', field: row => row.achievementsRus, align: 'left', sortable: true },
+                { name: 'achievementsInter', label: 'Информация об участии детей в Международных конкурсах детского творчества', field: row => row.achievementsInter, align: 'left', sortable: true },
+                { name: 'schoolEvents', label: 'Участие в мероприятиях школы', field: row => row.schoolEvents, align: 'left', sortable: true },
+                { name: 'specAttention', label: 'Требует особого внимания', field: row => row.specAttention, align: 'left', sortable: true },
+            ]
+        },
     }
     return TableSchema[name] || null;
 }

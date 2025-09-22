@@ -85,7 +85,7 @@
 }
 
 .q-card{
-  @apply !bg-white !rounded-[15pt]
+  @apply bg-white !rounded-[15pt]
 }
 
 .brand-title{
