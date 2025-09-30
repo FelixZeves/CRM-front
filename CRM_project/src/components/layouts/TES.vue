@@ -13,26 +13,42 @@ watch(() => props.edit, (val) => {
 })
 
 const addInput = () => {
-    if(props.body.parents.length < 4)
-        props.body.parents.push("")
+    if(bodyCopy.value.parents.length < 4)
+        bodyCopy.value.parents.push("")
     else
         errorNotify('Количество родителей превышает 4')
 }
 
 const removeInput = (index) => {
-    props.body.parents.splice(index, 1)
+    bodyCopy.value.parents.splice(index, 1)
 }
 
 const lists = [
     {value: 'schoolEvents', label: 'Школьные конкурсы'},
     {value: 'achievementsRus', label: 'Всероссийские конкурсы'},
     {value: 'achievementsInter', label: 'Международные конкурсы'}]
+
+function formatPhone(phone) {
+  if (!phone) return ''
+
+  // если мобильный (11 цифр, начинается с 7 или 8)
+  if (/^(\+7|7|8)\d{10}$/.test(phone)) {
+    return phone.replace(/(\d)(\d{3})(\d{3})(\d{2})(\d{2})/, '8 ($2) $3-$4-$5')
+  }
+
+  // если домашний (например, 6 цифр)
+  if (/^\d{5}$/.test(phone)) {
+    return phone.replace(/(\d{1})(\d{2})(\d{2})/, '$1-$2-$3')
+  }
+
+  return phone // fallback
+}
 </script>
 
 <template>
     <q-list v-if="!edit" class="row items-start no-wrap">
         <q-item>
-            <q-item-section>
+            <q-item-section class="max-w-[25%] break-words whitespace-normal">
                 <q-item-label class="brand-text font-medium">Родители</q-item-label>
                 <q-item-label v-for="parent in body.parents" class="brand-text !font-light"> <q-icon name="fa-solid fa-user" size="12px"/> {{ parent }}</q-item-label>
             </q-item-section>
@@ -40,15 +56,15 @@ const lists = [
         <q-item>
             <q-item-section>
                 <q-item-label class="brand-text font-medium">Телефон</q-item-label>
-                <q-item-label class="brand-text !font-light"> <q-icon name="fa-solid fa-phone" size="12px"/> 8(929)-123-45-56</q-item-label>
-                <q-item-label class="brand-text !font-light"> <q-icon name="fa-solid fa-phone" size="12px"/> 5-64-88</q-item-label>
+                <q-item-label class="brand-text !font-light"> <q-icon name="fa-solid fa-phone" size="12px"/> {{ formatPhone(body.mainPhone) }}</q-item-label>
+                <q-item-label class="brand-text !font-light"> <q-icon name="fa-solid fa-phone" size="12px"/> {{ formatPhone(body.subPhone) }}</q-item-label>
             </q-item-section>
         </q-item>
         <q-item>
             <q-item-section>
                 <q-item-label class="brand-text font-medium"> Физическое состояние</q-item-label>
                 <q-item-label class="brand-text !font-light"><q-icon name="fa-solid fa-heart-pulse" size="12px"/> {{ body.health }} группа здоровья</q-item-label>
-                <q-item-label class="brand-text !font-light text-orange-6"><q-icon name="fa-solid fa-triangle-exclamation" size="12px" color="orange-6"/>Требует особого внимания</q-item-label>
+                <q-item-label v-if="body.specAttention == 'Да'" class="brand-text !font-light text-orange-6"><q-icon name="fa-solid fa-triangle-exclamation" size="12px" color="orange-6"/> Требует особого внимания</q-item-label>
             </q-item-section>
         </q-item>
         <q-item>
@@ -65,7 +81,7 @@ const lists = [
                     v-for="(list, index) in lists"
                     expand-separator
                     dense
-                    :content-inset-level=1
+                    :content-inset-level="1"
                     switch-toggle-side
                     header-class="font-semibold"
                     :label="lists[index].label"
@@ -73,7 +89,7 @@ const lists = [
                     >
                         <q-list>
                             <q-item dense v-for="val in body[lists[index].value]">
-                                <q-item-section>- {{ val }}</q-item-section>
+                                <q-item-section class="w-[300px] break-words whitespace-normal">- {{ val }}</q-item-section>
                             </q-item>
                         </q-list>
                     </q-expansion-item>
@@ -116,7 +132,7 @@ const lists = [
                     <q-input
                         hide-bottom-space
                         v-model="bodyCopy.mainPhone"
-                        :mask="bodyCopy.mainPhone.length <= 5 ? '#-##-##' : '#(###) ###-##-##'"
+                        :mask="bodyCopy.mainPhone.length <= 7 ? '#-##-###' : '#(###) ###-##-##'"
                         dense
                         outlined
                         label="Основной"
@@ -126,7 +142,7 @@ const lists = [
                     <q-input
                         hide-bottom-space
                         v-model="bodyCopy.subPhone"
-                        :mask="bodyCopy.subPhone.length <= 5 ? '#-##-##' : '#(###) ###-##-##'"
+                        :mask="bodyCopy.subPhone.length <= 7 ? '#-##-###' : '#(###) ###-##-##'"
                         dense
                         outlined
                         label="Дополнительный"
@@ -190,7 +206,6 @@ const lists = [
                         <q-expansion-item
                         v-for="(list, index) in lists"
                         dense
-                        content-inset-level=1
                         switch-toggle-side
                         header-class="font-semibold"
                         :label="lists[index].label"
@@ -205,7 +220,7 @@ const lists = [
                                 :options="buffOptions"
                                 :option-label="'title'"
                                 :option-value="'id'"
-                                v-model="body[lists[index].value]"
+                                v-model="bodyCopy[lists[index].value]"
                                 class="w-[300px]"
                             />
                         </q-expansion-item>

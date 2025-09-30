@@ -215,11 +215,10 @@ export function getTableSchema(name) {
                 { name: 'subPhone', label: 'Доп. телефон', field: row => row.subPhone, align: 'left', sortable: true },
                 { name: 'health', label: 'Группа здоровья', field: row => row.health, align: 'left', sortable: true },
                 { name: 'tutors', label: 'Репетиторы', field: row => row.tutors.map(item => `${item.title} `), align: 'left', sortable: true },
-                { name: 'achievementsRus', label: 'Информация об участии во Всероссийских конкурсах детского творчества', field: row => row.achievementsRus, align: 'left', sortable: true },
-                { name: 'achievementsInter', label: 'Информация об участии детей в Международных конкурсах детского творчества', field: row => row.achievementsInter, align: 'left', sortable: true },
-                { name: 'schoolEvents', label: 'Участие в мероприятиях школы', field: row => row.schoolEvents, align: 'left', sortable: true },
+                { name: 'schoolEvents', label: 'Школьные конкурсы', field: row => row.schoolEvents, align: 'left', sortable: true },
+                { name: 'achievementsRus', label: 'Всероссийские конкурсы', field: row => row.achievementsRus, align: 'left', sortable: true },
+                { name: 'achievementsInter', label: 'Международные конкурсы', field: row => row.achievementsInter, align: 'left', sortable: true },
                 { name: 'specAttention', label: 'Требует особого внимания', field: row => row.specAttention, align: 'left', sortable: true },
-                { name: 'edit', label: 'Действия', align: 'center'}
             ]
         },
     }

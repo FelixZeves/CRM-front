@@ -92,7 +92,7 @@ const lessonGroups = computed(() => {
 
 <template>
     <div class="flex flex-row h-[100vh] w-[100vw] items-center px-8 gap-x-4 !flex-nowrap">
-        <header class="min-w-[225px]">
+        <header class="min-w-[225px] w-[225px]">
             <NavigationColumn section='Education'/>
         </header>
         
