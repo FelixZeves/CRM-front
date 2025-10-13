@@ -1,9 +1,10 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import NavigationColumn from '@/components/menus/NavigationColumn.vue';
 import { LocalStorage, SessionStorage } from 'quasar';
-import { getTableSchema } from '@/components/Utils';
+import { getFormSchema, getTableSchema } from '@/components/Utils';
 import TES from '@/components/layouts/TES.vue';
+import { confirmNotify, errorNotify } from '@/components/Notifies';
 
 const body = ref(SessionStorage.getItem('selectedClass'))
 const user = SessionStorage.getItem('user')
@@ -11,15 +12,13 @@ const user = SessionStorage.getItem('user')
 const cols = getTableSchema('students')
 const pagination = ref({rowsPerPage: 0})
 const selected = ref([])
-const edit = ref(null)
+const editIndex = ref(null)
 
 const availableCols = ref([
     { value: 'fio', label: 'Ф.И.О.'},
     { value: 'parents', label: 'Родители'},
     { value: 'mainPhone', label: 'Основной телефон'},
-    { value: 'subPhone', label: 'Доп. телефон'},
     { value: 'health', label: 'Группа здоровья'},
-    { value: 'tutors', label: 'Репетиторы'},
     { value: 'schoolEvents', label: 'Школьные конкурсы'},
     { value: 'achievementsRus', label: 'Всероссийские конкурсы'},
     { value: 'achievementsInter', label: 'Международные конкрусы'},
@@ -33,16 +32,36 @@ const visibleCols = ref(
 )
 
 const students = ref([
-    {id: 1, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич', 'Сидорова Нина Николаевна'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}, {id: 3, title: 'Английский язык'}], achievementsRus: ['Олимпиада "Кенгуру"', 'Олимпиада "Олимпик"', 'Областная олимпиада Урфо', 'Третья Государственная олимпиада для учеников средних классов', 'Областная олимпиада Урфо'], achievementsInter: [''], schoolEvents: ['Конкурс поделок', 'Конкурс сценического искусства'], specAttention: 'Да'},
-    {id: 2, name: 'Сидоров Сергей Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 3, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 4, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 5, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 6, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 7, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 8, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 9, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
-    {id: 10, name: 'Сидоров Михаил Викторович', parents: ['Сидоров Виктор Анатольевич'], mainPhone: '89291234567', subPhone: '56488', health: 3, tutors: [{id: 1, title: 'Математика'}, {id: 2, title: 'Русский язык'}], achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: 'Нет'},
+    {id: 1,
+        name: 'Сидоров Михаил Викторович',
+        birthday: '25.04.2013',
+        regAddress: 'г. Челябинск, ул Молодогвардейцев д.74. кв.101',
+        resAddress: 'г. Челябинск, ул Молодогвардейцев д.74. кв.101',
+        parents: [
+            {name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Российский Федеральный Ядерный Центр Всероссийский Научно-исследовательский Институт Технической Физики', workPost: 'Главный конструктор отдела новых разработок', education: 'Кандидат физических наук'},
+            {name:  'Сидорова Нина Николаевна', phone: '89231256548', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность',  education: 'Магистрская степень математических наук'}],
+        familyStatus: ['Многодетная'],
+        veterans:  true,
+        mainPhone: '89291234567',
+        health: 3,
+        achievementsRus: [
+            'Олимпиада "Кенгуру"',
+            'Олимпиада "Олимпик"',
+            'Областная олимпиада Урфо',
+            'Третья Государственная олимпиада для учеников средних классов',
+            'Областная олимпиада Урфо'],
+        achievementsInter: [],
+        schoolEvents: ['Конкурс поделок', 'Конкурс сценического искусства'],
+        specAttention: true},
+    {id: 2, name: 'Сидоров Сергей Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: true},
+    {id: 3, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: false},
+    {id: 4, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: false},
+    {id: 5, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: false},
+    {id: 6, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: true},
+    {id: 7, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: false},
+    {id: 8, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: true},
+    {id: 9, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: true},
+    {id: 10, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: true},
 ])
 
 function formatPhone(phone) {
@@ -59,6 +78,47 @@ function formatPhone(phone) {
   }
 
   return phone // fallback
+}
+
+function getRowKey(row, index){
+    return row.id ?? `${index}`
+}
+
+function addStudent(){
+    const hasUnsaved = students.value.some(s => s.id === null)
+
+    if(hasUnsaved){
+        errorNotify('Сначала завершите заполнение текущего нового ученика')
+        return
+    }
+
+    const newStudent = getFormSchema('student')
+
+    newStudent.parents.push(getFormSchema('parent'))
+
+    students.value.unshift(newStudent)
+
+    editIndex.value = 0
+
+    nextTick(() => {
+        const expandBtn = document.querySelector(
+        '.q-table tbody tr:first-child td:nth-child(2) button'
+        )
+        if (expandBtn) expandBtn.click()
+    })
+}
+
+function removeStudent(index) {
+    confirmNotify(()=>{
+        editIndex.value = null
+
+        const expandBtn = document.querySelector(
+        '.q-table tbody tr:first-child td:nth-child(2) button'
+        )
+        if (expandBtn) expandBtn.click()
+
+        students.value.splice(index, 1)
+    })
 }
 
 watch(
@@ -92,7 +152,7 @@ watch(
             virtual-scroll
             v-model:pagination="pagination"
             :rows-per-page-options="[0]"
-            row-key="id"
+            :row-key="getRowKey"
             :visible-columns="visibleCols"
             selection="multiple"
             v-model:selected="selected"
@@ -128,7 +188,13 @@ watch(
                                 Выгрузить учеников из файла
                             </q-tooltip>
                         </q-btn>
-                        <q-btn dense class="brand-description" flat color="brand-velvet" icon="add">
+                        <q-btn
+                            dense
+                            class="brand-description"
+                            flat color="brand-velvet"
+                            icon="add"
+                            @click="addStudent"
+                        >
                             <q-tooltip
                                 anchor="top left"
                                 outline
@@ -160,9 +226,35 @@ watch(
                         :key="col.name"
                         :props="props"
                     >
-                    {{ col.label }}
+                        <template v-if="col.name === 'specAttention'">
+                            <q-icon name="fa-solid fa-triangle-exclamation" size="sm">
+                                <q-tooltip
+                                anchor="top middle"
+                                self="bottom middle"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                >
+                                {{ col.label }}
+                                </q-tooltip>
+                            </q-icon>
+                        </template>
+
+                        <template v-else-if="col.name === 'health'">
+                            <q-icon name="fa-solid fa-heart-pulse" size="sm">
+                                <q-tooltip
+                                anchor="top middle"
+                                self="bottom middle"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                >
+                                {{ col.label }}
+                                </q-tooltip>
+                            </q-icon>
+                        </template>
+
+                        <template v-else>
+                            {{ col.label }}
+                        </template>
                     </q-th>
-                    <q-th width="150px"> Действия </q-th>
+                    <q-th> Действия </q-th>
                 </q-tr>
             </template>
             <template v-slot:body-selection="props">
@@ -195,37 +287,97 @@ watch(
                         :key="col.name"
                         :props="props"
                     >
-                    <q-td v-if="col.name === 'mainPhone'">
+                    <q-td v-if="col.name === 'fio'">
+                        {{ col.value.length > 0 ? col.value : 'Новый ученик' }}
+                    </q-td>
+                    <q-td v-else-if="col.name === 'mainPhone'">
                         {{ formatPhone(col.value) }}
                     </q-td>
-                    <q-td v-else-if="col.name === 'subPhone'">
-                        {{ formatPhone(col.value) }}
-                    </q-td>
-                    <span v-else-if="!['parents','tutors', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)">{{ col.value }}</span>
-                    <div class="flex flex-col" v-if="['parents','tutors', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)">
-                        <q-chip v-for="elem in col.value">
+                    <span v-else-if="!['parents', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)">{{ col.value }}</span>
+                    <div class="flex flex-col" v-if="['parents', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)">
+                        <q-chip v-if="col.name != 'parents' " v-for="elem in col.value">
                             {{ elem }}
                         </q-chip>
-                    </div>
-                    <div v-if="col.name == 'edit'"  class="flex flex-row justify-center flex-grow">
-                        <q-btn v-if="edit !== props.row.id" flat text-color="brand-velvet" icon="edit" dense @click="props.expand = true; edit = props.row.id"></q-btn>
-                        <q-btn v-if="edit === props.row.id" flat text-color="brand-complete" icon="fa-solid fa-check" dense ></q-btn>
-                        <q-btn v-if="edit === props.row.id" flat text-color="brand-danger" icon="refresh" dense @click="props.expand = false; edit = null"></q-btn>
-                        <q-btn flat text-color="brand-danger" icon="delete" dense></q-btn>
+                        <q-chip v-else v-for="elem in col.value">
+                            {{ elem.name }}
+                        </q-chip>
                     </div>
                     </q-td>
                     <q-td>
-                        <div  class="flex flex-row justify-center flex-grow">
-                            <q-btn v-if="edit !== props.row.id" flat text-color="brand-velvet" icon="edit" dense @click="props.expand = true; edit = props.row.id"></q-btn>
-                            <q-btn v-if="edit === props.row.id" flat text-color="brand-complete" icon="fa-solid fa-check" dense ></q-btn>
-                            <q-btn v-if="edit === props.row.id" flat text-color="brand-danger" icon="refresh" dense @click="props.expand = false; edit = null"></q-btn>
-                            <q-btn flat text-color="brand-danger" icon="delete" dense></q-btn>
+                        <div  class="flex flex-row justify-center">
+                            <q-btn v-if="editIndex !== props.rowIndex" flat text-color="brand-velvet" icon="edit" dense @click="props.expand = true; editIndex = props.rowIndex">
+                                <q-tooltip
+                                    anchor="top left"
+                                    outline
+                                    self="bottom right"
+                                    :offset="[-5, 5]"
+                                    class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                    >
+                                    Редактировать ученика
+                                </q-tooltip>
+                            </q-btn>
+                            <q-btn v-if="editIndex === props.rowIndex" flat text-color="brand-complete" icon="fa-solid fa-check" dense >
+                                <q-tooltip
+                                    anchor="top left"
+                                    outline
+                                    self="bottom right"
+                                    :offset="[-5, 5]"
+                                    class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                    >
+                                    Подтвердить изменения
+                                </q-tooltip>
+                            </q-btn>
+                            <q-btn v-if="editIndex === props.rowIndex  && props.row.name.length > 0" flat text-color="brand-danger" icon="refresh" dense @click="props.expand = false; editIndex = null">
+                                <q-tooltip
+                                    anchor="top left"
+                                    outline
+                                    self="bottom right"
+                                    :offset="[-5, 5]"
+                                    class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                    >
+                                    Сбросить изменения
+                                </q-tooltip>
+                            </q-btn>
+                            <q-btn v-if="props.row.id != null" flat text-color="brand-danger" icon="delete" dense>
+                                <q-tooltip
+                                    anchor="top left"
+                                    outline
+                                    self="bottom right"
+                                    :offset="[-5, 5]"
+                                    class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                    >
+                                    Удалить ученика
+                                </q-tooltip>
+                            </q-btn>
+                            <q-btn v-if="props.row.id === null" flat text-color="brand-danger" @click="removeStudent(props.rowIndex)" icon="delete" dense>
+                                <q-tooltip
+                                    anchor="top left"
+                                    outline
+                                    self="bottom right"
+                                    :offset="[-5, 5]"
+                                    class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                    >
+                                    Удалить нового ученика
+                                </q-tooltip>
+                            </q-btn>
                         </div>
                     </q-td>
                 </q-tr>
                 <q-tr v-show="props.expand" :props="props">
-                    <q-td colspan="100%">
-                        <TES :body="props.row" :edit="edit === props.row.id"/>
+                    <q-td colspan="100%" class="p-0">
+                        <transition
+                        name="expand"
+                        enter-active-class="transition ease-out duration-500"
+                        enter-from-class="opacity-0 -translate-y-4"
+                        enter-to-class="opacity-100 translate-y-0"
+                        leave-active-class="transition ease-in duration-500"
+                        leave-from-class="opacity-100 translate-y-0"
+                        leave-to-class="opacity-0 -translate-y-4"
+                        >
+                            <div v-show="props.expand" class="overflow-hidden">
+                                <TES :body="props.row" :edit="editIndex === props.rowIndex" />
+                            </div>
+                        </transition>
                     </q-td>
                 </q-tr>
             </template>

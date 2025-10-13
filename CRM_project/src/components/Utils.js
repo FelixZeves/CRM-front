@@ -1,5 +1,5 @@
 import api from '@/main';
-import { RoleEnum } from '@/components/Enums.vue';
+import { familyStatuses, RoleEnum } from '@/components/Enums.vue';
 
 export const USER = '/user'
 export const TASK = `/task`
@@ -157,6 +157,29 @@ export function getFormSchema(name) {
             title: '',
             subs: [],
             pubs: []
+        },
+        parent: {
+            name: '',
+            phone: '',
+            workPlace: '',
+            workPost: '',
+            education: ''
+        },
+        student: {
+            id: null,
+            name: '',
+            birthday: '',
+            regAdderss: '',
+            resAddress: '',
+            parents: [],
+            familyStatus: [],
+            veterans: false,
+            mainPhone: '',
+            health: 1,
+            achievementsRus: [],
+            achievementsInter: [],
+            schoolEvents: [],
+            specAttention: false
         }
     };
 
@@ -211,14 +234,12 @@ export function getTableSchema(name) {
             columns: [
                 { name: 'fio', label: 'Ф.И.О.', field: row => row.name, align: 'left', sortable: true },
                 { name: 'parents', label: 'Родители', field: row => row.parents, align: 'left', sortable: true },
-                { name: 'mainPhone', label: 'Основной телефон', field: row => row.mainPhone, align: 'left', sortable: true },
-                { name: 'subPhone', label: 'Доп. телефон', field: row => row.subPhone, align: 'left', sortable: true },
-                { name: 'health', label: 'Группа здоровья', field: row => row.health, align: 'left', sortable: true },
-                { name: 'tutors', label: 'Репетиторы', field: row => row.tutors.map(item => `${item.title} `), align: 'left', sortable: true },
+                { name: 'mainPhone', label: 'Телефон', field: row => row.mainPhone, align: 'left', sortable: true },
+                { name: 'health', label: 'Группа здоровья', field: row => row.health, align: 'center', sortable: true },
                 { name: 'schoolEvents', label: 'Школьные конкурсы', field: row => row.schoolEvents, align: 'left', sortable: true },
                 { name: 'achievementsRus', label: 'Всероссийские конкурсы', field: row => row.achievementsRus, align: 'left', sortable: true },
                 { name: 'achievementsInter', label: 'Международные конкурсы', field: row => row.achievementsInter, align: 'left', sortable: true },
-                { name: 'specAttention', label: 'Требует особого внимания', field: row => row.specAttention, align: 'left', sortable: true },
+                { name: 'specAttention', label: 'Требует особого внимания', field: row => row.specAttention ? '✔' : '✖', align: 'center', sortable: true },
             ]
         },
     }
