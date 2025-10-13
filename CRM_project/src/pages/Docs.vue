@@ -7,15 +7,20 @@ import DocumentsDropdownNSearch from '@/components/menus/DocumentsDropdownNSearc
 import AddDoc from '@/components/forms/AddDoc.vue';
 import { SessionStorage } from 'quasar';
 import { FILE } from '@/components/Utils';
+import DocumentSkeleton from '@/components/skeletons/DocumentSkeleton.vue';
 
 const docs = ref([])
 const visible = ref(false)
 const user = SessionStorage.getItem('user')
 
+const loading = ref(true)
+
 onMounted(async () => {await updateList()})
 
 async function updateList(params = {}) {
+    loading.value = true
     docs.value = (await api.get(FILE,  { params } )).data.data
+    loading.value = false
 }
 </script>
 
@@ -32,7 +37,10 @@ async function updateList(params = {}) {
             <div class="flex-grow">
                 <DocumentsDropdownNSearch @show-dialog="visible = true" @apply-filters="updateList"></DocumentsDropdownNSearch>
                 <AddDoc v-model:visible='visible' @update-list="updateList"></AddDoc>
-                <DocumentsList :docs="docs" :user="user" @update-list="updateList"/>
+                <q-list v-if="loading" class="h-[72vh] w-full overflow-y-auto justify-self-center">
+                    <DocumentSkeleton v-for="n in  5"/>
+                </q-list>
+                <DocumentsList v-else :docs="docs" :user="user" @update-list="updateList"/>
             </div>
         </main>
     </div>

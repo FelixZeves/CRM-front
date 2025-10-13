@@ -6,19 +6,23 @@ import TasksDropdown from '@/components/menus/TasksDropdown.vue'
 import AddTask from '@/components/forms/AddTask.vue'
 import { getTasks } from '@/components/Utils'
 import { SessionStorage } from 'quasar'
+import TaskSkeleton from '@/components/skeletons/TaskSkeleton.vue'
 
 const visible = ref(false)
 const tasks = ref([])
 const user = SessionStorage.getItem('user')
 
-onMounted(async () => {await updateList()})
-
 const filterParams = ref({})
+const loading = ref(true)
 
 async function updateList(params = {}) {
-    filterParams.value = params;
+    loading.value = true
+    filterParams.value = params
     tasks.value = await getTasks(null, false, filterParams.value)
+    loading.value = false
 }
+
+onMounted(async () => {await updateList()})
 </script>
 
 
@@ -33,7 +37,12 @@ async function updateList(params = {}) {
         <main class="flex flex-grow h-[80vh]">
             <div class="flex-grow">
                 <TasksDropdown @show-dialog="visible = true" @apply-filters="updateList"></TasksDropdown>
-                <TasksList @update-list="updateList" :tasks="tasks" :user="user"/>
+                <q-list v-if="loading" class="overflow-y-auto !justify-self-center !w-full">
+                    <q-item v-for="n in 4">
+                        <TaskSkeleton/>
+                    </q-item>
+                </q-list>
+                <TasksList v-else @update-list="updateList" :tasks="tasks" :user="user"/>
                 <AddTask v-model:visible="visible" @update-list="updateList" :me="user"></AddTask>
             </div>
         </main>
