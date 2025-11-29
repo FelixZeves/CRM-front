@@ -7,13 +7,16 @@ import Collection from '@/components/forms/admin/Collection.vue'
 import api from '@/main'
 import { computed, ref } from 'vue'
 
+const isSettings = ref(false)
+
 const status = ref('read')
 const isRead = computed(() => status.value != 'read'? false: true)
-const url = ref(null)
 const typeForm = ref(null)
 const formSubmit = ref(null)
 const details = ref(null)
 const pagination = ref({rowsPerPage: 0})
+
+const eventsFile = ref([])
 
 const forms = {
     user: User,
@@ -36,7 +39,7 @@ const tables = ref([
     info: "1. Чтобы добавить руководителя или сотрудника, необходимо выбрать нужный отдел в форме редактирования/добавления пользователя;\n2. Вышестоящее руководство добавляется путём добавления дочернего отдела у вышестоящего."
 },
   {...getTableSchema('classes'), name: 'class', data: [],
-  async get() {this.data = (await api.get(CLASS)).data.data},
+  async get() {this.data = (await api.get(CLASS+'/temp')).data.data},
   choose(row) {typeForm.value = 'class'; details.value = row},
   add() {typeForm.value = 'class'; details.value = getFormSchema('class'); status.value ='create';},
   info: "Вводите класс и параллель отдельно"
@@ -67,7 +70,8 @@ async function remove() {
 
 <template>
  <div class="w-[100vw] h-[100vh] flex flex-row p-5 pb-1 gap-10">
-    <div class="flex-grow max-w-[65%] pe-1 h-full overflow-y-auto">
+
+    <div v-if="!isSettings" class="flex-grow max-w-[65%] pe-1 h-full overflow-y-auto">
         <q-list bordered>
             <q-expansion-item
                 v-for="table in tables"
@@ -92,6 +96,52 @@ async function remove() {
             </q-expansion-item>
         </q-list>
     </div>
+
+    <div v-else class="flex-grow max-w-[65%] pe-1 h-full overflow-y-auto">
+        <q-list>
+            <q-item>
+                <q-form>
+                    <q-item-label class="brand-description !font-semibold pb-2">Добавление информации об олимпиадах и мероприятиях</q-item-label>
+                    <div class="flex flex-row gap-x-2">
+                        <q-file
+                            v-model="eventsFile"
+                            label="Прикрепить файлы"
+                            outlined
+                            hide-bottom-space
+                            :rules="[
+                                        val => !!val || 'Обязательное поле',
+                                        val => {
+                                                    if (!val) return true
+                                                    const totalSize = val.reduce((sum, file) => sum + file.size, 0)
+                                                    const sizeInMB = totalSize / (1024 * 1024)
+                                                    return totalSize <= 30 * 1024 * 1024 || `Общий размер файлов не должен превышать 30MB. Размер ${sizeInMB.toFixed(2)}MB`
+                                                }
+                                    ]"
+                            accept=".pdf, .jpg, .png, .docx, .pptx, .xlsx, .txt, .zip"
+                            class="brand-description !flex-grow">
+                            <template v-slot:append>
+                                <q-icon name="attach_file" />
+                                <q-btn type="submit" class="brand-text" dense flat>
+                                    <q-icon name="fa-solid fa-download" size="24px" color="brand-velvet"/>
+                                    <q-tooltip
+                                        anchor="top right"
+                                        outline
+                                        self="bottom left"
+                                        :offset="[5, 5]"
+                                        class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[200px]"
+                                    >
+                                        Внести данные в базу данных
+                                    </q-tooltip>
+                                </q-btn>
+                            </template>
+                        </q-file>
+                        
+                    </div>
+                </q-form>
+            </q-item>
+        </q-list>
+    </div>
+
     <div class="w-[30%] h-full overflow-y-auto">
         <div class="flex flex-col m-2">
             <div class="flex flex-col gap-4 mb-5">
@@ -100,38 +150,90 @@ async function remove() {
                     <q-btn
                     unelevated
                     :to="{name : 'Office'}"
-                    icon="fa-solid fa-arrow-right-from-bracket text-brand-danger"/>
+                    icon="fa-solid fa-arrow-right-from-bracket text-brand-danger">
+                        <q-tooltip
+                            anchor="center left"
+                            outline
+                            self="center right"
+                            :offset="[5, 5]"
+                            class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                        >
+                            Вернуться на главную
+                        </q-tooltip>
+                    </q-btn>
                 </div>
-                <div class="flex gap-4">
+                <div class="flex justify-start gap-4">
+                    <div class="flex gap-4">
+                        <q-btn
+                            icon="fa-solid fa-pen"
+                            padding="10px"
+                            size="sm"
+                            @click="status = (status != 'read') ? 'read' : 'edit'"
+                            :color="!isRead ? 'brand-velvet' : 'grey-4'"
+                            :text-color="!isRead ? 'white' : 'blue-grey-8'"
+                            :unelevated="!isRead ? true : false"
+                        >
+                            <q-tooltip
+                                anchor="top right"
+                                outline
+                                self="bottom left"
+                                :offset="[5, 5]"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[200px]"
+                            >
+                                Изменить выбранную запись
+                            </q-tooltip>
+                        </q-btn>
+                        <q-btn
+                            icon="fa-solid fa-trash"
+                            padding="10px"
+                            size="sm"
+                            @click="remove(); status = 'read'"
+                            :color="status == 'delete' ? 'brand-velvet' : 'grey-4'"
+                            :text-color="status == 'delete' ? 'white' : 'blue-grey-8'"
+                            :unelevated="status == 'delete' ? true : false"
+                        >
+                            <q-tooltip
+                                anchor="top right"
+                                outline
+                                self="bottom left"
+                                :offset="[5, 5]"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[200px]"
+                            >
+                                Удалить выбранную запись
+                            </q-tooltip>
+                        </q-btn>
+                    </div>
+
                     <q-btn
-                        icon="fa-solid fa-pen"
+                        icon="fa-solid fa-gear"
                         padding="10px"
                         size="sm"
-                        @click="status = (status != 'read') ? 'read' : 'edit'"
-                        :color="!isRead ? 'brand-velvet' : 'grey-4'"
-                        :text-color="!isRead ? 'white' : 'blue-grey-8'"
-                        :unelevated="!isRead ? true : false"
-                    />
-                    <q-btn
-                        icon="fa-solid fa-trash"
-                        padding="10px"
-                        size="sm"
-                        @click="remove(); status = 'read'"
-                        :color="status == 'delete' ? 'brand-velvet' : 'grey-4'"
-                        :text-color="status == 'delete' ? 'white' : 'blue-grey-8'"
-                        :unelevated="status == 'delete' ? true : false"
-                    />
+                        @click="isSettings = !isSettings"
+                        :color="isSettings ? 'brand-velvet' : 'grey-4'"
+                        :text-color="isSettings ? 'white' : 'blue-grey-8'"
+                        :unelevated="isSettings ? true : false"
+                    >
+                        <q-tooltip
+                            anchor="top right"
+                            outline
+                            self="bottom left"
+                            :offset="[5, 5]"
+                            class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[200px]"
+                        >
+                            Настройки и дополнительные действия
+                        </q-tooltip>
+                    </q-btn>
                 </div>
                 <span class="brand-title text-start">Описание</span>
                 <span v-if="typeForm && tables.find(t => t.name.includes(typeForm))" class="brand-description text-start whitespace-pre-line">
                 {{ tables.find(t => t.name.includes(typeForm)).info }}
                 </span>
                 <span v-else class="brand-description text-start">
-                На этой странице вы можете управлять пользователями,
-                отделами и уроками вашего образовательного центра,
-                а также добавлять новые записи. Также здесь можно
-                просматривать детали каждого элемента, что позволяет
-                легко отслеживать и управлять всеми аспектами вашего центра.
+                    На этой странице вы можете управлять пользователями,
+                    отделами и уроками вашего образовательного центра,
+                    а также добавлять новые записи. Также здесь можно
+                    просматривать детали каждого элемента, что позволяет
+                    легко отслеживать и управлять всеми аспектами вашего центра.
                 </span>
             </div>
 

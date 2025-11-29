@@ -3,7 +3,7 @@ import { RoleEnum } from '@/components/Enums.vue';
 import { ref } from 'vue';
 import { successNotify, passClipboardNotify, confirmNotify } from '@/components/Notifies';
 import api from '@/main';
-import { DEPARTMENT, USER } from '@/components/Utils';
+import { CLASS, DEPARTMENT, USER } from '@/components/Utils';
 
 const props = defineProps({
     model: {type: Object, required: true, default: {}},
@@ -19,7 +19,7 @@ const buffOptions = ref([{title: 'Пусто', id: null}])
 
 async function lazyLoad(url) {
     const data = (await api.get(url)).data.data
-    buffOptions.value = [{title: 'Пусто', id: null}, ...data]
+    buffOptions.value = [ ...data]
 }
 
 async function send() {
@@ -36,8 +36,10 @@ async function send() {
         }
 
         if (props.mode == 'edit') {
+            props.model.profile.manager = props.model.profile.manager?.id
+            props.model.profile.classes = props.model.profile.classes.map(cls => cls.id || cls)
             let response = await api.patch(USER, props.model)
-            if(response.status == 200) successNotify('Пользователь создан')
+            if(response.status == 200) successNotify('Пользователь отредактирован')
             }
 
         emit('update-list')
@@ -112,8 +114,14 @@ defineExpose({send, remove})
                     outlined
                     label="Классное руководство"
                     :readonly="status"
+                    multiple
+                    use-chips
                     emit-value
                     map-options
+                    :options="buffOptions"
+                    :option-label="option => `${option.number}.${option.parallel}`"
+                    :option-value="'id'"
+                    @focus="lazyLoad(CLASS+'/temp')"
                     v-model="model.profile.classes"
                 />
             </q-item>

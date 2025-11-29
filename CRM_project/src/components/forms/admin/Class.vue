@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue';
 import api from '@/main';
 import { successNotify, confirmNotify } from '@/components/Notifies';
-import { CLASS, DEPARTMENT } from '@/components/Utils';
+import { CLASS } from '@/components/Utils';
 
 const props = defineProps({
     model: {type: Object, required: true, default: {}},
@@ -25,20 +25,27 @@ async function send() {
     if (props.mode == 'create')
         response = await api.post(CLASS, localModel.value)
 
-    if (props.mode == 'edit')
-        response = await api.patch(CLASS, localModel.value)
+    if (props.mode == 'edit') {
+        const { statistic, spec, leader, ...payload } = localModel.value
+        payload.lid = leader?.id || null
+
+        response = await api.patch(CLASS, payload)
+    }
 
     if (response?.status == 200) successNotify()
     emit('update-list')
 }
 
-async function lazyLoad(url) {
-    const data = (await api.get(url)).data.data
-    buffOptions.value = [...data]
-}
+const leaderOptions = ref([props.model.leader])
 
 async function remove() {
-    if (props.mode != 'read') confirmNotify(async () => {await api.delete(`${CLASS}?id=${localModel.value.id}`); emit('update-list')})
+    if (props.mode != 'read') confirmNotify(async () => {
+        let response = await api.delete(`${CLASS}/${localModel.value.id}`)
+        if(response.status == 200){
+            successNotify('Класс успешно удалён')
+            emit('update-list')
+        }
+    })
 }
 
 defineExpose({ send, remove })
@@ -47,30 +54,29 @@ defineExpose({ send, remove })
 <template>
     <q-list>
         <q-item>
-            <q-input class="w-full brand-description" outlined label="Класс" :readonly="status" v-model="localModel.number"/>
+            <q-input class="w-full brand-description" outlined label="Параллель" type="number" max="11" :readonly="status" v-model="localModel.parallel"/>
         </q-item>
         <q-item>
-            <q-input class="w-full brand-description" outlined label="Параллель" :readonly="status" v-model="localModel.parallel"/>
+            <q-input class="w-full brand-description" outlined label="Класс" :readonly="status" type="number" v-model="localModel.number"/>
         </q-item>
         <q-item>
-            <q-input class="w-full brand-description" outlined disable label="Уклон" :readonly="status" v-model="localModel.spec"/>
+            <q-input class="w-full brand-description" outlined label="Уклон" :readonly="status" v-model="localModel.spec"/>
         </q-item>
-        <!-- <q-item>
+        <q-item>
             <q-select
-                label="Уклон"
+                label="Классный руководитель"
                 class="w-full brand-description"
                 outlined
                 emit-value
-                map-options
                 clearable
+                map-options
                 :readonly="status"
-                :options="buffOptions"
-                :option-label="'title'"
+                :options="leaderOptions"
+                :option-label="'fio'"
                 :option-value="'id'"
-                @focus="lazyLoad(DEPARTMENT)"
-                v-model="localModel.spec"
+                v-model="localModel.leader"
             />
-        </q-item> -->
+        </q-item>
         <q-item>
             <q-input class="w-full brand-description" borderless readonly label="Обновлен" v-model="localModel.update_at"/>
         </q-item>
