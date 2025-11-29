@@ -1,68 +1,34 @@
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onMounted } from 'vue'
+import api from '@/main'
 import NavigationColumn from '@/components/menus/NavigationColumn.vue';
 import { LocalStorage, SessionStorage } from 'quasar';
-import { getFormSchema, getTableSchema } from '@/components/Utils';
+import { CLASS, getFormSchema, getStudents, getTableSchema, STUDENT } from '@/components/Utils';
 import TES from '@/components/layouts/TES.vue';
 import { confirmNotify, errorNotify } from '@/components/Notifies';
 
 const body = ref(SessionStorage.getItem('selectedClass'))
 const user = SessionStorage.getItem('user')
 
-const cols = getTableSchema('students')
+const schema = getTableSchema('students')
 const pagination = ref({rowsPerPage: 0})
 const selected = ref([])
 const editIndex = ref(null)
 
-const availableCols = ref([
-    { value: 'fio', label: 'Ф.И.О.'},
-    { value: 'parents', label: 'Родители'},
-    { value: 'mainPhone', label: 'Основной телефон'},
-    { value: 'health', label: 'Группа здоровья'},
-    { value: 'schoolEvents', label: 'Школьные конкурсы'},
-    { value: 'achievementsRus', label: 'Всероссийские конкурсы'},
-    { value: 'achievementsInter', label: 'Международные конкрусы'},
-    { value: 'specAttention', label: 'Требует особого внимания'}
-])
+const availableCols = ref(
+    schema.columns.map(({ name, label }) => ({
+        value: name,
+        label
+    }))
+)
 
 const savedCols = LocalStorage.getItem('visibleCols')
 
 const visibleCols = ref(
-  savedCols ? JSON.parse(savedCols) : availableCols.value.map(item => item.value)
+  savedCols ? JSON.parse(savedCols) : ['fio', 'mainPhone', 'health', 'specAttention']
 )
 
-const students = ref([
-    {id: 1,
-        name: 'Сидоров Михаил Викторович',
-        birthday: '25.04.2013',
-        regAddress: 'г. Челябинск, ул Молодогвардейцев д.74. кв.101',
-        resAddress: 'г. Челябинск, ул Молодогвардейцев д.74. кв.101',
-        parents: [
-            {name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Российский Федеральный Ядерный Центр Всероссийский Научно-исследовательский Институт Технической Физики', workPost: 'Главный конструктор отдела новых разработок', education: 'Кандидат физических наук'},
-            {name:  'Сидорова Нина Николаевна', phone: '89231256548', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность',  education: 'Магистрская степень математических наук'}],
-        familyStatus: ['Многодетная'],
-        veterans:  true,
-        mainPhone: '89291234567',
-        health: 3,
-        achievementsRus: [
-            'Олимпиада "Кенгуру"',
-            'Олимпиада "Олимпик"',
-            'Областная олимпиада Урфо',
-            'Третья Государственная олимпиада для учеников средних классов',
-            'Областная олимпиада Урфо'],
-        achievementsInter: [],
-        schoolEvents: ['Конкурс поделок', 'Конкурс сценического искусства'],
-        specAttention: true},
-    {id: 2, name: 'Сидоров Сергей Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: true},
-    {id: 3, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: false},
-    {id: 4, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: false},
-    {id: 5, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: false},
-    {id: 6, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: true},
-    {id: 7, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: false},
-    {id: 8, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: true},
-    {id: 9, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: true},
-    {id: 10, name: 'Сидоров Михаил Викторович', parents: [{name: 'Сидоров Виктор Анатольевич', phone: '89231056889', workPlace: 'Некоторое предприятие', workPost: 'Некоторая должность'}], mainPhone: '89291234567', subPhone: '56488', health: 3, achievementsRus: [], achievementsInter: [], schoolEvents: [], specAttention: true},
-])
+const students = ref([])
 
 function formatPhone(phone) {
   if (!phone) return ''
@@ -81,7 +47,7 @@ function formatPhone(phone) {
 }
 
 function getRowKey(row, index){
-    return row.id ?? `${index}`
+    return row.id || `${index}`
 }
 
 function addStudent(){
@@ -121,6 +87,24 @@ function removeStudent(index) {
     })
 }
 
+async function deleteStudent(props){
+    confirmNotify(async () => {
+        editIndex.value = null
+
+        const expandBtn = document.querySelector(
+        '.q-table tbody tr:first-child td:nth-child(2) button'
+        )
+        console.log(props.expand)
+        if (props.expand) expandBtn.click()
+
+        let response = await api.delete(`${STUDENT}/${props.row.id}`)
+        if(response.status == 200){
+            successNotify('Ученик успешно удалён')
+            updateList()
+        }
+    })
+}
+
 watch(
   visibleCols,
   (newVal) => {
@@ -128,6 +112,31 @@ watch(
   },
   { deep: true }
 )
+
+async function updateList() {
+    students.value = (await api.get(`${CLASS}/${body.value.id}`)).data.data.students
+}
+
+const studentForms = ref({})
+
+async function onSubmit(row) {
+    // гарантируем, что дочерний компонент уже смонтирован/видим
+    await nextTick()
+
+    const form = studentForms.value[row.id]
+
+    if (!form) return errorNotify('Форма ещё не готова')
+
+    const response = await form.sendForm()
+
+    if (response?.status == 200) {
+        successNotify()
+        updateList()
+    }
+}
+
+onMounted(async () => {await updateList(); console.log(students.value)})
+
 </script>
 
 <template>
@@ -141,14 +150,14 @@ watch(
                 <q-breadcrumbs active-color="brand-velvet" class="brand-text ps-4">
                     <q-breadcrumbs-el :label="user.profile.initials_name" :to="{name: 'Office'}" />
                     <q-breadcrumbs-el label="Учебная деятельность" :to="{name : 'Education'}"/>
-                    <q-breadcrumbs-el :label="'Класс: ' + body.title" />
+                    <q-breadcrumbs-el :label="'Класс: ' + `${body.number}.${body.parallel}`" />
                 </q-breadcrumbs>
             </div>
             <q-table
             flat bordered
             class="h-[72vh]"
             :rows="students"
-            :columns="cols.columns"
+            :columns="schema.columns"
             virtual-scroll
             v-model:pagination="pagination"
             :rows-per-page-options="[0]"
@@ -226,7 +235,43 @@ watch(
                         :key="col.name"
                         :props="props"
                     >
-                        <template v-if="col.name === 'specAttention'">
+                        <template v-if="col.name === 'birthday'">
+                            <q-icon name="fa-solid fa-calendar-days" size="sm">
+                                <q-tooltip
+                                anchor="top middle"
+                                self="bottom middle"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                >
+                                {{ col.label }}
+                                </q-tooltip>
+                            </q-icon>
+                        </template>
+
+                        <template v-else-if="col.name === 'age'">
+                            <q-icon name="fa-solid fa-cake-candles" size="sm">
+                                <q-tooltip
+                                anchor="top middle"
+                                self="bottom middle"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                >
+                                {{ col.label }}
+                                </q-tooltip>
+                            </q-icon>
+                        </template>
+                        
+                        <template v-else-if="col.name === 'health'">
+                            <q-icon name="fa-solid fa-heart-pulse" size="sm">
+                                <q-tooltip
+                                anchor="top middle"
+                                self="bottom middle"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                >
+                                {{ col.label }}
+                                </q-tooltip>
+                            </q-icon>
+                        </template>
+                    
+                        <template v-else-if="col.name === 'specAttention'">
                             <q-icon name="fa-solid fa-triangle-exclamation" size="sm">
                                 <q-tooltip
                                 anchor="top middle"
@@ -238,8 +283,32 @@ watch(
                             </q-icon>
                         </template>
 
-                        <template v-else-if="col.name === 'health'">
-                            <q-icon name="fa-solid fa-heart-pulse" size="sm">
+                        <template v-else-if="col.name === 'homeEducation'">
+                            <q-icon name="fa-solid fa-house-user" size="sm">
+                                <q-tooltip
+                                anchor="top middle"
+                                self="bottom middle"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                >
+                                {{ col.label }}
+                                </q-tooltip>
+                            </q-icon>
+                        </template>
+
+                        <template v-else-if="col.name === 'citizenship'">
+                            <q-icon name="fa-solid fa-passport" size="sm">
+                                <q-tooltip
+                                anchor="top middle"
+                                self="bottom middle"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                >
+                                {{ col.label }}
+                                </q-tooltip>
+                            </q-icon>
+                        </template>
+
+                        <template v-else-if="col.name === 'veterans'">
+                            <q-icon name="fa-solid fa-medal" size="sm">
                                 <q-tooltip
                                 anchor="top middle"
                                 self="bottom middle"
@@ -288,18 +357,21 @@ watch(
                         :props="props"
                     >
                     <q-td v-if="col.name === 'fio'">
-                        {{ col.value.length > 0 ? col.value : 'Новый ученик' }}
+                        {{ col.value?.length > 0 ? col.value : 'Новый ученик' }}
                     </q-td>
                     <q-td v-else-if="col.name === 'mainPhone'">
                         {{ formatPhone(col.value) }}
                     </q-td>
-                    <span v-else-if="!['parents', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)">{{ col.value }}</span>
-                    <div class="flex flex-col" v-if="['parents', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)">
-                        <q-chip v-if="col.name != 'parents' " v-for="elem in col.value">
-                            {{ elem }}
+                    <span v-else-if="!['parents', 'familyStatus', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)" class=" break-words whitespace-normal">{{ col.value }}</span>
+                    <div class="flex flex-col" v-if="['parents', 'familyStatus', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)">
+                        <q-chip v-if="col.name == 'parents'" v-for="elem in col.value">
+                            {{ elem.name }}
+                        </q-chip>
+                        <q-chip v-else-if="col.name == 'familyStatus'" v-for="elem in col.value">
+                            {{ elem.label }}
                         </q-chip>
                         <q-chip v-else v-for="elem in col.value">
-                            {{ elem.name }}
+                            {{ elem }}
                         </q-chip>
                     </div>
                     </q-td>
@@ -316,7 +388,7 @@ watch(
                                     Редактировать ученика
                                 </q-tooltip>
                             </q-btn>
-                            <q-btn v-if="editIndex === props.rowIndex" flat text-color="brand-complete" icon="fa-solid fa-check" dense >
+                            <q-btn v-if="editIndex === props.rowIndex" @click="onSubmit(props.row)" flat text-color="brand-complete" icon="fa-solid fa-check" dense >
                                 <q-tooltip
                                     anchor="top left"
                                     outline
@@ -327,7 +399,7 @@ watch(
                                     Подтвердить изменения
                                 </q-tooltip>
                             </q-btn>
-                            <q-btn v-if="editIndex === props.rowIndex  && props.row.name.length > 0" flat text-color="brand-danger" icon="refresh" dense @click="props.expand = false; editIndex = null">
+                            <q-btn v-if="editIndex === props.rowIndex  && props.row.fio.length > 0" flat text-color="brand-danger" icon="refresh" dense @click="props.expand = false; editIndex = null">
                                 <q-tooltip
                                     anchor="top left"
                                     outline
@@ -338,13 +410,13 @@ watch(
                                     Сбросить изменения
                                 </q-tooltip>
                             </q-btn>
-                            <q-btn v-if="props.row.id != null" flat text-color="brand-danger" icon="delete" dense>
+                            <q-btn v-if="props.row.id != null" flat text-color="brand-danger" @click="deleteStudent(props)" icon="delete" dense>
                                 <q-tooltip
                                     anchor="top left"
                                     outline
                                     self="bottom right"
                                     :offset="[-5, 5]"
-                                    class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                    class="!text-sm text-center bg-brand-danger !text-white shadow-xl !max-w-[250px]"
                                     >
                                     Удалить ученика
                                 </q-tooltip>
@@ -355,7 +427,7 @@ watch(
                                     outline
                                     self="bottom right"
                                     :offset="[-5, 5]"
-                                    class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                    class="!text-sm text-center bg-brand-danger !text-white shadow-xl !max-w-[250px]"
                                     >
                                     Удалить нового ученика
                                 </q-tooltip>
@@ -375,7 +447,7 @@ watch(
                         leave-to-class="opacity-0 -translate-y-4"
                         >
                             <div v-show="props.expand" class="overflow-hidden">
-                                <TES :body="props.row" :edit="editIndex === props.rowIndex" />
+                                <TES :ref="el => studentForms[props.row.id] = el" :key="props.row.id" :body="props.row" :edit="editIndex === props.rowIndex" />
                             </div>
                         </transition>
                     </q-td>

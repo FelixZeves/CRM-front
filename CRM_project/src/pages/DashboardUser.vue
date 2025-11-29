@@ -8,6 +8,7 @@ import { onMounted, ref } from 'vue';
 import TaskTileSkeleton from '@/components/skeletons/TaskTileSkeleton.vue';
 import { getEvents, getTasks } from '@/components/Utils';
 import EventTLESkeleton from '@/components/skeletons/EventTLESkeleton.vue';
+import TransitionSetup from '@/components/layouts/TransitionSetup.vue';
 
 const tasks = ref([])
 const tasksLoading = ref(true)
@@ -45,19 +46,27 @@ onMounted(async () => {
                 <q-list v-if="tasksLoading" class="!max-h-[80vh] overflow-y-auto flex-grow px-2">
                     <TaskTileSkeleton v-for="n in 6"></TaskTileSkeleton>
                 </q-list>
-                <q-list v-else class="!max-h-[80vh] overflow-y-auto flex-grow px-2">
-                    <TasksTile v-for="task in tasks" :body="task"/>
-                </q-list>
+
+
+                <TransitionSetup :items="tasks" direction="y" :stagger="175" tag="q-list">
+                    <template #default="{ item, style, key }">
+                        <TasksTile :body="item" :key="key" :style="style" />
+                    </template>
+                </TransitionSetup>
             </div>
 
             <div class="flex flex-col gap-y-8 flex-grow w-[35%] flex-shrink-0">
                 <CRMCalendar/>
                 <q-timeline color="brand-velvet"
-                class="h-[40vh] overflow-y-auto !pe-2"
+                class="h-[40vh] overflow-y-auto !pe-2 overflow-x-hidden"
                 side="left"
                 >
                     <EventTLESkeleton v-if="eventsLoading" v-for="n in 5"/>
-                    <EventsTile v-else v-for="event in events" :body="event"/>
+                    <TransitionSetup :items="events" direction="x" :stagger="150" tag="div">
+                        <template #default="{item, style, key}">
+                            <EventsTile :body="item" :key="key" :style="style"/>
+                        </template>
+                    </TransitionSetup>
                 </q-timeline>
             </div>
         </main>

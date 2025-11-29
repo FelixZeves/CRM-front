@@ -4,6 +4,7 @@ import { Quasar, Notify, LocalStorage, SessionStorage } from 'quasar'
 import langRu from 'quasar/lang/ru'
 import App from './App.vue'
 import VCalendar from 'v-calendar'
+import VueApexCharts from 'vue3-apexcharts'
 
 
 import 'v-calendar/style.css'
@@ -70,4 +71,4 @@ api.interceptors.response.use((response) => response, (error) => {
     }
 });
 
-createApp(App).use(Quasar, {plugins: {Notify, LocalStorage, SessionStorage}, lang: langRu,}).use(router).use(VCalendar, {}).mount('#app')
+createApp(App).use(Quasar, {plugins: {Notify, LocalStorage, SessionStorage}, lang: langRu,}).use(router).use(VCalendar, {}).use(VueApexCharts).mount('#app')

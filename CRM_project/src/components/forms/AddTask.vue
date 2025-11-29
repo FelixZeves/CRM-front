@@ -5,7 +5,7 @@ import { DocEnum as D, PlaceEnum, RoleEnum_ as R} from '@/components/Enums.vue'
 import { EVENT, TASK, DEPARTMENT, getFormSchema, getToday, COLLECTION, getDepartments } from '@/components/Utils.js'
 import { errorNotify, successNotify } from '@/components/Notifies'
 
-const props = defineProps(['visible', 'body', 'me'])
+const props = defineProps(['visible', 'body', 'me', 'isMessage'])
 const emit = defineEmits(['update:visible', 'update-list'])
 
 const step = ref(1)
@@ -69,6 +69,11 @@ watch(visible, async (val) => {
                 task.value.reviewers = [props.body.active[1].user.id]
                 task.value.ref = []
                 lazyLoad()
+            }
+            else if(props.isMessage == true){
+                task.value.type = D.MEMO
+                task.value.reviewers = props.body.reviewers
+                task.value.ref = null
             }
         }
     }
@@ -216,6 +221,8 @@ async function send() {
             task.value.title = `${task.value.title} (${task.value.place})`
             task.value.reviewers = [...task.value.reviewers.map(staff => (staff.id))]
         }
+
+        if(props.isMessage == true) task.value.reviewers = [...task.value.reviewers.map(staff => (staff.id))]
 
         const fd = new FormData()
 
@@ -400,7 +407,6 @@ async function send() {
                                     label="Исполнитель (-и)"
                                     class="w-full"
                                     outlined
-                                    emit-value
                                     map-options
                                     use-chips
                                     multiple
@@ -415,7 +421,6 @@ async function send() {
                                     label="Согласующий (-ие)"
                                     class="w-full"
                                     outlined
-                                    emit-value
                                     map-options
                                     use-chips
                                     multiple
@@ -430,7 +435,6 @@ async function send() {
                                     label="Проверяющий (-ие)"
                                     class="w-full"
                                     outlined
-                                    emit-value
                                     map-options
                                     use-chips
                                     multiple

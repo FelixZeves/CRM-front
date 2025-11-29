@@ -1,5 +1,5 @@
 import api from '@/main';
-import { familyStatuses, RoleEnum } from '@/components/Enums.vue';
+import { houseConditions, RoleEnum } from '@/components/Enums.vue';
 
 export const USER = '/user'
 export const TASK = `/task`
@@ -9,6 +9,7 @@ export const COLLECTION = `/collection`
 export const FILE = `/document`
 export const CLASS = `/class`
 export const LESSON = `/lesson`
+export const STUDENT = `/student`
 
 export async function getMe(){
     const response = await api.get(`${USER}/me`)
@@ -51,16 +52,51 @@ export async function getDepartments(id = null){
 }
 
 export async function getTasks(limit = null, is_archive = false, params = {}) {
-    let query = { ...params, is_archive }
-    if (limit != null){
-        query.limit = limit
+    try{
+
+        let query = { ...params, is_archive }
+        if (limit != null){
+            query.limit = limit
+        }
+        let tasks = []
+        if (params.id)
+            tasks = [(await api.get(`${TASK}/${params.id}`)).data.data]
+        else
+            tasks = (await api.get(`${TASK}`, { params: query })).data.data
+        return tasks
+    } catch(error){
+        console.error('Ошибка получения задач:', error)
+        return []
     }
-    let tasks = []
-    if (params.id)
-        tasks = [(await api.get(`${TASK}/${params.id}`)).data.data]
-    else
-        tasks = (await api.get(`${TASK}`, { params: query })).data.data
-    return tasks
+}
+
+export async function getClasses(){
+    try{
+        let classes = (await api.get(`${CLASS}`)).data.data
+        return classes
+    } catch(error){
+        console.error('Ошибка получения классов:', error)
+        return []
+    }
+}
+
+export async function getStudents(limit = null, params = {}){
+    try{
+        let query = { ...params}
+        if (limit != null){
+            query.limit = limit
+        }
+        let students = []
+        if (params.id)
+            students = [(await api.get(`${STUDENT}/${params.id}`)).data.data]
+        else
+            students = (await api.get(`${STUDENT}`)).data.data
+    
+        return students
+    } catch (error) {
+        console.error('Ошибка получения учеников:', error)
+        return []
+    }
 }
 
 export async function getEvents(limit = null, params = {}){
@@ -91,6 +127,31 @@ export async function getSupervisors(){
 
 export function getToday() {
     return new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+export function getAge(birthday) {
+    if (!birthday) return null
+  
+    const parts = birthday.split('.')
+    if (parts.length !== 3) return null
+  
+    const [day, month, year] = parts.map(Number)
+    const birthDate = new Date(year, month - 1, day)
+  
+    if (isNaN(birthDate)) return null
+  
+    const today = new Date()
+    let age = today.getFullYear() - birthDate.getFullYear()
+  
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+    const dayDiff = today.getDate() - birthDate.getDate()
+  
+    // если день рождения ещё не наступил в этом году — вычитаем 1
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--
+    }
+  
+    return age
 }
 
 export async function downloadFile(url, id){
@@ -125,7 +186,8 @@ export function getFormSchema(name) {
         class: {
             number: '',
             parallel: '',
-            specialization: null
+            spec: null,
+            lid: null
         },
         lesson: {
             title: ''
@@ -159,27 +221,41 @@ export function getFormSchema(name) {
             pubs: []
         },
         parent: {
-            name: '',
+            fio: '',
             phone: '',
-            workPlace: '',
-            workPost: '',
-            education: ''
+            work: '',
+            post: '',
+            education: '',
+            kinship: null,
+            curator: false,
+            status: '',
         },
         student: {
             id: null,
-            name: '',
+            fio: '',
             birthday: '',
-            regAdderss: '',
-            resAddress: '',
+            country_reg: false,
+            gender: 'm',
+            address_type: '',
+            address_reg: '',
+            address_living: '',
             parents: [],
-            familyStatus: [],
-            veterans: false,
-            mainPhone: '',
+            family_type: [],
+            phone: '',
+            home_education: false,
             health: 1,
             achievementsRus: [],
             achievementsInter: [],
             schoolEvents: [],
-            specAttention: false
+            sp_doctor: null,
+            sp_disease: null,
+            count_childs: 3,
+            odn_date: null,
+            sop_date: null,
+            gr_reason: null,
+            df_reason: null,
+            dls_reason: null,
+            comment: ''
         }
     };
 
@@ -211,9 +287,10 @@ export function getTableSchema(name) {
         classes: {
             label: "Классы",
             columns: [
-                { name: 'class', label: 'Класс', field: row => `${row.number}.${row.parallel}`, align: 'left', sortable: true },
-                { name: 'spec', label: 'Уклон', field: row => row.spec?.title || '', align: 'left', sortable: true },
-                { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true },]
+                { name: 'class', label: 'Класс', field: row => `${row.parallel}.${row.number}`, align: 'left', sortable: true },
+                { name: 'spec', label: 'Уклон', field: row => row.spec || '', align: 'left', sortable: true },
+                { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true },
+                { name: 'leader', label: 'Классный руководитель', field: row => row.leader?.fio, align: 'left', sortable: true}]
         },
         lessons: {
             label: "Уроки",
@@ -232,16 +309,35 @@ export function getTableSchema(name) {
         students: {
             label: "Ученики",
             columns: [
-                { name: 'fio', label: 'Ф.И.О.', field: row => row.name, align: 'left', sortable: true },
-                { name: 'parents', label: 'Родители', field: row => row.parents, align: 'left', sortable: true },
-                { name: 'mainPhone', label: 'Телефон', field: row => row.mainPhone, align: 'left', sortable: true },
+                { name: 'fio', label: 'Ф.И.О.', field: row => row.fio, align: 'left', sortable: true },
+                { name: 'phone', label: 'Телефон', field: row => row.phone, align: 'left', sortable: true },
+                { name: 'gender', label: 'Пол', field: row => row.gender == 'm'?  'М' : 'Ж', align: 'center', sortable: true },
+                { name: 'birthday', label: 'Дата рождения', field: row => row.birthday, align: 'center', sortable: true},
+                { name: 'age', label: 'Возраст', field: row => row.age, align: 'center', sortable: true},
                 { name: 'health', label: 'Группа здоровья', field: row => row.health, align: 'center', sortable: true },
+                { name: 'specAttention', label: 'Требует особого внимания', field: row => row.sp_disease != null ? '✔' : '✖', align: 'center', sortable: true },
+                { name: 'homeEducation', label: 'Домашнее обучение', field: row => row.home_education ? '✔' : '✖', align: 'center', sortable: true},
+                { name: 'citizenship', label: 'Гражданство РФ', field: row => row.country_reg ? '✔' : '✖', align: 'center', sortable: true},
+                { name: 'housingConditions', label: 'Жилищные условия', field: row => row.address_type, align: 'left', sortable: true},
+                { name: 'regAddress', label: 'Адрес проживания', field: row => row.address_reg, align: 'left', sortable: true},
+                { name: 'resAddress', label: 'Адрес прописки', field: row => row.address_living, align: 'left', sortable: true},
+                { name: 'parents', label: 'Родители', field: row => row.parents, align: 'left', sortable: true },
+                { name: 'familyStatus', label: 'Категории семьи', field: row => row.family_type, align: 'left', sortable: true},
+                { name: 'veterans', label: 'Родители - участники боевых действий', field: row => row.parents?.some(p => p.status) ? '✔' : '✖', align: 'center', sortable: true},
                 { name: 'schoolEvents', label: 'Школьные конкурсы', field: row => row.schoolEvents, align: 'left', sortable: true },
                 { name: 'achievementsRus', label: 'Всероссийские конкурсы', field: row => row.achievementsRus, align: 'left', sortable: true },
                 { name: 'achievementsInter', label: 'Международные конкурсы', field: row => row.achievementsInter, align: 'left', sortable: true },
-                { name: 'specAttention', label: 'Требует особого внимания', field: row => row.specAttention ? '✔' : '✖', align: 'center', sortable: true },
             ]
         },
+        teachers: {
+            label: 'Учителя',
+            columns: [
+                { name: 'full_name', label: 'Ф.И.О', field: row =>  row.profile.full_name, align: 'left', sortable: true },
+                { name: 'class', label: 'Класс', field: row => row.class, align: 'left', sortable: true },
+                { name: 'phone',  label: 'Телефон',  field: row => row.profile.phone, align: 'left', sortable: true },
+                { name: 'email', label: 'E-mail', field: row => row.email, align: 'left', sortable: true },
+            ]
+        }
     }
     return TableSchema[name] || null;
 }
