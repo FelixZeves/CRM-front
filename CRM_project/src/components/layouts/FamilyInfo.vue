@@ -2,12 +2,13 @@
 import { ref, computed, watch } from 'vue'
 import { getToday } from '../Utils'
 import TransitionSetup from './TransitionSetup.vue'
+import { errorNotify } from '../Notifies'
 
 const props = defineProps({
     student: {type: Object, default: () => null},
     mode:  { type: String, default: () => 'read'}
 })
-const emit  = defineEmits(['update:statuses'])
+const emit  = defineEmits(['update:student'])
 
 const localStudent = computed({
   get: () => props.student,
@@ -16,24 +17,52 @@ const localStudent = computed({
 
 const sigleParentOptions = ['мама', 'папа', 'бабушка', 'дедушка', 'отчим', 'мачеха']
 
-const FTC = computed(() => [
+const required = val => !!val || 'Обязательное поле'
+
+const FTC = ref([
     {
         type: 'input',
         main_label: 'Многодетная',
         sub_label: 'Детей до 18 лет',
         hint: 'number',
-        val: localStudent.count_childs,
+        val: computed({
+            get: () => localStudent.value?.count_childs,
+            set: v => {
+                if (!localStudent.value.family_type.includes('Многодетная')) {
+                    localStudent.value.count_childs = null
+                    return
+                }
+                localStudent.value.count_childs = v
+            }
+        }),
         rules: required,
-        descriptions: [`${props.student?.count_childs} детей до 18 лет` || '']
+        descriptions: computed(() => {
+            const c = props.student?.count_childs
+            return c ? [`${c} детей до 18 лет`] : []
+        })
     },
     {
         type: 'select',
         main_label: 'Неполная',
         sub_label: 'Кто воспитывает',
-        val: props.student?.parents?.find(p => p.kinship)?.kinship || null,
+        val: computed({
+            get: () => localStudent.value?.parents?.[0]?.kinship ?? null,
+            set: v => {
+                if (!localStudent.value.family_type.includes('Неполная')) {
+                    if (localStudent.value.parents?.length) {
+                    localStudent.value.parents[0].kinship = null
+                    }
+                    return
+                }
+                localStudent.value.parents[0].kinship = v
+            }
+        }),
         rules: required,
         options: sigleParentOptions,
-        descriptions: [`Воспитывает ${props.student?.parents?.find(p => p.kinship)?.kinship}` || '']
+        descriptions: computed(() => {
+            const kinship = props.student?.parents?.find(p => p.kinship)?.kinship
+            return kinship ? [`Воспитывает ${kinship}`] : []
+        })
     },
     {
         main_label: 'Малообеспеченная',
@@ -43,83 +72,176 @@ const FTC = computed(() => [
         type: 'select',
         main_label: 'Дети под опекой',
         sub_label: 'Опекун',
-        options: props.student.parents,
+        options: computed(() => localStudent.value?.parents || []),
         option_label: 'fio',
-        val: props.student.parents?.find(p => p.curator) || null,
+        val: computed({
+            get: () => {
+                const parents = localStudent.value?.parents || []
+                return parents.find(p => p.curator) || null
+            },
+            set: selectedParent => {
+                if (!localStudent.value.family_type.includes('Дети под опекой')) {
+                    localStudent.value.parents?.forEach(p => p.curator = false)
+                    return
+                }
+
+                localStudent.value.parents.forEach(p => p.curator = false)
+                if (selectedParent) {
+                    const idx = localStudent.value.parents.findIndex(p => p.fio === selectedParent.fio)
+                    if (idx !== -1) localStudent.value.parents[idx].curator = true
+                    else errorNotify('Выбранный родитель не существует')
+                }
+            }
+        }),
         rules: required,
-        descriptions: [`Опекун: ${props.student?.parents?.find(p => p.curator)?.fio}` || '']
+        descriptions: computed(() => {
+            const p = props.student?.parents?.find(p => p.curator)
+            return p ? [`Опекун: ${p.fio}`] : []
+        })
     },
     {
         type: 'input',
         main_label: 'Состоит на учёте в ОДН',
         sub_label: 'Дата постановки на учёт (ОДН)',
-        val: localStudent.odn_date,
+        val: computed({
+            get: () => localStudent.value?.odn_date,
+            set: v => {
+                if (!localStudent.value.family_type.includes('Состоит на учёте в ОДН')) {
+                    localStudent.value.odn_date = null
+                    return
+                }
+                localStudent.value.odn_date = v
+            }
+        }),
         rules: required,
-        descriptions: [`На учёт поставлен с ${props.student?.odn_date}` || '']
+        descriptions: computed(() => {
+            const date = props.student?.odn_date
+            return date ? [`На учёт поставлен с ${date}`] : []
+        })
     },
     {
         type: 'input',
         main_label: 'Дети в состоянии социально опасного положения',
         sub_label: 'Дата постановки на учёт (СОП)',
-        val: localStudent.sop_date,
+        val: computed({
+            get: () => localStudent.value?.sop_date,
+            set: v => {
+                if (!localStudent.value.family_type.includes('Дети в состоянии социально опасного положения')) {
+                    localStudent.value.sop_date = null
+                    return
+                }
+                localStudent.value.sop_date = v
+            }
+        }),
         rules: required,
-        descriptions: [`На учёт поставлен с ${props.student?.sop_date}` || '']
+        descriptions: computed(() => {
+            const date = props.student?.sop_date
+            return date ? [`На учёт поставлен с ${date}`] : []
+        })
     },
     {
         type: 'input',
         main_label: 'Дети в группе риска',
         sub_label: 'Причина постановки на учёт',
         hint: 'textarea',
-        val: localStudent.gr_reason,
+        val: computed({
+            get: () => localStudent.value?.gr_reason ?? '',
+            set: v => {
+                if (!localStudent.value.family_type.includes('Дети в группе риска')) {
+                    localStudent.value.gr_reason = null
+                    return
+                }
+                localStudent.value.gr_reason = v
+            }
+        }),
         rules: required,
-        descriptions: [`Причина: ${props.student?.gr_reason}` || '']
+        descriptions: computed(() => {
+            const reason = props.student?.gr_reason
+            return reason ? [`Основание: ${reason}`] : []
+        })
+    },
+    {
+        type: 'input',
+        main_label: 'Дети из неблагополучной семьи',
+        sub_label: 'Состав семьи',
+        hint: 'number',
+        val: computed({
+            get: () => localStudent.value?.count_family ?? '',
+            set: v => {
+                if (!localStudent.value.family_type.includes('Дети из неблагополучной семьи')) {
+                    localStudent.value.count_family = null
+                    return
+                }
+                localStudent.value.count_family = v
+            }
+        }),
+        rules: required,
     },
     {
         type: 'input',
         main_label: 'Дети из неблагополучной семьи',
         sub_label: 'Основание (Дети из неблагополучной семьи)',
         hint: 'textarea',
-        val: localStudent.df_reason,
+        val: computed({
+            get: () => localStudent.value?.df_reason ?? '',
+            set: v => {
+                if (!localStudent.value.family_type.includes('Дети из неблагополучной семьи')) {
+                    localStudent.value.df_reason = null
+                    return
+                }
+                localStudent.value.df_reason = v
+            }
+        }),
         rules: required,
-        descriptions: [`Причина: ${props.student?.df_reason}` || '']
+        descriptions: computed(() => {
+            const [reason, count] = [props.student?.df_reason, props.student?.count_family]
+            return reason && count ? [`Состав семьи: ${count || 'не указан'}`,`Основание: ${reason}`] : []
+        })
+    },
+    {
+        type: 'input',
+        main_label: 'Дети в ТЖС',
+        sub_label: 'Состав семьи',
+        hint: 'number',
+        val: computed({
+            get: () => localStudent.value?.count_family ?? '',
+            set: v => {
+                if (!localStudent.value.family_type.includes('Дети в ТЖС')) {
+                    localStudent.value.count_family = null
+                    return
+                }
+                localStudent.value.count_family = v
+            }
+        }),
+        rules: required,
     },
     {
         type: 'input',
         main_label: 'Дети в ТЖС',
         sub_label: 'Основание (Дети в ТЖС)',
         hint: 'textarea',
-        val: localStudent.dls_reason,
+        val: computed({
+            get: () => localStudent.value?.dls_reason ?? '',
+            set: v => {
+                if (!localStudent.value.family_type.includes('Дети в ТЖС')) {
+                    localStudent.value.dls_reason = null
+                    return
+                }
+                localStudent.value.dls_reason = v
+            }
+        }),
         rules: required,
-        descriptions: [`Основание: ${props.student?.dls_reason}` || '']
-    }
+        descriptions: computed(() => {
+            const [reason, count] = [props.student?.dls_reason, props.student?.count_family]
+            return reason && count ? [`Состав семьи: ${count || 'не указан'}`,`Основание: ${reason}`] : []
+        })
+    },
 ])
 
 const visibleFamilyTypes = computed(() =>
   FTC.value.filter(i =>
-    props.student?.family_type?.includes(i.main_label)
+    props.student?.family_type?.includes(i.main_label) && i.descriptions
   )
-)
-
-const required = val => !!val || 'Обязательное поле'
-
-// "Дети под опекой"
-watch(
-    () => FTC.value.find(i => i.main_label === 'Дети под опекой')?.val,
-    (newVal) => {
-        if (!props.student?.parents) return
-        props.student.parents.forEach(p => {
-        p.curator = p === newVal
-        })
-    }
-)
-
-// "Неполная"
-watch(
-    () => FTC.value.find(i => i.main_label === 'Неполная')?.val,
-    (newVal) => {
-        if (props.student?.parents?.length != 0)
-            props.student.parents[0].kinship = newVal
-    }
 )
 
 watch(
@@ -161,23 +283,27 @@ watch(
 
 <template>
     <div v-if="mode === 'read'">
-        <div class="mb-4">Категория семей</div>
-        <q-list class="w-[250px]">
+        <div class="mb-1">Категория семей</div>
+        <q-list dense class="w-[300px]">
             
             <q-item
                 v-for="item in visibleFamilyTypes"
                 dense
-                class="!flex !flex-col"
             >
-                <q-item-section class="!font-light break-words whitespace-normal">
+                <q-item-section class="!font-medium break-words whitespace-normal">
                     - {{ item.main_label }}
-                </q-item-section>
-                <q-item-section
-                    v-for="(desc, index) in item.descriptions"
-                    :key="index"
-                    class="!font-light break-words whitespace-normal"
-                >
-                    {{ desc }}
+                    <q-tooltip
+                        v-if="item.descriptions?.length > 0"
+                        anchor="top left"
+                        outline
+                        self="bottom left"
+                        :offset="[5, 5]"
+                        class="!text-sm text-start bg-brand-velvet !text-white shadow-xl !max-w-[300px] flex flex-col gap-y-1"
+                    >
+                        <div v-for="(desc, index) in item.descriptions" :key="index">
+                            <div>{{ desc || '-' }}</div>
+                        </div>
+                    </q-tooltip>
                 </q-item-section>
             </q-item>
         </q-list>

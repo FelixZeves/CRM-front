@@ -2,13 +2,13 @@
 import { ref, watch, nextTick, onMounted } from 'vue'
 import api from '@/main'
 import NavigationColumn from '@/components/menus/NavigationColumn.vue';
-import { LocalStorage, SessionStorage } from 'quasar';
-import { CLASS, getFormSchema, getStudents, getTableSchema, STUDENT } from '@/components/Utils';
+import { LocalStorage, SessionStorage, uid } from 'quasar';
+import { CLASS, downloadFile, getFormSchema, getStudents, getTableSchema, STUDENT } from '@/components/Utils';
 import TES from '@/components/layouts/TES.vue';
-import { confirmNotify, errorNotify } from '@/components/Notifies';
+import { confirmNotify, errorNotify, successNotify } from '@/components/Notifies';
 
 const body = ref(SessionStorage.getItem('selectedClass'))
-const user = SessionStorage.getItem('user')
+const user = ref(SessionStorage.getItem('user'))
 
 const schema = getTableSchema('students')
 const pagination = ref({rowsPerPage: 0})
@@ -25,7 +25,7 @@ const availableCols = ref(
 const savedCols = LocalStorage.getItem('visibleCols')
 
 const visibleCols = ref(
-  savedCols ? JSON.parse(savedCols) : ['fio', 'mainPhone', 'health', 'specAttention']
+  savedCols ? JSON.parse(savedCols) : ['fio', 'phone', 'health', 'specAttention']
 )
 
 const students = ref([])
@@ -46,9 +46,7 @@ function formatPhone(phone) {
   return phone // fallback
 }
 
-function getRowKey(row, index){
-    return row.id || `${index}`
-}
+const rowKey = (row) => row.id ?? row._tempId
 
 function addStudent(){
     const hasUnsaved = students.value.some(s => s.id === null)
@@ -59,8 +57,8 @@ function addStudent(){
     }
 
     const newStudent = getFormSchema('student')
-
     newStudent.parents.push(getFormSchema('parent'))
+    newStudent._tempId = uid()
 
     students.value.unshift(newStudent)
 
@@ -91,11 +89,7 @@ async function deleteStudent(props){
     confirmNotify(async () => {
         editIndex.value = null
 
-        const expandBtn = document.querySelector(
-        '.q-table tbody tr:first-child td:nth-child(2) button'
-        )
-        console.log(props.expand)
-        if (props.expand) expandBtn.click()
+        if (props.expand) props.expand = false
 
         let response = await api.delete(`${STUDENT}/${props.row.id}`)
         if(response.status == 200){
@@ -119,23 +113,27 @@ async function updateList() {
 
 const studentForms = ref({})
 
-async function onSubmit(row) {
+async function onSubmit(props) {
     // гарантируем, что дочерний компонент уже смонтирован/видим
     await nextTick()
 
-    const form = studentForms.value[row.id]
+    const form = studentForms.value[props.row.id]
 
     if (!form) return errorNotify('Форма ещё не готова')
 
     const response = await form.sendForm()
 
     if (response?.status == 200) {
-        successNotify()
+        successNotify('Ученик успешно добавлен')
+
+        editIndex.value = null
+        if (props.expand) props.expand = false
+
         updateList()
     }
 }
 
-onMounted(async () => {await updateList(); console.log(students.value)})
+onMounted(async () => {await updateList()})
 
 </script>
 
@@ -161,7 +159,7 @@ onMounted(async () => {await updateList(); console.log(students.value)})
             virtual-scroll
             v-model:pagination="pagination"
             :rows-per-page-options="[0]"
-            :row-key="getRowKey"
+            :row-key="rowKey"
             :visible-columns="visibleCols"
             selection="multiple"
             v-model:selected="selected"
@@ -185,7 +183,24 @@ onMounted(async () => {await updateList(); console.log(students.value)})
                             </q-toggle>
                         </div>
                     </q-btn-dropdown>
-                    <div class="">
+                    <div class="flex flex-row">
+                        <q-btn
+                        flat
+                        dense
+                        icon="fa-regular fa-paste"
+                        color="brand-velvet"
+                        @click="downloadFile(CLASS, body.id)">
+                            <q-tooltip
+                            anchor="top left"
+                            outline
+                            self="bottom left"
+                            :offset="[0, 5]"
+                            class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                            >
+                                Скачать социальный паспорт
+                            </q-tooltip>
+                        </q-btn>
+                        <q-separator vertical size="2px" class="!mx-2" color="grey-4"/>
                         <q-btn dense class="brand-description" flat color="brand-velvet" icon="fa-regular fa-file-excel">
                             <q-tooltip
                                 anchor="top left"
@@ -362,13 +377,10 @@ onMounted(async () => {await updateList(); console.log(students.value)})
                     <q-td v-else-if="col.name === 'mainPhone'">
                         {{ formatPhone(col.value) }}
                     </q-td>
-                    <span v-else-if="!['parents', 'familyStatus', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)" class=" break-words whitespace-normal">{{ col.value }}</span>
-                    <div class="flex flex-col" v-if="['parents', 'familyStatus', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)">
+                    <span v-else-if="!['parents', 'family_type', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)" class=" break-words whitespace-normal">{{ col.value }}</span>
+                    <div class="flex flex-col" v-if="['parents', 'family_type', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)">
                         <q-chip v-if="col.name == 'parents'" v-for="elem in col.value">
-                            {{ elem.name }}
-                        </q-chip>
-                        <q-chip v-else-if="col.name == 'familyStatus'" v-for="elem in col.value">
-                            {{ elem.label }}
+                            {{ elem.fio }}
                         </q-chip>
                         <q-chip v-else v-for="elem in col.value">
                             {{ elem }}
@@ -388,7 +400,7 @@ onMounted(async () => {await updateList(); console.log(students.value)})
                                     Редактировать ученика
                                 </q-tooltip>
                             </q-btn>
-                            <q-btn v-if="editIndex === props.rowIndex" @click="onSubmit(props.row)" flat text-color="brand-complete" icon="fa-solid fa-check" dense >
+                            <q-btn v-if="editIndex === props.rowIndex" @click="onSubmit(props)" flat text-color="brand-complete" icon="fa-solid fa-check" dense >
                                 <q-tooltip
                                     anchor="top left"
                                     outline
@@ -454,12 +466,12 @@ onMounted(async () => {await updateList(); console.log(students.value)})
                 </q-tr>
             </template>
             <template v-slot:bottom>
-                <div v-if="selected.length > 0">
-                    <span>
+                <div>
+                    <span v-if="selected.length > 0">
                         Выбрано записей: {{ selected.length }}
                     </span>
                     <div class="flex flex-row justify-evenly">
-                        <q-btn flat dense icon="fa-solid fa-file-export" color="brand-velvet">
+                        <q-btn v-if="selected.length > 0" flat dense icon="fa-solid fa-file-export" color="brand-velvet">
                             <q-tooltip
                             anchor="top left"
                             outline
@@ -470,7 +482,7 @@ onMounted(async () => {await updateList(); console.log(students.value)})
                                 Экспортировать записи в файл
                             </q-tooltip>
                         </q-btn>
-                        <q-btn flat dense icon="delete" color="brand-danger" class="opacity-[80%]">
+                        <q-btn v-if="selected.length > 0" flat dense icon="delete" color="brand-danger" class="opacity-[80%]">
                             <q-tooltip
                             anchor="top left"
                             outline

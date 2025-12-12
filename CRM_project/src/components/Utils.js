@@ -129,30 +129,21 @@ export function getToday() {
     return new Date().toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-export function getAge(birthday) {
-    if (!birthday) return null
+export function formatPhone(phone) {
+    if (!phone) return ''
   
-    const parts = birthday.split('.')
-    if (parts.length !== 3) return null
-  
-    const [day, month, year] = parts.map(Number)
-    const birthDate = new Date(year, month - 1, day)
-  
-    if (isNaN(birthDate)) return null
-  
-    const today = new Date()
-    let age = today.getFullYear() - birthDate.getFullYear()
-  
-    const monthDiff = today.getMonth() - birthDate.getMonth()
-    const dayDiff = today.getDate() - birthDate.getDate()
-  
-    // если день рождения ещё не наступил в этом году — вычитаем 1
-    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
-      age--
+    // если мобильный (11 цифр, начинается с 7 или 8)
+    if (/^(\+7|7|8)\d{10}$/.test(phone)) {
+      return phone.replace(/(\d)(\d{3})(\d{3})(\d{2})(\d{2})/, '8($2)$3-$4-$5')
     }
   
-    return age
-}
+    // если домашний (например, 6 цифр)
+    if (/^\d{5}$/.test(phone)) {
+      return phone.replace(/(\d{1})(\d{2})(\d{2})/, '$1-$2-$3')
+    }
+  
+    return phone // fallback
+  }
 
 export async function downloadFile(url, id){
     const response = await api.get(`${url}/download/${id}`, {responseType: 'blob'});
@@ -179,7 +170,8 @@ export function getFormSchema(name) {
             profile: {
                 fio: '',
                 post: '',
-                classes: null,
+                phone: null,
+                classes: [],
                 department: null,
                 lessons: null,
             }},
@@ -249,13 +241,14 @@ export function getFormSchema(name) {
             schoolEvents: [],
             sp_doctor: null,
             sp_disease: null,
-            count_childs: 3,
+            count_family: null,
+            count_childs: null,
             odn_date: null,
             sop_date: null,
             gr_reason: null,
             df_reason: null,
             dls_reason: null,
-            comment: ''
+            comment: null
         }
     };
 
@@ -310,7 +303,7 @@ export function getTableSchema(name) {
             label: "Ученики",
             columns: [
                 { name: 'fio', label: 'Ф.И.О.', field: row => row.fio, align: 'left', sortable: true },
-                { name: 'phone', label: 'Телефон', field: row => row.phone, align: 'left', sortable: true },
+                { name: 'phone', label: 'Телефон', field: row => formatPhone(row.phone), align: 'left', sortable: true },
                 { name: 'gender', label: 'Пол', field: row => row.gender == 'm'?  'М' : 'Ж', align: 'center', sortable: true },
                 { name: 'birthday', label: 'Дата рождения', field: row => row.birthday, align: 'center', sortable: true},
                 { name: 'age', label: 'Возраст', field: row => row.age, align: 'center', sortable: true},
@@ -322,7 +315,7 @@ export function getTableSchema(name) {
                 { name: 'regAddress', label: 'Адрес проживания', field: row => row.address_reg, align: 'left', sortable: true},
                 { name: 'resAddress', label: 'Адрес прописки', field: row => row.address_living, align: 'left', sortable: true},
                 { name: 'parents', label: 'Родители', field: row => row.parents, align: 'left', sortable: true },
-                { name: 'familyStatus', label: 'Категории семьи', field: row => row.family_type, align: 'left', sortable: true},
+                { name: 'family_type', label: 'Категории семьи', field: row => row.family_type, align: 'left', sortable: true},
                 { name: 'veterans', label: 'Родители - участники боевых действий', field: row => row.parents?.some(p => p.status) ? '✔' : '✖', align: 'center', sortable: true},
                 { name: 'schoolEvents', label: 'Школьные конкурсы', field: row => row.schoolEvents, align: 'left', sortable: true },
                 { name: 'achievementsRus', label: 'Всероссийские конкурсы', field: row => row.achievementsRus, align: 'left', sortable: true },
@@ -332,10 +325,10 @@ export function getTableSchema(name) {
         teachers: {
             label: 'Учителя',
             columns: [
-                { name: 'full_name', label: 'Ф.И.О', field: row =>  row.profile.full_name, align: 'left', sortable: true },
-                { name: 'class', label: 'Класс', field: row => row.class, align: 'left', sortable: true },
-                { name: 'phone',  label: 'Телефон',  field: row => row.profile.phone, align: 'left', sortable: true },
-                { name: 'email', label: 'E-mail', field: row => row.email, align: 'left', sortable: true },
+                { name: 'full_name', label: 'Ф.И.О', field: row =>  row.leader?.fio || 'Не назначен', align: 'left', sortable: true },
+                { name: 'class', label: 'Класс', field: row => `${row.parallel}.${row.number} ${row.spec ||  ''}`, align: 'left', sortable: true },
+                { name: 'phone',  label: 'Телефон',  field: row => row.leader?.phone  || 'Не указан', align: 'left', sortable: true },
+                { name: 'email', label: 'E-mail', field: row => row.leader?.email, align: 'left', sortable: true },
             ]
         }
     }

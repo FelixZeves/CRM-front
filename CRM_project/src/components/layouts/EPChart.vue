@@ -79,7 +79,7 @@ const chartOptions = computed(() => ({
 
 <template>
   <VueApexCharts
-    height="200px"
+    height="150px"
     type="area"
     :options="chartOptions"
     :series="series"

@@ -150,7 +150,7 @@ async function remove() {
                     <q-btn
                     unelevated
                     :to="{name : 'Office'}"
-                    icon="fa-solid fa-arrow-right-from-bracket text-brand-danger">
+                    icon="fa-solid fa-chevron-right text-brand-danger">
                         <q-tooltip
                             anchor="center left"
                             outline

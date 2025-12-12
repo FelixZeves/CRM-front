@@ -31,11 +31,13 @@ async function send() {
         if (props.model.profile.department?.id) {props.model.profile.department = props.model.profile.department.id}
 
         if (props.mode == 'create') {
+            props.model.phone = props.model.phone.replace(/\D/g, '')
             let response = await api.post(USER, props.model);
             if (response.data?.password) passClipboardNotify(response.data.password)
         }
 
         if (props.mode == 'edit') {
+            props.model.profile.phone = props.model.profile.phone.replace(/\D/g, '')
             props.model.profile.manager = props.model.profile.manager?.id
             props.model.profile.classes = props.model.profile.classes.map(cls => cls.id || cls)
             let response = await api.patch(USER, props.model)
@@ -106,6 +108,18 @@ defineExpose({send, remove})
                 <q-input class="w-full brand-description" outlined label="Ф.И.О." :readonly="status" v-model="model.profile.fio"/>
             </q-item>
             <q-item>
+                <q-input
+                    :readonly="status"
+                    hide-bottom-space
+                    v-model="model.profile.phone"
+                    :mask="model.profile.phone?.length <= 7 ? '#-##-###' : '#(###)###-##-##'"
+                    outlined
+                    label="Телефон"
+                    type="text"
+                    class="w-full brand-description"
+                />
+            </q-item>
+            <q-item>
                 <q-input class="w-full brand-description" outlined label="Должность" :readonly="status" v-model="model.profile.post"/>
             </q-item>
             <q-item>
@@ -119,7 +133,7 @@ defineExpose({send, remove})
                     emit-value
                     map-options
                     :options="buffOptions"
-                    :option-label="option => `${option.number}.${option.parallel}`"
+                    :option-label="option => `${option.parallel}.${option.number}`"
                     :option-value="'id'"
                     @focus="lazyLoad(CLASS+'/temp')"
                     v-model="model.profile.classes"

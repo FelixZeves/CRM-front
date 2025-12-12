@@ -13,11 +13,18 @@ const classesTab = ref('user')
 const user = SessionStorage.getItem('user')
 
 const classes = ref([])
+const teachers = ref([])
 async function updateList() {
-    classes.value = await getClasses()
-    for (let key in classes.value){
-        classes.value[key] = classSlider(classes.value[key])
-    }
+    const raw = await getClasses()
+    classes.value = raw
+    for (let key in classes.value) classes.value[key] = classSlider(classes.value[key])
+
+    teachers.value = [
+        makeTeacherGroup('1-4', raw.junior_classes),
+        makeTeacherGroup('5-9', raw.middle_classes),
+        makeTeacherGroup('10-11', raw.hight_classes),
+    ]
+    console.log(teachers.value)
 }
 
 function classSlider(classes){
@@ -28,25 +35,22 @@ function classSlider(classes){
     return groups
 }
 
-const teachers = [
-    {
-        title: '1-4',
-        class: 41,
-        people: 32,
-    },
-    {
-        title: '5-9',
-        class: 55,
-        people: 45,
-    },
-    {
-        title: '10-11',
-        class: 18,
-        people: 18,
+function makeTeacherGroup(title, groupedClasses) {
+    const flat = groupedClasses.flat()
+
+    const uniqueTeachers = new Set(
+        flat
+            .filter(c => c.leader && c.leader.id)
+            .map(c => c.leader.id)
+    )
+
+    return {
+        title,
+        classesCount: flat.length,
+        teachersCount: uniqueTeachers.size,
+        classes: flat
     }
-]
-
-
+}
 
 const chartData = [
     { className: '5.1', avgScore: 4.2 },
@@ -70,7 +74,7 @@ onMounted(async () => {await updateList()})
             <NavigationColumn section='Education'/>
         </header>
         
-        <main class="!flex !flex-col justify-between flex-grow !h-[80vh] w-full">
+        <main class="!flex !flex-col justify-between flex-grow 2xs:h-[85vh] 2xl:h-[80vh] w-full">
                 <div class="flex flex-col">
                     <div class="brand-title ps-24">Списки классов</div>
                     <q-tabs

@@ -7,7 +7,9 @@ import { DocEnum as D} from '@/components/Enums.vue'
 import { getTableSchema, getToday } from '@/components/Utils'
 
 const body = ref(SessionStorage.getItem('selectedCollection'))
+console.log(body.value)
 const user = SessionStorage.getItem('user')
+
 const visible = ref(false)
 const tmpBody = ref({
     title: 'СЗ от ' + user.profile.initials_name,
@@ -75,7 +77,7 @@ function formatPhone(phone) {
 function mapTeacher(teacher) {
   return {
     id: teacher.id,
-    fio: teacher.profile.full_name
+    fio: teacher.fio
   }
 } 
 
@@ -98,7 +100,7 @@ function mapTeacher(teacher) {
             <q-table
             flat bordered
             class="h-[72vh]"
-            :rows="expandedTeachers"
+            :rows="body.classes"
             :columns="schema.columns"
             virtual-scroll
             v-model:pagination="pagination"
@@ -133,7 +135,7 @@ function mapTeacher(teacher) {
                     </q-td>
                     <q-td>
                         <div  class="flex flex-row justify-center">
-                            <q-btn flat text-color="brand-velvet" icon="edit" dense @click="tmpBody.reviewers = [mapTeacher(props.row)]; visible=true">
+                            <q-btn flat text-color="brand-velvet" icon="fa-regular fa-comment-dots" dense @click="tmpBody.reviewers = [mapTeacher(props.row.leader)]; visible=true">
                                 <q-tooltip
                                     anchor="top left"
                                     outline

@@ -3,17 +3,27 @@ import { ref, watch, computed, nextTick } from 'vue'
 import api from '@/main'
 import { confirmNotify, errorNotify, successNotify } from '@/components/Notifies'
 import { familyStatuses, houseConditions } from '@/components/Enums.vue'
-import { getFormSchema, getAge, STUDENT } from '@/components/Utils'
+import { getFormSchema, STUDENT, formatPhone } from '@/components/Utils'
 import StudentParentForm from '../forms/StudentParentForm.vue'
 import TransitionSetup from './TransitionSetup.vue'
 import FamilyInfo from './FamilyInfo.vue'
 import { SessionStorage } from 'quasar'
 
 const props = defineProps(['body', 'edit'])
-
+const bodyCopy = ref(JSON.parse(JSON.stringify(props.body)))
 const classInfo =  ref(SessionStorage.getItem('selectedClass'))
 
-const bodyCopy = ref(JSON.parse(JSON.stringify(props.body)))
+watch(
+    () => props.body,
+    (v) => {
+        // обновляем копию
+        Object.assign(bodyCopy.value, JSON.parse(JSON.stringify(v)))
+
+        // read-часть продолжает смотреть на props.body, так что всё ок
+    },
+    { deep: true, immediate: true }
+)
+
 const specAttention = computed({
     get() {
         return bodyCopy.value.sp_doctor != null || bodyCopy.value.sp_disease != null
@@ -42,12 +52,15 @@ async function sendForm(){
     }
     let student = bodyCopy.value
 
-    console.log(student)
-
     let form = {
        ...student,
        class_id: classInfo.value.id
     }
+    form.phone = form.phone.replace(/\D/g, '')
+    form.parents = form.parents.map(p => ({
+        ...p,
+        phone: p.phone.replace(/\D/g, '')
+    }));
 
     if(form.id){
         return await api.patch(STUDENT, form)
@@ -85,22 +98,6 @@ const lists = [
 
 const statusesOptions = Object.values(familyStatuses)
 const houseOptions =  Object.values(houseConditions)
-
-function formatPhone(phone) {
-  if (!phone) return ''
-
-  // если мобильный (11 цифр, начинается с 7 или 8)
-  if (/^(\+7|7|8)\d{10}$/.test(phone)) {
-    return phone.replace(/(\d)(\d{3})(\d{3})(\d{2})(\d{2})/, '8($2)$3-$4-$5')
-  }
-
-  // если домашний (например, 6 цифр)
-  if (/^\d{5}$/.test(phone)) {
-    return phone.replace(/(\d{1})(\d{2})(\d{2})/, '$1-$2-$3')
-  }
-
-  return phone // fallback
-}
 </script>
 
 <template>
@@ -137,7 +134,7 @@ function formatPhone(phone) {
                     </div>
                     <div class="items-center">
                         <q-icon name="fa-solid fa-cake-candles" size="12px"/>
-                        {{ getAge(body.birthday) }}
+                        {{ body.age }}
                         <q-tooltip
                             anchor="top left"
                             outline
@@ -149,7 +146,7 @@ function formatPhone(phone) {
                         </q-tooltip>
                     </div>
                 </q-item-label>
-                <div class="flex flex-row gap-x-4">
+                <div class="flex flex-row gap-x-4 no-wrap">
                     <q-item-label class="brand-text !font-light">
                         <q-icon :name="body.gender == 'm' ? 'fa-solid fa-mars' : 'fa-solid fa-venus'" size="16px"/>
                         {{ body.gender == 'm' ? 'М' : 'Ж' }}

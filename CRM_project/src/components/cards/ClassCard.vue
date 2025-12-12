@@ -28,14 +28,14 @@ function toClass(){
                 class="text-brand-velvet" 
             />
             <div class="flex flex-col w-[70%]">
-                <span v-if="type == 'class'" class="brand-title">Класс {{ `${body.parallel}.${body.number}` }}</span>
+                <span v-if="type == 'class'" class="brand-title">Класс {{ `${body.parallel}.${body.number} ${body.spec || ''}` }}</span>
                 <span v-else-if="type == 'teacher'" class="brand-title">{{ body.title }} классы</span>
                 <div v-if="type == 'class'">
                     <span  class="brand-text text-ellipsis line-clamp-1">Учеников: {{ body.statistic?.total}}</span>
                 </div>
                 <div v-else-if="type === 'teacher'">
-                    <span class="brand-text text-ellipsis line-clamp-1">Учителей: {{ body.people }}</span>
-                    <span v-if="body.class" class="brand-text text-ellipsis line-clamp-1">Классов: {{ body.class }}</span>
+                    <span class="brand-text text-ellipsis line-clamp-1">Учителей: {{ body.teachersCount }}</span>
+                    <span class="brand-text text-ellipsis line-clamp-1">Классов: {{ body.classesCount }}</span>
                 </div>
             </div>
         </q-card-section>
