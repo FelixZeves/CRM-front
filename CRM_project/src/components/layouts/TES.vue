@@ -7,6 +7,7 @@ import { getFormSchema, STUDENT, formatPhone } from '@/components/Utils'
 import StudentParentForm from '../forms/StudentParentForm.vue'
 import TransitionSetup from './TransitionSetup.vue'
 import FamilyInfo from './FamilyInfo.vue'
+import DaDataInput from './DaDataInput.vue'
 import { SessionStorage } from 'quasar'
 
 const props = defineProps(['body', 'edit'])
@@ -545,30 +546,16 @@ const houseOptions =  Object.values(houseConditions)
                                 val => !!val ||  'Обязательное поле'
                             ]"
                         />
-                        <q-input
-                            hide-bottom-space
-                            v-model="bodyCopy.address_living"
-                            dense
-                            outlined
-                            type="text"
-                            class="brand-text !font-light"
-                            label="Адрес проживания"
-                            :rules="[
-                                val => !!val ||  'Обязательное поле'
-                            ]"
-                            />
-                        <q-input
-                            hide-bottom-space
+                        <DaDataInput
                             v-model="bodyCopy.address_reg"
-                            dense
-                            outlined
-                            type="text"
-                            class="brand-text !font-light"
                             label="Адрес прописки"
-                            :rules="[
-                                val => !!val ||  'Обязательное поле'
-                            ]"
-                            />
+                            @select="data => {bodyCopy.address_reg = data; bodyCopy.address_living = data}"
+                        />
+                        <DaDataInput
+                            v-model="bodyCopy.address_living"
+                            label="Адрес проживания"
+                            @select="data => bodyCopy.address_living = data"
+                        />
                     </div>
                     </q-expansion-item>
                 </q-item-section>

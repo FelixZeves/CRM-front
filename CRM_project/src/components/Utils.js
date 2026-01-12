@@ -1,4 +1,5 @@
 import api from '@/main';
+import { dadata } from '@/main';
 import { houseConditions, RoleEnum } from '@/components/Enums.vue';
 
 export const USER = '/user'
@@ -159,6 +160,18 @@ export async function downloadFile(url, id){
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(tmpUrl);
+}
+
+
+export async function suggestAddress(query) {
+    if (!query || query.length < 3) return []
+
+    const { data } = await dadata.post('', {
+        query,
+        count: 5
+    })
+
+    return data.suggestions || []
 }
 
 export function getFormSchema(name) {

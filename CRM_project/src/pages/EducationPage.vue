@@ -24,7 +24,6 @@ async function updateList() {
         makeTeacherGroup('5-9', raw.middle_classes),
         makeTeacherGroup('10-11', raw.hight_classes),
     ]
-    console.log(teachers.value)
 }
 
 function classSlider(classes){

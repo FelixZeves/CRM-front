@@ -24,15 +24,19 @@ import axios from 'axios'
 import { scheduleTokenRefresh } from './components/Utils.js'
 
 const api = axios.create({
-    baseURL: import.meta.env.DEV ? '/dev' : '/api' // на dev через proxy, на prod — без
+    baseURL: import.meta.env.DEV ? '/dev' : '/api'
+  })
+  
+export default api
+  
+export const dadata = axios.create({
+    baseURL: '/dadata', // только относительный путь!
 })
 
 const token = localStorage.getItem('jwtToken');
 if (token) {
   scheduleTokenRefresh();
 }
-
-export default api
 
 // handler for jwt token
 api.interceptors.request.use((config) => {
@@ -53,6 +57,10 @@ api.interceptors.response.use((response) => response, (error) => {
     }
 
     switch (error.response.status) {
+        case 500: 
+            message = 'Ошибка работы сервера'
+            errorNotify(message)
+            break
         case 401:
             localStorage.removeItem('jwtToken');
             window.location.href = '/';

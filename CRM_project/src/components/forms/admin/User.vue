@@ -31,15 +31,15 @@ async function send() {
         if (props.model.profile.department?.id) {props.model.profile.department = props.model.profile.department.id}
 
         if (props.mode == 'create') {
-            props.model.phone = props.model.phone.replace(/\D/g, '')
+            props.model.phone = props.model.phone?.replace(/\D/g, '')
             let response = await api.post(USER, props.model);
             if (response.data?.password) passClipboardNotify(response.data.password)
         }
 
         if (props.mode == 'edit') {
-            props.model.profile.phone = props.model.profile.phone.replace(/\D/g, '')
-            props.model.profile.manager = props.model.profile.manager?.id
-            props.model.profile.classes = props.model.profile.classes.map(cls => cls.id || cls)
+            props.model.profile.phone = props.model.profile.phone?.replace(/\D/g, '')
+            props.model.profile.manager = props.model.profile.manager?.id || props.model.profile.manager
+            props.model.profile.classes = props.model.profile.classes?.map(cls => cls.id || cls) || []
             let response = await api.patch(USER, props.model)
             if(response.status == 200) successNotify('Пользователь отредактирован')
             }
