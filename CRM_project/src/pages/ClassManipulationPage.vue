@@ -14,6 +14,8 @@ const schema = getTableSchema('students')
 const pagination = ref({rowsPerPage: 0})
 const selected = ref([])
 const editIndex = ref(null)
+const fileRef = ref(null)
+const studentsFile = ref(null)
 
 const availableCols = ref(
     schema.columns.map(({ name, label }) => ({
@@ -99,6 +101,37 @@ async function deleteStudent(props){
     })
 }
 
+function pickStudentsFile () {
+    fileRef.value.pickFiles()
+}
+
+async function uploadStudentsFile (file) {
+    if (!file) return
+
+    const formData = new FormData()
+    formData.append('body', file)
+    formData.append('class_id', body.value.id)
+
+    try {
+        const response = await api.post(
+        `${CLASS}/upload`,
+        formData,
+        {
+            headers: {
+            'Content-Type': 'multipart/form-data'
+            }
+        }
+        )
+        if(response.status == 200){
+            successNotify('Ученики успешно импортированы')
+            updateList()
+        }
+    } catch (e) {
+    } finally {
+        studentsFile.value = null
+    }
+}
+
 watch(
   visibleCols,
   (newVal) => {
@@ -114,7 +147,6 @@ async function updateList() {
 const studentForms = ref({})
 
 async function onSubmit(props) {
-    // гарантируем, что дочерний компонент уже смонтирован/видим
     await nextTick()
 
     const form = studentForms.value[props.row.id]
@@ -201,17 +233,30 @@ onMounted(async () => {await updateList()})
                             </q-tooltip>
                         </q-btn>
                         <q-separator vertical size="2px" class="!mx-2" color="grey-4"/>
-                        <q-btn dense class="brand-description" flat color="brand-velvet" icon="fa-regular fa-file-excel">
+                        <q-btn
+                            dense
+                            flat
+                            color="brand-velvet"
+                            icon="fa-regular fa-file-excel"
+                            @click="pickStudentsFile"
+                        >
                             <q-tooltip
                                 anchor="top left"
                                 outline
                                 self="bottom right"
                                 :offset="[-5, 5]"
                                 class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[200px]"
-                                >
-                                Выгрузить учеников из файла
+                            >
+                                Выгрузить учеников из файла (.xlsx)
                             </q-tooltip>
                         </q-btn>
+                        <q-file
+                            ref="fileRef"
+                            v-model="studentsFile"
+                            accept=".xlsx"
+                            class="hidden"
+                            @update:model-value="uploadStudentsFile"
+                        />
                         <q-btn
                             dense
                             class="brand-description"
