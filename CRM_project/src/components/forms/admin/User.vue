@@ -31,7 +31,7 @@ async function send() {
         if (props.model.profile.department?.id) {props.model.profile.department = props.model.profile.department.id}
 
         if (props.mode == 'create') {
-            props.model.phone = props.model.phone?.replace(/\D/g, '')
+            props.model.profile.phone = props.model.profile.phone?.replace(/\D/g, '')
             let response = await api.post(USER, props.model);
             if (response.data?.password) passClipboardNotify(response.data.password)
         }

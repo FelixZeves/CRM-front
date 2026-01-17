@@ -273,30 +273,145 @@ export function getTableSchema(name) {
         user: {
             label: "Пользователи",
             columns: [
-                { name: 'fio', label: 'Ф.И.О.', field: row => row.profile.initials_name, align: 'left', sortable: true },
-                { name: 'post', label: 'Должность', field: row => row.profile.post, align: 'left', sortable: true },
-                { name: 'email', label: 'E-mail', field: row => row.email, align: 'left', sortable: true },
-                { name: 'role', label: 'Уровень доступа', field: row => RoleEnum[row.role].translation, align: 'right', sortable: true },
-                { name: 'default_pass', label: 'Стандартный пароль', field: row => row.default_pass ? '✔' : '✖', align: 'center', sortable: true },
-                { name: 'update_at', label: 'Обновлено', field: row => row.profile.update_at, align: 'center', sortable: true }]
+                {
+                    name: 'fio',
+                    label: 'Ф.И.О.',
+                    field: row => row.profile.initials_name,
+                    align: 'left',
+                    sortable: true,
+                    style: 'max-width: 200зч; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'
+                },
+                {
+                    name: 'post',
+                    label: 'Должность',
+                    field: row => row.profile.post,
+                    align: 'center',
+                    sortable: true,
+                    style: 'max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'
+                },
+                {
+                    name: 'email',
+                    label: 'E-mail',
+                    field: row => row.email,
+                    align: 'center',
+                    sortable: true,
+                    style: 'max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'
+                },
+                {
+                    name: 'role',
+                    label: 'Уровень доступа',
+                    field: row => RoleEnum[row.role].translation,
+                    align: 'center',
+                    sortable: true,
+                    style: 'width: 250px; white-space: nowrap;'
+                },
+                {
+                    name: 'default_pass',
+                    label: 'Стандартный пароль',
+                    field: row => row.default_pass ? '✔' : '✖',
+                    align: 'center',
+                    sortable: true,
+                    style: 'width: 100px;'
+                },
+                {
+                    name: 'update_at',
+                    label: 'Обновлено',
+                    field: row => row.profile.update_at,
+                    align: 'center',
+                    sortable: true,
+                    style: 'width: 150px; white-space: nowrap;'
+                }
+            ]
         },
         department: {
             label: "Отделы",
             columns: [
-                { name: 'title', label: 'Отдел', field: row => row.title, align: 'left', sortable: true },
-                { name: 'manager', label: 'Руководитель отдела', field: row => row.manager?.init_name, align: 'left', sortable: true },
-                { name: 'parents', label: 'Вышестоящее руководство', field: row => row.parents.map(item => `${item.title} `), align: 'left', sortable: true },
-                { name: 'childrens', label: 'Дочерние отделы', field: row => row.childrens.length, align: 'left', sortable: true},
-                { name: 'staff', label: 'Сотрудники', field: row => `${row.staff.length} чел.`, align: 'center', sortable: true },
-                { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true }]
+                {
+                    name: 'title',
+                    label: 'Отдел',
+                    field: row => row.title,
+                    align: 'left',
+                    sortable: true,
+                    style: 'max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'
+                },
+                {
+                    name: 'manager',
+                    label: 'Руководитель отдела',
+                    field: row => row.manager?.init_name,
+                    align: 'center',
+                    sortable: true,
+                    style: 'max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'
+                },
+                {
+                    name: 'parents',
+                    label: 'Вышестоящее руководство',
+                    field: row => row.parents.map(item => item.title).join(', '),
+                    align: 'center',
+                    sortable: true,
+                    style: 'max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'
+                },
+                {
+                    name: 'childrens',
+                    label: 'Дочерние отделы',
+                    field: row => row.childrens.length,
+                    align: 'center',
+                    sortable: true,
+                    style: 'width: 140px;'
+                },
+                {
+                    name: 'staff',
+                    label: 'Сотрудники',
+                    field: row => `${row.staff.length} чел.`,
+                    align: 'center',
+                    sortable: true,
+                    style: 'width: 140px;'
+                },
+                {
+                    name: 'update_at',
+                    label: 'Обновлено',
+                    field: row => row.update_at,
+                    align: 'left',
+                    sortable: true,
+                    style: 'width: 140px; white-space: nowrap;'
+                }
+            ]
         },
         classes: {
             label: "Классы",
             columns: [
-                { name: 'class', label: 'Класс', field: row => `${row.parallel}.${row.number}`, align: 'left', sortable: true },
-                { name: 'spec', label: 'Уклон', field: row => row.spec || '', align: 'left', sortable: true },
-                { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true },
-                { name: 'leader', label: 'Классный руководитель', field: row => row.leader?.fio, align: 'left', sortable: true}]
+                {
+                    name: 'class',
+                    label: 'Класс',
+                    field: row => `${row.parallel}.${row.number}`,
+                    align: 'left',
+                    sortable: true,
+                    style: 'width: 100px;'
+                },
+                {
+                    name: 'spec',
+                    label: 'Уклон',
+                    field: row => row.spec || '',
+                    align: 'left',
+                    sortable: true,
+                    style: 'max-width: 50px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'
+                },
+                {
+                    name: 'leader',
+                    label: 'Классный руководитель',
+                    field: row => row.leader?.fio,
+                    align: 'center',
+                    sortable: true,
+                    style: 'max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'
+                },
+                {
+                    name: 'update_at',
+                    label: 'Обновлено',
+                    field: row => row.update_at,
+                    align: 'left',
+                    sortable: true,
+                    style: 'width: 140px; white-space: nowrap;'
+                }
+            ]
         },
         lessons: {
             label: "Уроки",
@@ -307,10 +422,39 @@ export function getTableSchema(name) {
         collections: {
             label: "Группы",
             columns: [
-                { name: 'title', label: 'Группа', field: row => row.title, align: 'left', sortable: true },
-                { name: 'subscribers', label: 'Участники', field: row => row.subs.length, align: 'left', sortable: true },
-                { name: 'publishers', label: 'Писатели', field: row => row.pubs.length,  align: 'left', sortable: true },
-                { name: 'update_at', label: 'Обновлено', field: row => row.update_at, align: 'left', sortable: true },]
+                {
+                    name: 'title',
+                    label: 'Группа',
+                    field: row => row.title,
+                    align: 'left',
+                    sortable: true,
+                    style: 'max-width: 450px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'
+                },
+                {
+                    name: 'subscribers',
+                    label: 'Участники',
+                    field: row => `${row.subs.length} чел.`,
+                    align: 'center',
+                    sortable: true,
+                    style: 'width: 120px;'
+                },
+                {
+                    name: 'publishers',
+                    label: 'Писатели',
+                    field: row => `${row.pubs.length} чел.`,
+                    align: 'center',
+                    sortable: true,
+                    style: 'width: 120px;'
+                },
+                {
+                    name: 'update_at',
+                    label: 'Обновлено',
+                    field: row => row.update_at,
+                    align: 'left',
+                    sortable: true,
+                    style: 'width: 140px; white-space: nowrap;'
+                }
+            ]
         },
         students: {
             label: "Ученики",

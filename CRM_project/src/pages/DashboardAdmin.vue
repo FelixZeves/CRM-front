@@ -58,6 +58,12 @@ const tables = ref([
 }
 ])
 
+const shouldShowTooltip = (val) => {
+    if (!val) return false
+        if (typeof val !== 'string') {console.log(val); return false}
+        return val.length > 25
+}
+
 async function save() {
     await formSubmit.value.send()
 }
@@ -85,12 +91,34 @@ async function remove() {
                     <q-table
                         :rows="table.data"
                         :columns="table.columns"
-                        class="max-h-[400px] pb-2 !rounded-none"
+                        class="max-h-[400px] pb-2 !rounded-none table-fixed"
                         virtual-scroll
                         v-model:pagination="pagination"
                         :rows-per-page-options="[0]"
                         @row-click="(evt, row, index) => {table.choose(row)}"
-                    />
+                    >
+                    <template #body-cell="props">
+                        <q-td :props="props">
+                            <div
+                            class="truncate max-w-full"
+                            :class="{ 'cursor-help': shouldShowTooltip(props.value) }"
+                            >
+                            {{ props.value }}
+
+                            <q-tooltip
+                                v-if="shouldShowTooltip(props.value)"
+                                anchor="top middle"
+                                outline
+                                self="bottom middle"
+                                :offset="[5, 5]"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                            >
+                                {{ props.value }}
+                            </q-tooltip>
+                            </div>
+                        </q-td>
+                    </template>
+                    </q-table>
                     <q-btn @click="table.add()" class="brand-description" label="Добавить" flat color="brand-velvet" icon="add"/>
                 </q-card>
             </q-expansion-item>
@@ -145,7 +173,7 @@ async function remove() {
     <div class="w-[30%] h-full overflow-y-auto">
         <div class="flex flex-col m-2">
             <div class="flex flex-col gap-4 mb-5">
-                <div class="flex flex-row justify-between">
+                <div class="flex flex-row justify-between no-wrap">
                     <span class="font-bold text-gray-800 text-xl 2xl:text-2xl content-center"> Административная страница </span>
                     <q-btn
                     unelevated
