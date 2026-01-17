@@ -209,14 +209,14 @@ async function send() {
         errorNotify('Задача. Не все поля заполнены')
         return
     }
-    if([...task.value.executors, ...task.value.reviewers, ...task.value.executors].length == 0){
+    if([...task.value.executors, ...task.value.reviewers, ...task.value.checkers].length == 0){
         errorNotify('Поля получателей пусты')
         return
     }
 
     if (receiversTab.value == 'concrete' ||
         task.value.type == D.APPLICATION ||
-        (receiversTab.value == 'massive' && [...task.value.executors, ...task.value.reviewers].length == 1)) {
+        (receiversTab.value == 'massive' && [...task.value.executors, ...task.value.reviewers, ...task.value.checkers].length == 1)) {
             task.value.executors = [...task.value.executors.map(staff => (staff.id))]
             task.value.reviewers = [...task.value.reviewers.map(staff => (staff.id))]
             task.value.checkers = [...task.value.checkers.map(staff => (staff.id))]
@@ -246,6 +246,9 @@ async function send() {
     }
 
     else {
+        task.value.executors = [...task.value.executors.map(staff => (staff.id))]
+        task.value.reviewers = [...task.value.reviewers.map(staff => (staff.id))]
+        task.value.checkers = [...task.value.checkers.map(staff => (staff.id))]
         const fd = new FormData()
 
         const { files, ...rest } = task.value
