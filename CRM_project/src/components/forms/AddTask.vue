@@ -217,31 +217,32 @@ async function send() {
     if (receiversTab.value == 'concrete' ||
         task.value.type == D.APPLICATION ||
         (receiversTab.value == 'massive' && [...task.value.executors, ...task.value.reviewers].length == 1)) {
-        if (task.value.type == D.APPLICATION){
-            task.value.title = `${task.value.title} (${task.value.place})`
+            task.value.executors = [...task.value.executors.map(staff => (staff.id))]
             task.value.reviewers = [...task.value.reviewers.map(staff => (staff.id))]
-        }
+            task.value.checkers = [...task.value.checkers.map(staff => (staff.id))]
 
-        if(props.isMessage == true) task.value.reviewers = [...task.value.reviewers.map(staff => (staff.id))]
+            if (task.value.type == D.APPLICATION){
+                task.value.title = `${task.value.title} (${task.value.place})`
+            }
 
-        const fd = new FormData()
+            const fd = new FormData()
 
-        const { files, ...rest } = task.value
-        fd.append('data', JSON.stringify(rest))
+            const { files, ...rest } = task.value
+            fd.append('data', JSON.stringify(rest))
 
-        files.forEach(file => fd.append('files', file))
+            files.forEach(file => fd.append('files', file))
 
-        let response = await api.post(`${TASK}`, fd, {headers: {'Content-Type': 'multipart/form-data'}})
+            let response = await api.post(`${TASK}`, fd, {headers: {'Content-Type': 'multipart/form-data'}})
 
-        if (activeEvent.value && response.status == 200) {
-            event.value.user = [...evtUsers.value]
-            response = await api.post(EVENT, event.value)
-        }
+            if (activeEvent.value && response.status == 200) {
+                event.value.user = [...evtUsers.value]
+                response = await api.post(EVENT, event.value)
+            }
 
-        if (response.status == 200){
-            successNotify('Задача поставлена')
-            emit('update-list')
-        }
+            if (response.status == 200){
+                successNotify('Задача поставлена')
+                emit('update-list')
+            }
     }
 
     else {
