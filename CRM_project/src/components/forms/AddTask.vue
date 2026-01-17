@@ -217,9 +217,6 @@ async function send() {
     if (receiversTab.value == 'concrete' ||
         task.value.type == D.APPLICATION ||
         (receiversTab.value == 'massive' && [...task.value.executors, ...task.value.reviewers, ...task.value.checkers].length == 1)) {
-            task.value.executors = [...task.value.executors.map(staff => (staff.id))]
-            task.value.reviewers = [...task.value.reviewers.map(staff => (staff.id))]
-            task.value.checkers = [...task.value.checkers.map(staff => (staff.id))]
 
             if (task.value.type == D.APPLICATION){
                 task.value.title = `${task.value.title} (${task.value.place})`
