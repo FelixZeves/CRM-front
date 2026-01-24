@@ -6,6 +6,7 @@ import Class from '@/components/forms/admin/Class.vue'
 import Collection from '@/components/forms/admin/Collection.vue'
 import api from '@/main'
 import { computed, ref } from 'vue'
+import { errorNotify } from '@/components/Notifies'
 
 const isSettings = ref(false)
 
@@ -17,6 +18,7 @@ const details = ref(null)
 const pagination = ref({rowsPerPage: 0})
 
 const eventsFile = ref([])
+const marksFile = ref([])
 
 const forms = {
     user: User,
@@ -70,6 +72,23 @@ async function save() {
 
 async function remove() {
     await formSubmit.value.remove()
+    status.value = 'read'
+    details.value = null
+}
+
+function checkEditStatus(){
+    return details.value
+}
+
+function checkDeleteStatus(){
+    if (!checkEditStatus()){
+        errorNotify('Не выбрана запись для редактирования')
+        return false
+    }
+    else if (status.value != 'edit'){
+        return false
+    }
+    return true
 }
 
 </script>
@@ -77,7 +96,7 @@ async function remove() {
 <template>
  <div class="w-[100vw] h-[100vh] flex flex-row p-5 pb-1 gap-10">
 
-    <div v-if="!isSettings" class="flex-grow max-w-[65%] pe-1 h-full overflow-y-auto">
+    <div class="flex-grow max-w-[65%] pe-1 h-full overflow-y-auto">
         <q-list bordered>
             <q-expansion-item
                 v-for="table in tables"
@@ -125,51 +144,6 @@ async function remove() {
         </q-list>
     </div>
 
-    <div v-else class="flex-grow max-w-[65%] pe-1 h-full overflow-y-auto">
-        <q-list>
-            <q-item>
-                <q-form>
-                    <q-item-label class="brand-description !font-semibold pb-2">Добавление информации об олимпиадах и мероприятиях</q-item-label>
-                    <div class="flex flex-row gap-x-2">
-                        <q-file
-                            v-model="eventsFile"
-                            label="Прикрепить файлы"
-                            outlined
-                            hide-bottom-space
-                            :rules="[
-                                        val => !!val || 'Обязательное поле',
-                                        val => {
-                                                    if (!val) return true
-                                                    const totalSize = val.reduce((sum, file) => sum + file.size, 0)
-                                                    const sizeInMB = totalSize / (1024 * 1024)
-                                                    return totalSize <= 30 * 1024 * 1024 || `Общий размер файлов не должен превышать 30MB. Размер ${sizeInMB.toFixed(2)}MB`
-                                                }
-                                    ]"
-                            accept=".pdf, .jpg, .png, .docx, .pptx, .xlsx, .txt, .zip"
-                            class="brand-description !flex-grow">
-                            <template v-slot:append>
-                                <q-icon name="attach_file" />
-                                <q-btn type="submit" class="brand-text" dense flat>
-                                    <q-icon name="fa-solid fa-download" size="24px" color="brand-velvet"/>
-                                    <q-tooltip
-                                        anchor="top right"
-                                        outline
-                                        self="bottom left"
-                                        :offset="[5, 5]"
-                                        class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[200px]"
-                                    >
-                                        Внести данные в базу данных
-                                    </q-tooltip>
-                                </q-btn>
-                            </template>
-                        </q-file>
-                        
-                    </div>
-                </q-form>
-            </q-item>
-        </q-list>
-    </div>
-
     <div class="w-[30%] h-full overflow-y-auto">
         <div class="flex flex-col m-2">
             <div class="flex flex-col gap-4 mb-5">
@@ -196,7 +170,7 @@ async function remove() {
                             icon="fa-solid fa-pen"
                             padding="10px"
                             size="sm"
-                            @click="status = (status != 'read') ? 'read' : 'edit'"
+                            @click="isSettings ? errorNotify('Вы находитесь в меню дополнительного функционала') : checkEditStatus() ? status = (status != 'read') ? 'read' : 'edit': errorNotify('Не выбрана запись для редактирования')"
                             :color="!isRead ? 'brand-velvet' : 'grey-4'"
                             :text-color="!isRead ? 'white' : 'blue-grey-8'"
                             :unelevated="!isRead ? true : false"
@@ -215,7 +189,7 @@ async function remove() {
                             icon="fa-solid fa-trash"
                             padding="10px"
                             size="sm"
-                            @click="remove(); status = 'read'"
+                            @click="checkDeleteStatus() ? remove() : errorNotify('Вы не в режиме редактирования записи')"
                             :color="status == 'delete' ? 'brand-velvet' : 'grey-4'"
                             :text-color="status == 'delete' ? 'white' : 'blue-grey-8'"
                             :unelevated="status == 'delete' ? true : false"
@@ -236,7 +210,7 @@ async function remove() {
                         icon="fa-solid fa-gear"
                         padding="10px"
                         size="sm"
-                        @click="isSettings = !isSettings"
+                        @click="status != 'read' ? errorNotify('Вы находитесь в режиме редактирования записи') : isSettings = !isSettings"
                         :color="isSettings ? 'brand-velvet' : 'grey-4'"
                         :text-color="isSettings ? 'white' : 'blue-grey-8'"
                         :unelevated="isSettings ? true : false"
@@ -266,13 +240,87 @@ async function remove() {
             </div>
 
             <q-card class="!min-h-[40vh] p-2">
-                <q-card-section class="brand-title"> {{ status === 'edit' ? 'Редактировать' : status === 'create' ? 'Создать' : 'Подробности' }} </q-card-section>
+                <q-card-section class="brand-title"> {{ isSettings ? 'Дополнительные возможности' : status === 'edit' ? 'Редактировать' : status === 'create' ? 'Создать' : 'Подробности' }} </q-card-section>
                 <q-separator inset />
-                <q-card-section class="flex flex-col justify-center">
+                <q-card-section v-if="!isSettings"  class="flex flex-col justify-center">
                     <q-form @submit="save(); status = 'read'">
                         <component ref="formSubmit" :is="forms[typeForm]" :model="details" :status="isRead" :mode="status" @update-list="tables.find(t => t.name.includes(typeForm)).get()"/>
                         <q-btn v-if="!isRead" type="submit" label="Сохранить" color="brand-velvet" class="mt-2"/>
                     </q-form>
+                </q-card-section>
+                <q-card-section v-else class="flex flex-col justify-center">
+                    <q-list class="flex flex-col gap-y-4">
+                        <q-item>
+                            <q-form class="w-full">
+                                <q-file
+                                    v-model="eventsFile"
+                                    label="Информация об олимпиадах и мероприятиях"
+                                    class="w-full brand-description"
+                                    outlined
+                                    hide-bottom-space
+                                    :rules="[
+                                                val => !!val || 'Обязательное поле',
+                                                val => {
+                                                            if (!val) return true
+                                                            const totalSize = val.reduce((sum, file) => sum + file.size, 0)
+                                                            const sizeInMB = totalSize / (1024 * 1024)
+                                                            return totalSize <= 30 * 1024 * 1024 || `Общий размер файлов не должен превышать 30MB. Размер ${sizeInMB.toFixed(2)}MB`
+                                                        }
+                                            ]"
+                                    accept=".xlsx, .xls">
+                                    <template v-slot:append>
+                                        <q-btn type="submit" class="brand-text" dense flat>
+                                            <q-icon name="fa-solid fa-download" size="24px" color="brand-velvet"/>
+                                            <q-tooltip
+                                                anchor="top right"
+                                                outline
+                                                self="bottom left"
+                                                :offset="[5, 5]"
+                                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[200px]"
+                                            >
+                                                Внести данные в базу данных
+                                            </q-tooltip>
+                                        </q-btn>
+                                    </template>
+                                </q-file>
+                            </q-form>
+                        </q-item>
+                        <q-item>
+                            <q-form class="w-full">
+                                <q-file
+                                    v-model="marksFile"
+                                    label="Средняя оценка классов"
+                                    class="w-full brand-description"
+                                    outlined
+                                    hide-bottom-space
+                                    :rules="[
+                                                val => !!val || 'Обязательное поле',
+                                                val => {
+                                                            if (!val) return true
+                                                            const totalSize = val.reduce((sum, file) => sum + file.size, 0)
+                                                            const sizeInMB = totalSize / (1024 * 1024)
+                                                            return totalSize <= 30 * 1024 * 1024 || `Общий размер файлов не должен превышать 30MB. Размер ${sizeInMB.toFixed(2)}MB`
+                                                        }
+                                            ]"
+                                    accept=".xlsx, .xls">
+                                    <template v-slot:append>
+                                        <q-btn type="submit" class="brand-text" dense flat>
+                                            <q-icon name="fa-solid fa-download" size="24px" color="brand-velvet"/>
+                                            <q-tooltip
+                                                anchor="top right"
+                                                outline
+                                                self="bottom left"
+                                                :offset="[5, 5]"
+                                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[200px]"
+                                            >
+                                                Внести данные в базу данных
+                                            </q-tooltip>
+                                        </q-btn>
+                                    </template>
+                                </q-file>
+                            </q-form>
+                        </q-item>
+                    </q-list>
                 </q-card-section>
             </q-card>
         </div>
