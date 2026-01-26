@@ -65,12 +65,13 @@ watch(visible, async (val) => {
             task.value.type = D.ORDER
             task.value.ref = props.body.id
             if(props.body.gid && props.body.owner == props.me.profile.id){
+                console.log(props)
                 task.value.type = D.MEMO
-                task.value.reviewers = [props.body.active[1].user.id]
-                task.value.ref = []
+                task.value.reviewers = [props.body.active[1].user]
                 lazyLoad()
             }
             else if(props.isMessage == true){
+                console.log(props)
                 task.value.type = D.MEMO
                 task.value.reviewers = props.body.reviewers
                 task.value.ref = null
@@ -84,12 +85,12 @@ watch(visible, async (val) => {
 watch(subsIntoCollection, (newVal) => {
     if (Array.isArray(newVal) && newVal.length > 0) {
         if (task.value.type === D.ORDER) {
-            task.value.executors = newVal.map(item => item.id)
+            task.value.executors = newVal
             task.value.reviewers = []
             task.value.checkers = []
         } else {
             task.value.executors = []
-            task.value.reviewers = newVal.map(item => item.id)
+            task.value.reviewers = newVal
             task.value.checkers = []
         }
     }
@@ -145,10 +146,23 @@ function clearForm() {
     }
 }
 
-function throwData(){
+function throwData () {
     evtUsers.value.clear()
-    if (eventForMe.value) evtUsers.value.add(props.me.id)
-    let tmp = [...task.value.executors, ...task.value.reviewers, ...task.value.checkers].forEach(id => evtUsers.value.add(id))
+
+    if (eventForMe.value) {
+        evtUsers.value.add(props.me.id)
+    }
+
+    const users = [
+        ...task.value.executors,
+        ...task.value.reviewers,
+        ...task.value.checkers
+    ]
+
+    users.forEach(user => {
+        if (user == null) return
+        evtUsers.value.add(typeof user === 'object' ? user.id : user)
+    })
 
     event.value.title = task.value.title
     event.value.description = task.value.description
@@ -221,6 +235,10 @@ async function send() {
             if (task.value.type == D.APPLICATION){
                 task.value.title = `${task.value.title} (${task.value.place})`
             }
+
+            task.value.executors = [...task.value.executors.map(staff => (staff.id))]
+            task.value.reviewers = [...task.value.reviewers.map(staff => (staff.id))]
+            task.value.checkers = [...task.value.checkers.map(staff => (staff.id))]
 
             const fd = new FormData()
 
@@ -468,7 +486,6 @@ async function send() {
                                     label="Уточнение выбора"
                                     class="w-full"
                                     outlined
-                                    emit-value
                                     map-options
                                     use-chips
                                     multiple
@@ -498,7 +515,6 @@ async function send() {
                                     label="Уточнение выбора"
                                     class="w-full"
                                     outlined
-                                    emit-value
                                     map-options
                                     use-chips
                                     multiple
@@ -507,7 +523,8 @@ async function send() {
                                     :option-value="'id'"
                                     v-model="task.reviewers"
                                 />
-
+                                
+                                
                             </div>
 
                             <q-select

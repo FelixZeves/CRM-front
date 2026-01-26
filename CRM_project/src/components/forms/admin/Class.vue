@@ -54,13 +54,41 @@ defineExpose({ send, remove })
 <template>
     <q-list>
         <q-item>
-            <q-input class="w-full brand-description" outlined label="Параллель" type="number" max="11" :readonly="status" v-model="localModel.parallel"/>
+            <q-input
+            class="w-full brand-description"
+            outlined label="Параллель"
+            type="number"
+            max="15"
+            :readonly="status"
+            v-model="localModel.parallel"
+            :rules="[
+                val => !!val || 'Обязательное поле'
+            ]"
+            hide-bottom-space
+            />
         </q-item>
         <q-item>
-            <q-input class="w-full brand-description" outlined label="Класс" :readonly="status" type="number" v-model="localModel.number"/>
+            <q-input
+            class="w-full brand-description"
+            outlined label="Класс"
+            :readonly="status"
+            type="number"
+            max="25"
+            v-model="localModel.number"
+            :rules="[
+                val => !!val || 'Обязательное поле'
+            ]"
+            hide-bottom-space
+            />
         </q-item>
         <q-item>
-            <q-input class="w-full brand-description" outlined label="Уклон" :readonly="status" v-model="localModel.spec"/>
+            <q-input
+            class="w-full brand-description"
+            outlined
+            label="Уклон"
+            :readonly="status"
+            v-model="localModel.spec"
+            />
         </q-item>
         <q-item>
             <q-select

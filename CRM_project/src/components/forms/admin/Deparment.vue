@@ -63,7 +63,17 @@ defineExpose({send, remove})
 <template>
     <q-list>
         <q-item>
-            <q-input class="w-full brand-description" outlined label="Название" :readonly="status" v-model="localModel.title"/>
+            <q-input
+                class="w-full brand-description"
+                outlined
+                label="Название"
+                :readonly="status"
+                v-model="localModel.title"
+                :rules="[
+                    val => !!val || 'Обязательное поле'
+                ]"
+                hide-bottom-space
+            />
         </q-item>
         <q-item>
             <q-select

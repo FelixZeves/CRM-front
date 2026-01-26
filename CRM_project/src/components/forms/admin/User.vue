@@ -15,7 +15,7 @@ const emit = defineEmits(['update-list'])
 
 const isPassReset = ref(false)
 const roleOptions = Object.entries(RoleEnum).map(([key, value]) => ({label: value.translation, value: Number(key)}))
-const buffOptions = ref([{title: 'Пусто', id: null}])
+const buffOptions = ref([])
 
 async function lazyLoad(url) {
     const data = (await api.get(url)).data.data
@@ -64,7 +64,15 @@ defineExpose({send, remove})
 <template>
     <q-list>
         <q-item>
-            <q-input class="w-full brand-description" outlined label="Email" :readonly="status" v-model="model.email"/>
+            <q-input
+            class="w-full brand-description"
+            outlined
+            label="Email"
+            :readonly="status"
+            v-model="model.email"
+            :rules="[val => !!val || 'Обязательное поле', val => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val) || 'Введите корректный email']"
+            hide-bottom-space
+            />
         </q-item>
         <q-item>
             <q-checkbox
@@ -105,7 +113,19 @@ defineExpose({send, remove})
         </q-item>
         <q-expansion-item class="w-full brand-title" label="Профиль">
             <q-item>
-                <q-input class="w-full brand-description" outlined label="Ф.И.О." :readonly="status" v-model="model.profile.fio"/>
+                <q-input
+                    class="w-full brand-description"
+                    outlined
+                    label="Ф.И.О."
+                    :readonly="status"
+                    v-model="model.profile.fio"
+                    :rules="[
+                        val => !!val || 'Обязательное поле',
+                        val => !val || val.length <= 50 || 'Максимальная длина 50 символов',
+                        val => !val || val.length>=2 || 'Минимальная длина 2 символа'
+                    ]"
+                    hide-bottom-space
+                />
             </q-item>
             <q-item>
                 <q-input
@@ -117,10 +137,22 @@ defineExpose({send, remove})
                     label="Телефон"
                     type="text"
                     class="w-full brand-description"
+                    :rules="[
+                        val => !!val || 'Обязательное поле'
+                    ]"
                 />
             </q-item>
             <q-item>
-                <q-input class="w-full brand-description" outlined label="Должность" :readonly="status" v-model="model.profile.post"/>
+                <q-input
+                class="w-full brand-description"
+                outlined
+                label="Должность"
+                :readonly="status"
+                v-model="model.profile.post"
+                :rules="[
+                    val => !!val || 'Обязательное поле'
+                ]"
+                hide-bottom-space/>
             </q-item>
             <q-item>
                 <q-select
