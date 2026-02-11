@@ -28,10 +28,6 @@ const api = axios.create({
   })
   
 export default api
-  
-export const dadata = axios.create({
-    baseURL: '/dadata', // только относительный путь!
-})
 
 const token = localStorage.getItem('jwtToken');
 if (token) {

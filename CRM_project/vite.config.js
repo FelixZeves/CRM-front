@@ -36,15 +36,6 @@ export default ({ mode }) => {
           target: 'http://localhost:5000', // Ваш Flask-сервер
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/dev/, ''), // Удаляет префикс "/dev"
-        },
-        '/dadata': {
-          target: 'https://suggestions.dadata.ru/suggestions/api/4_1/rs',
-          changeOrigin: true,
-          rewrite: path => path.replace(/^\/dadata/, '/suggest/address'),
-          headers: {
-            'Authorization': `Token ${env.VITE_DADATA_TOKEN}`,
-            'Content-Type': 'application/json'
-          }
         }
       },
     },
