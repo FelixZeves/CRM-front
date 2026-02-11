@@ -4,7 +4,7 @@ import { ref, computed } from 'vue'
 import AddTask from '@/components/forms/AddTask.vue'
 import NavigationColumn from '@/components/menus/NavigationColumn.vue'
 import { DocEnum as D} from '@/components/Enums.vue'
-import { getTableSchema, getToday } from '@/components/Utils'
+import { getTableSchema, getToday, formatPhone } from '@/components/Utils'
 
 const body = ref(SessionStorage.getItem('selectedCollection'))
 console.log(body.value)
@@ -29,49 +29,18 @@ const tmpBody = ref({
 const pagination = ref({rowsPerPage: 0})
 const schema = getTableSchema('teachers')
 
-const teachers = ref([
-    {id: 'b2cb1e2f-ffa6-4eb4-bd72-f8a4a4a2db8d', email: 't1@mail.ru', profile: { full_name: 'Исполнительный Сергей Витальевич', classes: ['1.2', '1.4', '4.6', '6.4'], phone: '89291238765' }}
-])
+const classFilter = ref('')
 
-const expandedTeachers = computed(() => {
-  // диапазон для текущей группы
-  const [min, max] = body.value.title.split('-').map(Number)
+function filterByClass(rows, terms) {
+    if (!terms) return rows
 
-  const result = []
+    const needle = terms.toLowerCase()
 
-  teachers.value.forEach(teacher => {
-    teacher.profile.classes.forEach(className => {
-      // выделяем номер параллели (первая часть до точки)
-      const classNumber = parseInt(className.split('.')[0])
+    return rows.filter(row => {
+        const classValue = `${row.parallel}.${row.number} ${row.spec || ''}`.toLowerCase()
 
-      // если этот класс входит в диапазон группы
-      if (classNumber >= min && classNumber <= max) {
-        // добавляем "развёрнутую" запись
-        result.push({
-          ...teacher,
-          class: className
-        })
-      }
+        return classValue.includes(needle)
     })
-  })
-
-  return result
-})
-
-function formatPhone(phone) {
-  if (!phone) return ''
-
-  // если мобильный (11 цифр, начинается с 7 или 8)
-  if (/^(7|8)\d{10}$/.test(phone)) {
-    return phone.replace(/(\d)(\d{3})(\d{3})(\d{2})(\d{2})/, '$1 ($2) $3-$4-$5')
-  }
-
-  // если домашний (например, 6 цифр)
-  if (/^\d{5}$/.test(phone)) {
-    return phone.replace(/(\d{1})(\d{2})(\d{2})/, '$1-$2-$3')
-  }
-
-  return phone // fallback
 }
 
 function mapTeacher(teacher) {
@@ -107,7 +76,30 @@ function mapTeacher(teacher) {
             :rows-per-page-options="[0]"
             separator="cell"
             hide-bottom
+            :filter="classFilter"
+            :filter-method="filterByClass"
             >
+
+            <template v-slot:top>
+                <div class="w-full flex flex-row items-center justify-end px-2 py-0">
+
+                    <q-input
+                    v-model="classFilter"
+                        label="Поиск класса"
+                        dense
+                        outlined
+                        clearable
+                        debounce="300"
+                        placeholder="1.5"
+                        class="brand-text !font-light"
+                    >
+                    <template #append>
+                        <q-icon name="search" />
+                    </template>
+                    </q-input>
+                </div>
+            </template>
+
             <template v-slot:header="props">
                 <q-tr :props="props">
                     <q-th

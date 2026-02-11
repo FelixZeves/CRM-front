@@ -122,7 +122,7 @@ const houseOptions =  Object.values(houseConditions)
                 <q-item-label class="flex flex-row gap-x-6 brand-text !font-light break-words whitespace-normal">
                     <div class="items-center">
                         <q-icon name="fa-solid fa-calendar-days" size="12px"/>
-                        {{ formatPhone(body.birthday) }}
+                        {{ body.birthday }}
                         <q-tooltip
                             anchor="top left"
                             outline
