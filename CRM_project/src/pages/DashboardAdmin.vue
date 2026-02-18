@@ -71,9 +71,11 @@ async function save() {
 }
 
 async function remove() {
-    await formSubmit.value.remove()
-    status.value = 'read'
-    details.value = null
+    let response = await formSubmit.value.remove()
+    if(response.status == 200){
+        status.value = 'read'
+        details.value = null
+    }
 }
 
 function checkEditStatus(){
