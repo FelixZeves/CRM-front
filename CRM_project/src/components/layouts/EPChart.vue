@@ -17,6 +17,8 @@ const series = computed(() => [
   
 ])
 
+const isEmpty = computed(() => !props.data?.length)
+
 const chartOptions = computed(() => ({
     chart: {
       id: 'performance-chart',
@@ -24,7 +26,13 @@ const chartOptions = computed(() => ({
         show: false
       }
     },
-    xaxis: { categories: props.data.map(c => c.className) },
+    grid: {
+      show: !isEmpty.value
+    },
+    xaxis: {
+      categories: props.data.map(c => c.className),
+      show: !isEmpty.value
+    },
     stroke: {
         width: 3,
         curve: 'smooth'
@@ -44,6 +52,16 @@ const chartOptions = computed(() => ({
         hover: {
           size: 12,
         }
+    },
+    noData: {
+      text: 'Отсутствует информация о классах',
+      align: 'center',
+      verticalAlign: 'middle',
+      style: {
+        color: 'text-stone-600',
+        fontSize: '1.25rem',
+        fontFamily: 'inherit'
+      }
     },
     fill: {
         type: "gradient",

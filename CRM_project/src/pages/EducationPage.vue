@@ -12,18 +12,29 @@ const classesSlide = ref(1)
 const classesTab = ref('user')
 const user = SessionStorage.getItem('user')
 
-const classes = ref([])
+const classes = ref({
+    my_classes: [],
+    junior_classes: [],
+    middle_classes: [],
+    hight_classes: []
+})
 const teachers = ref([])
+
 async function updateList() {
     const raw = await getClasses()
     classes.value = raw
-    for (let key in classes.value) classes.value[key] = classSlider(classes.value[key])
+    for (let key in classes.value) {
+        if (Array.isArray(classes.value[key])) {
+            classes.value[key] = classSlider(classes.value[key])
+        }
+    }
 
     teachers.value = [
         makeTeacherGroup('1-4', raw.junior_classes),
         makeTeacherGroup('5-9', raw.middle_classes),
         makeTeacherGroup('10-11', raw.hight_classes),
     ]
+
 }
 
 function classSlider(classes){
@@ -51,7 +62,7 @@ function makeTeacherGroup(title, groupedClasses) {
     }
 }
 
-const chartData = [
+let chartData = [
     { className: '5.1', avgScore: 4.2 },
     { className: '5.2', avgScore: 4.1 },
     { className: '5.3', avgScore: 3.9 },
@@ -75,7 +86,7 @@ onMounted(async () => {await updateList()})
         
         <main class="!flex !flex-col justify-between flex-grow 2xs:h-[85vh] 2xl:h-[80vh] w-full">
                 <div class="flex flex-col">
-                    <div class="brand-title ps-24">Списки классов</div>
+                    <div class="brand-title ps-24">{{user.role == RoleEnum_.LEADER ? 'Списки классов' : 'Список классов'}}</div>
                     <q-tabs
                     v-model="classesTab"
                     active-color="brand-velvet"
@@ -110,17 +121,20 @@ onMounted(async () => {await updateList()})
                                 padding
                                 class="bg-brand-grey"
                             >
-                                <q-carousel-slide
-                                    v-for="(group, idx) in classes.my_classes"
-                                    :name="idx + 1"
-                                    class="justify-between"
-                                >
-                                    <ClassCard
-                                        v-for="c in group"
-                                        type="class"
-                                        :body="c"
-                                    />
-                                </q-carousel-slide>
+                                <template v-if="classes?.my_classes?.length > 0">
+                                    <q-carousel-slide
+                                        v-for="(group, idx) in classes.my_classes"
+                                        :name="idx + 1"
+                                        class="justify-between"
+                                    >
+                                        <ClassCard
+                                            v-for="c in group"
+                                            type="class"
+                                            :body="c"
+                                        />
+                                    </q-carousel-slide>
+                                </template>
+                                <q-carousel-slide :name="1" class="brand-title justify-center content-center !items-center" v-else>Нет классов, где вы являетесь классным руководителем</q-carousel-slide>
                             </q-carousel>
                         </q-tab-panel>
 

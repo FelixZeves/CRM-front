@@ -208,7 +208,7 @@ function checkDeleteStatus(){
                         </q-btn>
                     </div>
 
-                    <q-btn
+                    <!-- <q-btn
                         icon="fa-solid fa-gear"
                         padding="10px"
                         size="sm"
@@ -226,7 +226,7 @@ function checkDeleteStatus(){
                         >
                             Настройки и дополнительные действия
                         </q-tooltip>
-                    </q-btn>
+                    </q-btn> -->
                 </div>
                 <span class="brand-title text-start">Описание</span>
                 <span v-if="typeForm && tables.find(t => t.name.includes(typeForm))" class="brand-description text-start whitespace-pre-line">
@@ -250,7 +250,7 @@ function checkDeleteStatus(){
                         <q-btn v-if="!isRead" type="submit" label="Сохранить" color="brand-velvet" class="mt-2"/>
                     </q-form>
                 </q-card-section>
-                <q-card-section v-else class="flex flex-col justify-center">
+                <!-- <q-card-section v-else class="flex flex-col justify-center">
                     <q-list class="flex flex-col gap-y-4">
                         <q-item>
                             <q-form class="w-full">
@@ -323,7 +323,7 @@ function checkDeleteStatus(){
                             </q-form>
                         </q-item>
                     </q-list>
-                </q-card-section>
+                </q-card-section> -->
             </q-card>
         </div>
     </div>

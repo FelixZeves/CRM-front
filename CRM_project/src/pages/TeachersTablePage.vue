@@ -7,7 +7,6 @@ import { DocEnum as D} from '@/components/Enums.vue'
 import { getTableSchema, getToday, formatPhone } from '@/components/Utils'
 
 const body = ref(SessionStorage.getItem('selectedCollection'))
-console.log(body.value)
 const user = SessionStorage.getItem('user')
 
 const visible = ref(false)

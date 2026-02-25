@@ -15,6 +15,12 @@ const emit = defineEmits(['update-list'])
 const localModel = ref(JSON.parse(JSON.stringify(props.model)))
 const buffOptions = ref([])
 
+async function lazyLoad(url, params) {
+    const data = (await api.get(url, params={params}))
+    console.log(data)
+    buffOptions.value = data.data
+}
+
 watch(() => props.model, (val) => {
   Object.assign(localModel.value, JSON.parse(JSON.stringify(val)))
 }, { deep: true })
@@ -26,10 +32,10 @@ async function send() {
         response = await api.post(CLASS, localModel.value)
 
     if (props.mode == 'edit') {
-        const { statistic, spec, leader, ...payload } = localModel.value
+        const { statistic, leader, cid, ...payload } = localModel.value
         payload.lid = leader?.id || null
 
-        response = await api.patch(CLASS, payload)
+        response = await api.put(CLASS+`/${cid}`, payload)
     }
 
     if (response?.status == 200) successNotify()
@@ -40,7 +46,7 @@ const leaderOptions = ref([props.model.leader])
 
 async function remove() {
     if (props.mode != 'read') confirmNotify(async () => {
-        let response = await api.delete(`${CLASS}/${localModel.value.id}`)
+        let response = await api.delete(`${CLASS}/${localModel.value.cid}`)
         if(response.status == 200){
             successNotify('Класс успешно удалён')
             emit('update-list')
@@ -59,6 +65,7 @@ defineExpose({ send, remove })
             outlined label="Параллель"
             type="number"
             max="15"
+            min="1"
             :readonly="status"
             v-model="localModel.parallel"
             :rules="[
@@ -74,6 +81,7 @@ defineExpose({ send, remove })
             :readonly="status"
             type="number"
             max="25"
+            min="1"
             v-model="localModel.number"
             :rules="[
                 val => !!val || 'Обязательное поле'
@@ -82,12 +90,20 @@ defineExpose({ send, remove })
             />
         </q-item>
         <q-item>
-            <q-input
-            class="w-full brand-description"
-            outlined
-            label="Уклон"
-            :readonly="status"
-            v-model="localModel.spec"
+            <q-select
+                label="Уклон"
+                class="w-full brand-description"
+                outlined
+                emit-value
+                clearable
+                map-options
+                :menu-anchor="'bottom left'"
+                :menu-self="'top left'"
+                :readonly="status"
+                :options="buffOptions"
+                v-model="localModel.spec"
+                popup-content-style="height: 300px;"
+                @focus="lazyLoad(CLASS+'/lists', params={v: 'class'})"
             />
         </q-item>
         <q-item>

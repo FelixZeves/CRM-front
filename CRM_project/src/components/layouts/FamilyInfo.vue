@@ -28,7 +28,7 @@ const FTC = ref([
         val: computed({
             get: () => localStudent.value?.count_childs,
             set: v => {
-                if (!localStudent.value.family_type.includes('Многодетная')) {
+                if (!localStudent.value?.family_type?.includes('Многодетная')) {
                     localStudent.value.count_childs = null
                     return
                 }
@@ -48,7 +48,7 @@ const FTC = ref([
         val: computed({
             get: () => localStudent.value?.parents?.[0]?.kinship ?? null,
             set: v => {
-                if (!localStudent.value.family_type.includes('Неполная')) {
+                if (!localStudent.value.family_type?.includes('Неполная')) {
                     if (localStudent.value.parents?.length) {
                     localStudent.value.parents[0].kinship = null
                     }
@@ -80,7 +80,7 @@ const FTC = ref([
                 return parents.find(p => p.curator) || null
             },
             set: selectedParent => {
-                if (!localStudent.value.family_type.includes('Дети под опекой')) {
+                if (!localStudent.value.family_type?.includes('Дети под опекой')) {
                     localStudent.value.parents?.forEach(p => p.curator = false)
                     return
                 }
@@ -106,7 +106,7 @@ const FTC = ref([
         val: computed({
             get: () => localStudent.value?.odn_date,
             set: v => {
-                if (!localStudent.value.family_type.includes('Состоит на учёте в ОДН')) {
+                if (!localStudent.value.family_type?.includes('Состоит на учёте в ОДН')) {
                     localStudent.value.odn_date = null
                     return
                 }
@@ -126,7 +126,7 @@ const FTC = ref([
         val: computed({
             get: () => localStudent.value?.sop_date,
             set: v => {
-                if (!localStudent.value.family_type.includes('Дети в состоянии социально опасного положения')) {
+                if (!localStudent.value.family_type?.includes('Дети в состоянии социально опасного положения')) {
                     localStudent.value.sop_date = null
                     return
                 }
@@ -147,7 +147,7 @@ const FTC = ref([
         val: computed({
             get: () => localStudent.value?.gr_reason ?? '',
             set: v => {
-                if (!localStudent.value.family_type.includes('Дети в группе риска')) {
+                if (!localStudent.value.family_type?.includes('Дети в группе риска')) {
                     localStudent.value.gr_reason = null
                     return
                 }
@@ -168,7 +168,7 @@ const FTC = ref([
         val: computed({
             get: () => localStudent.value?.count_family ?? '',
             set: v => {
-                if (!localStudent.value.family_type.includes('Дети из неблагополучной семьи')) {
+                if (!localStudent.value.family_type?.includes('Дети из неблагополучной семьи')) {
                     localStudent.value.count_family = null
                     return
                 }
@@ -185,7 +185,7 @@ const FTC = ref([
         val: computed({
             get: () => localStudent.value?.df_reason ?? '',
             set: v => {
-                if (!localStudent.value.family_type.includes('Дети из неблагополучной семьи')) {
+                if (!localStudent.value.family_type?.includes('Дети из неблагополучной семьи')) {
                     localStudent.value.df_reason = null
                     return
                 }
@@ -206,7 +206,7 @@ const FTC = ref([
         val: computed({
             get: () => localStudent.value?.count_family ?? '',
             set: v => {
-                if (!localStudent.value.family_type.includes('Дети в ТЖС')) {
+                if (!localStudent.value.family_type?.includes('Дети в ТЖС')) {
                     localStudent.value.count_family = null
                     return
                 }
@@ -223,7 +223,7 @@ const FTC = ref([
         val: computed({
             get: () => localStudent.value?.dls_reason ?? '',
             set: v => {
-                if (!localStudent.value.family_type.includes('Дети в ТЖС')) {
+                if (!localStudent.value.family_type?.includes('Дети в ТЖС')) {
                     localStudent.value.dls_reason = null
                     return
                 }
@@ -245,7 +245,7 @@ const visibleFamilyTypes = computed(() =>
 )
 
 watch(
-  () => localStudent.value.family_type.includes('Состоит на учёте в ОДН'),
+  () => localStudent.value.family_type?.includes('Состоит на учёте в ОДН'),
   (visible) => {
     if (visible) {
       const item = FTC.value.find(i => i.main_label === 'Состоит на учёте в ОДН')
@@ -263,7 +263,7 @@ watch(
 )
 
 watch(
-  () => localStudent.value.family_type.includes('Дети в состоянии социально опасного положения'),
+  () => localStudent.value.family_type?.includes('Дети в состоянии социально опасного положения'),
   (visible) => {
     if (visible) {
       const item = FTC.value.find(i => i.main_label === 'Дети в состоянии социально опасного положения')
@@ -325,7 +325,7 @@ watch(
             v-if="item.type === 'input' &&
                 !['Состоит на учёте в ОДН',
                     'Дети в состоянии социально опасного положения'].includes(item.main_label) &&
-                    localStudent.family_type.includes(item.main_label)"
+                    localStudent.family_type?.includes(item.main_label)"
             :style="style"
             hide-bottom-space
             dense
@@ -341,7 +341,7 @@ watch(
             <q-input
             v-else-if="['Состоит на учёте в ОДН',
                         'Дети в состоянии социально опасного положения'].includes(item.main_label) &&
-                        localStudent.family_type.includes(item.main_label)"
+                        localStudent.family_type?.includes(item.main_label)"
             :style="style"
             :label="item.sub_label"
             v-model="item.val"
@@ -374,7 +374,7 @@ watch(
             <!-- Select поля -->
             <q-select
             v-else-if="item.type === 'select' &&
-                        localStudent.family_type.includes(item.main_label)"
+                        localStudent.family_type?.includes(item.main_label)"
             :style="style"
             outlined
             hide-bottom-space

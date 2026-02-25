@@ -3,7 +3,7 @@ import { ref, watch, computed, nextTick } from 'vue'
 import api from '@/main'
 import { confirmNotify, errorNotify, successNotify } from '@/components/Notifies'
 import { familyStatuses, houseConditions } from '@/components/Enums.vue'
-import { getFormSchema, STUDENT, formatPhone } from '@/components/Utils'
+import { getFormSchema, STUDENT, formatPhone, validateMark, CLASS } from '@/components/Utils'
 import StudentParentForm from '../forms/StudentParentForm.vue'
 import TransitionSetup from './TransitionSetup.vue'
 import FamilyInfo from './FamilyInfo.vue'
@@ -19,8 +19,6 @@ watch(
     (v) => {
         // обновляем копию
         Object.assign(bodyCopy.value, JSON.parse(JSON.stringify(v)))
-
-        // read-часть продолжает смотреть на props.body, так что всё ок
     },
     { deep: true, immediate: true }
 )
@@ -41,33 +39,29 @@ const specAttention = computed({
     }
 })
 
-const studentForm = ref(null)
+const studentForm = ref()
 
 async function sendForm(){
     await nextTick()
-    const formValid = await studentForm.value.validate()
+    const formValid = true
     if (!formValid) {
         errorNotify('Не все поля заполнены')
         console.log(bodyCopy.value)
         return
     }
-    let student = bodyCopy.value
+    let student = JSON.parse(JSON.stringify(bodyCopy.value))
 
-    let form = {
-       ...student,
-       class_id: classInfo.value.id
-    }
-    form.phone = form.phone.replace(/\D/g, '')
-    form.parents = form.parents.map(p => ({
+    student.phone = student.phone.replace(/\D/g, '')
+    student.parents = student.parents.map(p => ({
         ...p,
         phone: p.phone.replace(/\D/g, '')
     }));
 
-    if(form.id){
-        return await api.patch(STUDENT, form)
+    if(student.sid){
+        return await api.put(CLASS+`/${classInfo.value.cid}`+STUDENT+`/${student.sid}`, student)
     }
 
-    return await api.post(STUDENT, form)
+    return await api.post(CLASS+`/${classInfo.value.cid}`+STUDENT, student)
 }
 
 defineExpose({
@@ -90,12 +84,6 @@ const addParent = async () => {
 const removeInput = (index) => {
     confirmNotify(() => {bodyCopy.value.parents.splice(index, 1)})
 }
-
-const lists = [
-    {value: 'schoolEvents', label: 'Школьные конкурсы'},
-    {value: 'achievementsRus', label: 'Всероссийские конкурсы'},
-    {value: 'achievementsInter', label: 'Международные конкурсы'}
-]
 
 const statusesOptions = Object.values(familyStatuses)
 const houseOptions =  Object.values(houseConditions)
@@ -302,26 +290,24 @@ const houseOptions =  Object.values(houseConditions)
             </q-item-section>
         </q-item>
         <q-item class="max-w-[30%] flex flex-col gap-y-2">
-            <q-item-section>
-                <q-item-label class="brand-text font-medium"> Олимпиады и мероприятия</q-item-label>
-                <q-list dense>
-                    <q-expansion-item
-                    v-for="(list, index) in lists"
-                    expand-separator
-                    dense
-                    :content-inset-level="1"
-                    switch-toggle-side
-                    header-class="font-semibold"
-                    :label="lists[index].label"
-                    group="achivements"
-                    >
-                        <q-list class="!flex !flex-col !gap-y-2">
-                            <q-item dense v-for="val in body[lists[index].value]">
-                                <q-item-section class="w-[300px] !font-light break-words whitespace-normal">- {{ val }}</q-item-section>
-                            </q-item>
-                        </q-list>
-                    </q-expansion-item>
-                </q-list>
+            <q-item-section class="gap-y-2">
+                <q-item-label class="brand-text font-medium"> Успеваемость и активность</q-item-label>
+                <q-item-label class="!px-0">
+                    Средняя оценка: {{ body.average_mark || 0}}
+                </q-item-label>
+                <q-expansion-item
+                expand-separator
+                dense
+                :content-inset-level="1"
+                header-class="!px-0 !flex !flex-row !justify-start"
+                :label="`Олимпиады и мероприятия (${body?.olimpics?.total || 0} баллов)`"
+                >
+                    <q-list class="!flex !flex-col !gap-y-2">
+                        <q-item dense v-for="val in body.olimpics">
+                            <q-item-section class="w-[300px] !font-light break-words whitespace-normal !px-0">- {{ val }}</q-item-section>
+                        </q-item>
+                    </q-list>
+                </q-expansion-item>
             </q-item-section>
             <q-item-section class="!m-0">
                 <q-item-label class="brand-text font-medium">Дополнительная информация</q-item-label>
@@ -601,31 +587,37 @@ const houseOptions =  Object.values(houseConditions)
             </q-item>
 
             <q-item class="flex flex-col gap-y-2">
-                <q-item-section>
-                    <q-item-label class="brand-text">Олимпиады и мероприятия</q-item-label>
-                    <q-list dense>
-                        <q-expansion-item
-                        v-for="(list, index) in lists"
+                <q-item-section class="gap-y-2">
+                    <q-item-label class="brand-text">Успеваемость и активность</q-item-label>
+                    <q-input
+                        hide-bottom-space
+                        v-model="bodyCopy.average_mark"
                         dense
-                        switch-toggle-side
-                        header-class="font-semibold"
-                        :label="lists[index].label"
-                        group="achivements"
-                        >
-                            <q-select
-                                emit-value
-                                map-options
-                                outlined
-                                use-chips
-                                multiple
-                                :options="buffOptions"
-                                :option-label="'title'"
-                                :option-value="'id'"
-                                v-model="bodyCopy[lists[index].value]"
-                                class="w-[300px]"
-                            />
-                        </q-expansion-item>
-                    </q-list>
+                        outlined
+                        type="text"
+                        class="brand-text !font-light w-[300px] break-words whitespace-normal"
+                        label="Средняя оценка"
+                        :rules="[validateMark]"
+                    />
+                    <q-expansion-item
+                    dense
+                    switch-toggle-side
+                    header-class="font-semibold"
+                    label="Олимпиады и мероприятия"
+                    default-opened
+                    >
+                        <q-select
+                            emit-value
+                            map-options
+                            outlined
+                            use-chips
+                            multiple
+                            :option-label="'title'"
+                            :option-value="'id'"
+                            v-model="bodyCopy.olimpics"
+                            class="w-[300px]"
+                        />
+                    </q-expansion-item>
                 </q-item-section>
                 <q-item-section class="!ms-0">
                     <q-item-label class="brand-text pb-2">Дополнительная информация</q-item-label>

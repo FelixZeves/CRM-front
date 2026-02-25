@@ -3,9 +3,10 @@ import { ref, watch, nextTick, onMounted } from 'vue'
 import api from '@/main'
 import NavigationColumn from '@/components/menus/NavigationColumn.vue';
 import { LocalStorage, SessionStorage, uid } from 'quasar';
-import { CLASS, downloadFile, getFormSchema, getStudents, getTableSchema, STUDENT } from '@/components/Utils';
+import { CLASS, downloadFile, getFormSchema, getTableSchema, formatPhone, STUDENT, triggerDownload } from '@/components/Utils';
 import TES from '@/components/layouts/TES.vue';
 import { confirmNotify, errorNotify, successNotify } from '@/components/Notifies';
+import EPPDialog from '@/components/forms/EPPDialog.vue';
 
 const body = ref(SessionStorage.getItem('selectedClass'))
 const user = ref(SessionStorage.getItem('user'))
@@ -15,7 +16,27 @@ const pagination = ref({rowsPerPage: 0})
 const selected = ref([])
 const editIndex = ref(null)
 const fileRef = ref(null)
-const studentsFile = ref(null)
+const currentUploadType = ref(null)
+
+const uploadMap = {
+  students: {
+    url: `${CLASS}/${body.value.cid}/upload`,
+    method: 'post',
+    success: 'Ученики успешно импортированы'
+  },
+  performance: {
+    url: `${CLASS}/${body.value.cid}/upload-performance`,
+    method: 'put',
+    success: 'Успеваемость успешно загружена'
+  },
+  achievements: {
+    url: `${CLASS}/${body.value.cid}/upload-achievements`,
+    method: 'put',
+    success: 'Достижения успешно загружены'
+  }
+}
+
+const showPerformanceDialog = ref(false)
 
 const availableCols = ref(
     schema.columns.map(({ name, label }) => ({
@@ -24,34 +45,47 @@ const availableCols = ref(
     }))
 )
 
+function pickFile(type){
+    currentUploadType.value = type
+    fileRef.value.pickFiles()
+}
+
+async function handleUpload(file) {
+    if (!file || !currentUploadType.value) return
+
+    const config = uploadMap[currentUploadType.value]
+    if (!config) return
+
+    const formData = new FormData()
+    formData.append('body', file)
+
+    try {
+        const response = await api[config.method](config.url, formData)
+
+        if (response.status === 200) {
+            successNotify(config.success)
+            await updateList()
+        }
+
+    } catch (e) {
+        errorNotify('Ошибка при загрузке файла')
+    } finally {
+        currentUploadType.value = null
+    }
+}
+
 const savedCols = LocalStorage.getItem('visibleCols')
 
 const visibleCols = ref(
-  savedCols ? JSON.parse(savedCols) : ['fio', 'phone', 'health', 'specAttention']
+    savedCols ? JSON.parse(savedCols) : ['fio', 'phone', 'health',  'specAttention', 'citizenship', 'avgMark']
 )
 
 const students = ref([])
 
-function formatPhone(phone) {
-  if (!phone) return ''
-
-  // если мобильный (11 цифр, начинается с 7 или 8)
-  if (/^(7|8)\d{10}$/.test(phone)) {
-    return phone.replace(/(\d)(\d{3})(\d{3})(\d{2})(\d{2})/, '$1 ($2) $3-$4-$5')
-  }
-
-  // если домашний (например, 6 цифр)
-  if (/^\d{5}$/.test(phone)) {
-    return phone.replace(/(\d{1})(\d{2})(\d{2})/, '$1-$2-$3')
-  }
-
-  return phone // fallback
-}
-
-const rowKey = (row) => row.id ?? row._tempId
+const rowKey = (row) => row.sid ?? row._tempId
 
 function addStudent(){
-    const hasUnsaved = students.value.some(s => s.id === null)
+    const hasUnsaved = students.value.some(s => s.sid === null)
 
     if(hasUnsaved){
         errorNotify('Сначала завершите заполнение текущего нового ученика')
@@ -93,43 +127,12 @@ async function deleteStudent(props){
 
         if (props.expand) props.expand = false
 
-        let response = await api.delete(`${STUDENT}/${props.row.id}`)
+        let response = await api.delete(`${CLASS}/${body.value.cid}/${STUDENT}/${props.row.sid}`)
         if(response.status == 200){
             successNotify('Ученик успешно удалён')
             updateList()
         }
     })
-}
-
-function pickStudentsFile () {
-    fileRef.value.pickFiles()
-}
-
-async function uploadStudentsFile (file) {
-    if (!file) return
-
-    const formData = new FormData()
-    formData.append('body', file)
-    formData.append('class_id', body.value.id)
-
-    try {
-        const response = await api.post(
-        `${CLASS}/upload`,
-        formData,
-        {
-            headers: {
-            'Content-Type': 'multipart/form-data'
-            }
-        }
-        )
-        if(response.status == 200){
-            successNotify('Ученики успешно импортированы')
-            updateList()
-        }
-    } catch (e) {
-    } finally {
-        studentsFile.value = null
-    }
 }
 
 watch(
@@ -141,7 +144,21 @@ watch(
 )
 
 async function updateList() {
-    students.value = (await api.get(`${CLASS}/${body.value.id}`)).data.data.students
+    students.value = (await api.get(`${CLASS}/${body.value.cid}`)).data.data.students
+}
+
+async function downloadSocialPassport() {
+    try {
+        const response = await api.get(
+            `${CLASS}/${body.value.cid}/download`,
+            {
+                responseType: 'blob'
+            }
+        )
+        triggerDownload(response, 'Соц. паспорт.docx')
+    } catch (e) {
+        errorNotify('Ошибка при формировании социального паспорта')
+    }
 }
 
 const studentForms = ref({})
@@ -149,7 +166,7 @@ const studentForms = ref({})
 async function onSubmit(props) {
     await nextTick()
 
-    const form = studentForms.value[props.row.id]
+    const form = studentForms.value[rowKey(props.row)]
 
     if (!form) return errorNotify('Форма ещё не готова')
 
@@ -215,62 +232,82 @@ onMounted(async () => {await updateList()})
                             </q-toggle>
                         </div>
                     </q-btn-dropdown>
-                    <div class="flex flex-row">
-                        <q-btn
-                        flat
-                        dense
-                        icon="fa-regular fa-paste"
-                        color="brand-velvet"
-                        @click="downloadFile(CLASS, body.id)">
-                            <q-tooltip
-                            anchor="top left"
-                            outline
-                            self="bottom left"
-                            :offset="[0, 5]"
-                            class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                    <div class="flex flex-row items-center gap-x-2">
+
+                        <q-btn size="sm" flat color="brand-velvet" icon="fa-solid fa-file-download !text-base pe-1" label="Генерация файлов">
+                            <q-menu
+                                auto-close
+                                :offset="[0, 5]"
+                                class="text-brand-velvet"
                             >
-                                Скачать социальный паспорт
-                            </q-tooltip>
+                                <q-list>
+                                    <q-item clickable @click="downloadSocialPassport">
+                                        <q-item-section>Скачать социальный паспорт</q-item-section>
+                                    </q-item>
+
+                                    <q-item clickable @click="showPerformanceDialog = true">
+                                        <q-item-section>Скачать таблицу успеваемости</q-item-section>
+                                    </q-item>
+                                </q-list>
+                            </q-menu>
                         </q-btn>
+
                         <q-separator vertical size="2px" class="!mx-2" color="grey-4"/>
+
+                        <q-btn
+                            flat
+                            color="brand-velvet"
+                            icon="fa-solid fa-chart-line !text-base pe-1"
+                            label="Успеваемость и достижения"
+                        >
+                            <q-menu auto-close :offset="[0, 5]" class="text-brand-velvet">
+                                <q-list>
+                                    <q-item clickable @click="pickFile('performance')">
+                                        <q-item-section>Добавить успеваемость класса</q-item-section>
+                                    </q-item>
+
+                                    <q-item clickable @click="pickFile('achievements')">
+                                        <q-item-section>Добавить достижения класса</q-item-section>
+                                    </q-item>
+                                </q-list>
+                            </q-menu>
+                        </q-btn>
+                                                
+                        <q-separator vertical size="2px" class="!mx-2" color="grey-4"/>
+
                         <q-btn
                             dense
                             flat
                             color="brand-velvet"
                             icon="fa-regular fa-file-excel"
-                            @click="pickStudentsFile"
+                            @click="pickFile('students')"
                         >
                             <q-tooltip
                                 anchor="top left"
-                                outline
-                                self="bottom right"
+                                outline self="bottom right"
                                 :offset="[-5, 5]"
-                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[200px]"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
                             >
-                                Выгрузить учеников из файла (.xlsx)
+                                Добавить учеников из файла (.xlsx)
                             </q-tooltip>
                         </q-btn>
+
                         <q-file
                             ref="fileRef"
-                            v-model="studentsFile"
                             accept=".xlsx"
                             class="hidden"
-                            @update:model-value="uploadStudentsFile"
+                            @update:model-value="handleUpload"
                         />
+
                         <q-btn
                             dense
-                            class="brand-description"
-                            flat color="brand-velvet"
+                            flat
+                            color="brand-velvet"
                             icon="add"
                             @click="addStudent"
                         >
-                            <q-tooltip
-                                anchor="top left"
-                                outline
-                                self="bottom right"
-                                :offset="[-5, 5]"
-                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
-                                >
+                            <q-tooltip anchor="top left" outline self="bottom right" :offset="[-5, 5]"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]">
                                 Добавить ученика
                             </q-tooltip>
                         </q-btn>
@@ -379,6 +416,30 @@ onMounted(async () => {await updateList()})
                             </q-icon>
                         </template>
 
+                        <template v-else-if="col.name === 'avgMark'">
+                            <q-icon name="fa-solid fa-star-half-alt" size="sm">
+                                <q-tooltip
+                                anchor="top middle"
+                                self="bottom middle"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                >
+                                {{ col.label }}
+                                </q-tooltip>
+                            </q-icon>
+                        </template>
+
+                        <template v-else-if="col.name === 'olimpics'">
+                            <q-icon name="fa-solid fa-trophy" size="sm">
+                                <q-tooltip
+                                anchor="top middle"
+                                self="bottom middle"
+                                class="!text-sm text-center bg-brand-velvet !text-white shadow-xl !max-w-[250px]"
+                                >
+                                {{ col.label }}
+                                </q-tooltip>
+                            </q-icon>
+                        </template>
+
                         <template v-else>
                             {{ col.label }}
                         </template>
@@ -422,8 +483,8 @@ onMounted(async () => {await updateList()})
                     <q-td v-else-if="col.name === 'mainPhone'">
                         {{ formatPhone(col.value) }}
                     </q-td>
-                    <span v-else-if="!['parents', 'family_type', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)" class=" break-words whitespace-normal">{{ col.value }}</span>
-                    <div class="flex flex-col" v-if="['parents', 'family_type', 'achievementsRus', 'achievementsInter', 'schoolEvents'].includes(col.name)">
+                    <span v-else-if="!['parents', 'family_type', 'olimpics'].includes(col.name)" class=" break-words whitespace-normal">{{ col.value }}</span>
+                    <div class="flex flex-col" v-if="['parents', 'family_type', 'olimpics'].includes(col.name)">
                         <q-chip v-if="col.name == 'parents'" v-for="elem in col.value">
                             {{ elem.fio }}
                         </q-chip>
@@ -467,7 +528,7 @@ onMounted(async () => {await updateList()})
                                     Сбросить изменения
                                 </q-tooltip>
                             </q-btn>
-                            <q-btn v-if="props.row.id != null" flat text-color="brand-danger" @click="deleteStudent(props)" icon="delete" dense>
+                            <q-btn v-if="props.row.sid != null" flat text-color="brand-danger" @click="deleteStudent(props)" icon="delete" dense>
                                 <q-tooltip
                                     anchor="top left"
                                     outline
@@ -478,7 +539,7 @@ onMounted(async () => {await updateList()})
                                     Удалить ученика
                                 </q-tooltip>
                             </q-btn>
-                            <q-btn v-if="props.row.id === null" flat text-color="brand-danger" @click="removeStudent(props.rowIndex)" icon="delete" dense>
+                            <q-btn v-if="props.row.sid === null" flat text-color="brand-danger" @click="removeStudent(props.rowIndex)" icon="delete" dense>
                                 <q-tooltip
                                     anchor="top left"
                                     outline
@@ -504,7 +565,7 @@ onMounted(async () => {await updateList()})
                         leave-to-class="opacity-0 -translate-y-4"
                         >
                             <div v-show="props.expand" class="overflow-hidden">
-                                <TES :ref="el => studentForms[props.row.id] = el" :key="props.row.id" :body="props.row" :edit="editIndex === props.rowIndex" />
+                                <TES :ref="el => studentForms[rowKey(props.row)] = el" :key="rowKey(props.row)" :body="props.row" :edit="editIndex === props.rowIndex" />
                             </div>
                         </transition>
                     </q-td>
@@ -515,7 +576,7 @@ onMounted(async () => {await updateList()})
                     <span v-if="selected.length > 0">
                         Выбрано записей: {{ selected.length }}
                     </span>
-                    <div class="flex flex-row justify-evenly">
+                    <!-- <div class="flex flex-row justify-evenly">
                         <q-btn v-if="selected.length > 0" flat dense icon="fa-solid fa-file-export" color="brand-velvet">
                             <q-tooltip
                             anchor="top left"
@@ -538,10 +599,14 @@ onMounted(async () => {await updateList()})
                                 Удалить выбранные записи
                             </q-tooltip>
                         </q-btn>
-                    </div>
+                    </div> -->
                 </div>
             </template>
             </q-table>
         </main>
     </div>
+    <EPPDialog
+        v-model="showPerformanceDialog"
+        :class-id="body.cid"
+    />
 </template>

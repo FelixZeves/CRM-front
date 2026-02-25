@@ -9,7 +9,7 @@ export const COLLECTION = `/collection`
 export const FILE = `/document`
 export const CLASS = `/class`
 export const LESSON = `/lesson`
-export const STUDENT = `/student`
+export const STUDENT = `/students`
 
 export async function getMe(){
     const response = await api.get(`${USER}/me`)
@@ -80,25 +80,6 @@ export async function getClasses(){
     }
 }
 
-export async function getStudents(limit = null, params = {}){
-    try{
-        let query = { ...params}
-        if (limit != null){
-            query.limit = limit
-        }
-        let students = []
-        if (params.id)
-            students = [(await api.get(`${STUDENT}/${params.id}`)).data.data]
-        else
-            students = (await api.get(`${STUDENT}`)).data.data
-    
-        return students
-    } catch (error) {
-        console.error('Ошибка получения учеников:', error)
-        return []
-    }
-}
-
 export async function getEvents(limit = null, params = {}){
     try{
         let response
@@ -143,13 +124,14 @@ export function formatPhone(phone) {
     }
   
     return phone // fallback
-  }
+}
 
-export async function downloadFile(url, id){
-    const response = await api.get(`${url}/download/${id}`, {responseType: 'blob'});
+export function triggerDownload(response, fallbackName = 'file.bin') {
     const disposition = response.headers['content-disposition'] || '';
     const fileNameMatch = disposition.match(/filename="?([^"]+)"?/);
-    const fileName = fileNameMatch ? decodeURIComponent(fileNameMatch[1]) : 'file.bin';
+    const fileName = fileNameMatch
+        ? decodeURIComponent(fileNameMatch[1])
+        : fallbackName;
 
     const tmpUrl = window.URL.createObjectURL(response.data);
     const link = document.createElement('a');
@@ -161,6 +143,15 @@ export async function downloadFile(url, id){
     window.URL.revokeObjectURL(tmpUrl);
 }
 
+export async function downloadFile(url, id) {
+    const response = await api.get(
+        `${url}/download/${id}`,
+        { responseType: 'blob' }
+    )
+
+    triggerDownload(response)
+}
+
 
 export async function suggestAddress(query) {
     if (!query || query.length < 3) return []
@@ -168,6 +159,20 @@ export async function suggestAddress(query) {
     const data = await api.get(`${CLASS}/address?v=${query}`)
 
     return data.data.suggestions || []
+}
+
+export function validateMark(val){
+    if (val.endsWith('.')) return 'Некорректный ввод: число не может заканчиваться точкой'
+
+    if (!/^\d+(\.\d+)?$/.test(val))
+      return 'Введите корректное число'
+
+    const num = Number(val)
+
+    if (num > 5)
+        return 'Оценка не может быть больше 5'
+
+    return true
 }
 
 export function getFormSchema(name) {
@@ -233,7 +238,7 @@ export function getFormSchema(name) {
             status: '',
         },
         student: {
-            id: null,
+            sid: null,
             fio: '',
             birthday: '',
             country_reg: false,
@@ -246,9 +251,8 @@ export function getFormSchema(name) {
             phone: '',
             home_education: false,
             health: 1,
-            achievementsRus: [],
-            achievementsInter: [],
-            schoolEvents: [],
+            average_mark: null,
+            olimpics: [],
             sp_doctor: null,
             sp_disease: null,
             count_family: null,
@@ -471,9 +475,8 @@ export function getTableSchema(name) {
                 { name: 'parents', label: 'Родители', field: row => row.parents, align: 'left', sortable: true },
                 { name: 'family_type', label: 'Категории семьи', field: row => row.family_type, align: 'left', sortable: true},
                 { name: 'veterans', label: 'Родители - участники боевых действий', field: row => row.parents?.some(p => p.status) ? '✔' : '✖', align: 'center', sortable: true},
-                { name: 'schoolEvents', label: 'Школьные конкурсы', field: row => row.schoolEvents, align: 'left', sortable: true },
-                { name: 'achievementsRus', label: 'Всероссийские конкурсы', field: row => row.achievementsRus, align: 'left', sortable: true },
-                { name: 'achievementsInter', label: 'Международные конкурсы', field: row => row.achievementsInter, align: 'left', sortable: true },
+                { name: 'avgMark', label: 'Средняя оценка', field: row=> row.average_mark, align: 'center', sortable: true},
+                { name: 'olimpics', label: 'Олимпиады и мероприятия', field: row => row.olimpics, align: 'left', sortable: true },
             ]
         },
         teachers: {
